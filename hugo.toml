@@ -1,0 +1,27 @@
+baseURL = "https://jellyfishjellyman.github.io/"
+languageCode = "zh-cn"
+title = "Jellyfish的博客"
+theme = "ananke"
+
+[params]
+  site_logo = "images/avatar.jpg"
+  description = "记录学习、技术和生活"
+
+  [params.social]
+    twitter = ""
+
+[menu]
+  [[menu.main]]
+    name = "首页"
+    url = "/"
+    weight = 1
+
+  [[menu.main]]
+    name = "文章"
+    url = "/posts/"
+    weight = 2
+
+  [[menu.main]]
+    name = "关于"
+    url = "/about/"
+    weight = 3
