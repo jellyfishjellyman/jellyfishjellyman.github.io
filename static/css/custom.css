@@ -1,0 +1,41 @@
+/* 全站平滑滚动 */
+html { scroll-behavior: smooth; }
+
+/* 回到顶部按钮 */
+#backToTop {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.15);
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,0,0,.12);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 9999;
+}
+
+#backToTop.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#backToTop:hover {
+  transform: translateY(-2px);
+}
+
+/* 小优化：链接 hover 更柔和一些 */
+a { transition: opacity .15s ease, transform .15s ease; }
+a:hover { opacity: .9; }
+
+/* 可选：鼠标造型（先给你“轻量版”，不需要自定义图片） */
+a, button { cursor: pointer; }
