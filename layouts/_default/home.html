@@ -1,0 +1,44 @@
+{{ define "main" }}
+
+<!-- 全屏开场 -->
+<section id="hero" class="hero">
+  <div class="hero-overlay"></div>
+
+  <div class="hero-inner">
+    <h1 class="hero-title hero-animate">欢迎来到我的博客</h1>
+    <p class="hero-sub hero-animate delay-1">
+      {{ .Site.Title }} · {{ .Site.Params.description }}
+    </p>
+
+    <div class="hero-hint hero-animate delay-2" role="button" tabindex="0">
+      只需要滚动一下 ↓
+    </div>
+  </div>
+</section>
+
+<!-- 文章区 -->
+<section id="homeContent" class="home-wrap pt5">
+  <div class="home-grid">
+    {{ range first 10 (where .Site.RegularPages "Section" "posts") }}
+      <article class="post-card">
+        <h2 class="f3">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </h2>
+
+        <div class="post-meta">
+          {{ .Date.Format "2006-01-02" }}{{ with .ReadingTime }} · {{ . }} 分钟阅读{{ end }}
+        </div>
+
+        <div class="post-summary">
+          {{ .Summary | plainify | truncate 120 }}
+        </div>
+      </article>
+    {{ end }}
+  </div>
+
+  <div class="tc mt4">
+    <a class="link dim" href="/posts/">查看更多文章 →</a>
+  </div>
+</section>
+
+{{ end }}
