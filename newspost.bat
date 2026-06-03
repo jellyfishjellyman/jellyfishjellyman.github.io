@@ -5,9 +5,9 @@ chcp 65001 >nul
 cd /d "%~dp0"
 
 echo === Hugo 一键新建文章 ===
-set /p TITLE=请输入文章标题（可中文）： 
+set /p TITLE=请输入文章标题（可中文）：
 
-set /p SLUG=请输入文章路径slug（建议英文/拼音，用-分隔；直接回车自动生成）：
+set /p SLUG=请输入文章路径 slug（建议英文或拼音，用 - 分隔；直接回车自动生成）：
 if "%SLUG%"=="" (
   for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set SLUG=post-%%i
 )
