@@ -1,0 +1,22 @@
+{{ define "main" }}
+<section class="module-page">
+  <div class="module-intro reveal-on-scroll">
+    <p class="eyebrow">Games</p>
+    <h1>{{ .Title }}</h1>
+    <div class="module-copy">{{ .Content }}</div>
+  </div>
+
+  <div class="game-grid">
+    {{ range site.Data.games }}
+      <article class="game-card reveal-on-scroll">
+        <div>
+          <span class="game-status">{{ .status }}</span>
+          <h2>{{ .name }}</h2>
+          <p>{{ .description }}</p>
+        </div>
+        <button class="ghost-button" type="button" disabled>准备中</button>
+      </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

@@ -1,0 +1,20 @@
+<nav class="site-nav" role="navigation" aria-label="主导航">
+  <a class="site-brand" href="{{ .Site.Home.RelPermalink }}" aria-label="{{ .Site.Title }}">
+    {{ with .Site.Params.site_logo }}
+      <img src="{{ relURL . }}" alt="" />
+    {{ end }}
+    <span>{{ .Site.Title }}</span>
+  </a>
+
+  {{ if .Site.Menus.main }}
+    <ul class="site-menu">
+      {{ $current := .RelPermalink }}
+      {{ range .Site.Menus.main }}
+        {{ $active := or (eq .URL $current) (and (ne .URL "/") (hasPrefix $current .URL)) }}
+        <li>
+          <a class="{{ if $active }}is-active{{ end }}" href="{{ .URL }}">{{ .Name }}</a>
+        </li>
+      {{ end }}
+    </ul>
+  {{ end }}
+</nav>

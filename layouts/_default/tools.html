@@ -1,0 +1,34 @@
+{{ define "main" }}
+<section class="module-page">
+  <div class="module-intro reveal-on-scroll">
+    <p class="eyebrow">Tools</p>
+    <h1>{{ .Title }}</h1>
+    <div class="module-copy">{{ .Content }}</div>
+  </div>
+
+  <div class="module-grid">
+    {{ range site.Data.tools }}
+      <article class="module-card reveal-on-scroll">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">{{ substr .title 0 1 }}</span>
+          <div>
+            <h2>{{ .title }}</h2>
+            <p>{{ .description }}</p>
+          </div>
+        </div>
+        <div class="link-list">
+          {{ range .items }}
+            <a class="link-item" href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
+              <span>
+                <strong>{{ .name }}</strong>
+                <em>{{ .note }}</em>
+              </span>
+              <small>{{ .status }}</small>
+            </a>
+          {{ end }}
+        </div>
+      </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

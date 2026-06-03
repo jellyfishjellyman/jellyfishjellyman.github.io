@@ -1,0 +1,12 @@
+<header class="site-header">
+  {{ partial "site-navigation.html" . }}
+  {{ if not .IsHome }}
+    <section class="page-hero">
+      <p class="eyebrow">{{ .Section | default "Jellyfish" }}</p>
+      <h1>{{ .Title | default .Site.Title }}</h1>
+      {{ with .Description }}
+        <p>{{ . }}</p>
+      {{ end }}
+    </section>
+  {{ end }}
+</header>

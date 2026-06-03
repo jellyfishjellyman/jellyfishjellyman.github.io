@@ -13,11 +13,44 @@
     <div class="hero-hint hero-animate delay-2" role="button" tabindex="0">
       只需要滚动一下 ↓
     </div>
+
+    <div class="hero-actions hero-animate delay-3">
+      <a class="primary-button" href="/posts/">读文章</a>
+      <a class="ghost-button" href="/links/">逛资源</a>
+      <a class="ghost-button" href="/games/">玩一会</a>
+    </div>
   </div>
 </section>
 
 <!-- 文章区 -->
 <section id="homeContent" class="home-wrap pt5">
+  <div class="feature-strip">
+    <a class="feature-card" href="/links/">
+      <span>Links</span>
+      <strong>资源收藏</strong>
+      <p>动漫、小说、视频和常用网站，先从轻量导航开始。</p>
+    </a>
+    <a class="feature-card" href="/tools/">
+      <span>Tools</span>
+      <strong>小工具</strong>
+      <p>图片编辑、文本处理和以后准备集成的浏览器工具。</p>
+    </a>
+    <a class="feature-card" href="/games/">
+      <span>Games</span>
+      <strong>小游戏</strong>
+      <p>2048、扫雷、小恐龙等轻量游戏入口。</p>
+    </a>
+  </div>
+
+  <div class="section-title">
+    <div>
+      <p class="eyebrow">Posts</p>
+      <h2>最近文章</h2>
+      <p>写一点学习、生活和突然想到的东西。</p>
+    </div>
+    <a href="/posts/">全部文章 →</a>
+  </div>
+
   <div class="home-grid">
     {{ range first 10 (where .Site.RegularPages "Section" "posts") }}
       <article class="post-card">
@@ -34,10 +67,6 @@
         </div>
       </article>
     {{ end }}
-  </div>
-
-  <div class="tc mt4">
-    <a class="link dim" href="/posts/">查看更多文章 →</a>
   </div>
 </section>
 
