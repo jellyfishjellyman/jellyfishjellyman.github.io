@@ -86,7 +86,7 @@
 
   const musicCopy = document.createElement("div");
   musicCopy.className = "music-copy";
-  musicCopy.innerHTML = '<span class="music-title">Ambient</span><span class="music-status">点击启动</span>';
+  musicCopy.innerHTML = '<span class="music-title">Moonlight</span><span class="music-status">点击启动</span>';
 
   const bars = document.createElement("div");
   bars.className = "music-bars";
@@ -108,11 +108,11 @@
   let step = 0;
 
   const notesByPath = {
-    "/links/": [261.63, 329.63, 392.0, 523.25, 659.25],
-    "/tools/": [293.66, 369.99, 440.0, 587.33, 739.99],
-    "/games/": [329.63, 392.0, 493.88, 659.25, 783.99],
-    "/posts/": [246.94, 329.63, 415.3, 493.88, 622.25],
-    default: [220.0, 277.18, 329.63, 440.0, 554.37],
+    "/links/": [220.0, 277.18, 329.63, 415.3, 493.88],
+    "/tools/": [196.0, 246.94, 293.66, 369.99, 440.0],
+    "/games/": [174.61, 220.0, 261.63, 329.63, 392.0],
+    "/posts/": [196.0, 246.94, 293.66, 369.99, 493.88],
+    default: [174.61, 220.0, 261.63, 329.63, 392.0],
   };
 
   const getNotes = () => {
@@ -135,38 +135,38 @@
     const shimmer = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     const filter = audioCtx.createBiquadFilter();
-    osc.type = index % 3 === 0 ? "triangle" : "sine";
+    osc.type = "sine";
     shimmer.type = "sine";
     osc.frequency.setValueAtTime(frequency, time);
-    shimmer.frequency.setValueAtTime(frequency * 2.01, time);
+    shimmer.frequency.setValueAtTime(frequency * (index % 2 ? 1.5 : 2.0), time);
     filter.type = "lowpass";
-    filter.frequency.setValueAtTime(720 + index * 42, time);
-    filter.Q.setValueAtTime(4.2, time);
+    filter.frequency.setValueAtTime(560 + (index % 5) * 34, time);
+    filter.Q.setValueAtTime(1.8, time);
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.036, time + 0.08);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.7);
+    gain.gain.exponentialRampToValueAtTime(0.026, time + 0.36);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 3.8);
     osc.connect(filter);
     shimmer.connect(filter);
     filter.connect(gain);
     gain.connect(masterGain);
     osc.start(time);
     shimmer.start(time + 0.02);
-    osc.stop(time + 1.8);
-    shimmer.stop(time + 1.4);
+    osc.stop(time + 4.0);
+    shimmer.stop(time + 3.2);
   };
 
-  const playPulse = (time, index) => {
+  const playBass = (time, frequency) => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = "square";
-    osc.frequency.setValueAtTime(index % 4 === 0 ? 82.41 : 123.47, time);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(frequency * 0.5, time);
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.012, time + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
+    gain.gain.exponentialRampToValueAtTime(0.018, time + 0.5);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 4.8);
     osc.connect(gain);
     gain.connect(masterGain);
     osc.start(time);
-    osc.stop(time + 0.22);
+    osc.stop(time + 5.0);
   };
 
   const startMusic = async () => {
@@ -174,23 +174,24 @@
     const notes = getNotes();
     playing = true;
     musicPanel.classList.add("is-playing");
-    musicStatus.textContent = "合成器运行中";
-    masterGain.gain.setTargetAtTime(0.38, audioCtx.currentTime, 0.2);
+    musicStatus.textContent = "月光模式";
+    masterGain.gain.setTargetAtTime(0.3, audioCtx.currentTime, 0.35);
 
     const tick = () => {
       if (!playing) return;
       const now = audioCtx.currentTime;
-      const note = notes[step % notes.length] * (step % 7 === 0 ? 0.5 : 1);
+      const note = notes[step % notes.length];
       playTone(note, now, step);
-      if (step % 2 === 0) playPulse(now + 0.04, step);
+      if (step % 3 === 0) playTone(note * 1.25, now + 0.18, step + 2);
+      if (step % 4 === 0) playBass(now + 0.08, note);
       step += 1;
-      musicTimer = window.setTimeout(tick, step % 5 === 0 ? 1180 : 1480);
+      musicTimer = window.setTimeout(tick, step % 4 === 0 ? 2600 : 2100);
     };
 
     tick();
     lfoTimer = window.setInterval(() => {
       if (!masterGain || !playing) return;
-      const value = 0.34 + Math.sin(Date.now() / 900) * 0.08;
+      const value = 0.26 + Math.sin(Date.now() / 1300) * 0.045;
       masterGain.gain.setTargetAtTime(value, audioCtx.currentTime, 0.2);
     }, 240);
   };

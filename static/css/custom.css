@@ -12,6 +12,8 @@
   --vapor-cyan: #01cdfd;
   --vapor-violet: #8f65ff;
   --dream-mint: #c7f5dc;
+  --dream-lilac: #d8ccff;
+  --dream-moon: #fff7c9;
   --cursor-hue: 174deg;
   --shadow: 0 24px 80px rgba(44, 42, 35, 0.15);
   --radius: 8px;
@@ -33,10 +35,11 @@ body {
   min-height: 100%;
   color: var(--text);
   background:
-    radial-gradient(760px circle at var(--mouse-x, 50%) var(--mouse-y, 12%), rgba(255, 113, 206, 0.16), transparent 40%),
-    radial-gradient(840px circle at calc(100% - var(--mouse-x, 50%)) 24%, rgba(1, 205, 253, 0.13), transparent 42%),
-    radial-gradient(720px circle at 22% 78%, rgba(199, 245, 220, 0.32), transparent 46%),
-    linear-gradient(135deg, #f7f4ee 0%, #edf6f1 45%, #fff0f8 100%);
+    radial-gradient(640px circle at var(--mouse-x, 50%) var(--mouse-y, 12%), rgba(255, 247, 201, 0.24), transparent 42%),
+    radial-gradient(820px circle at calc(100% - var(--mouse-x, 50%)) 26%, rgba(216, 204, 255, 0.24), transparent 44%),
+    radial-gradient(760px circle at 18% 74%, rgba(199, 245, 220, 0.38), transparent 48%),
+    radial-gradient(900px circle at 85% 80%, rgba(255, 113, 206, 0.13), transparent 48%),
+    linear-gradient(135deg, #f8f6ef 0%, #edf8f4 43%, #fff2fb 100%);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   cursor: var(--paw-cursor);
@@ -57,9 +60,11 @@ body::before {
   z-index: -2;
   background-image:
     linear-gradient(115deg, transparent 0 62%, rgba(255,113,206,.12) 62% 63%, transparent 63%),
+    radial-gradient(circle at 20% 12%, rgba(255,247,201,.42) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 26%, rgba(216,204,255,.48) 0 1px, transparent 3px),
     linear-gradient(rgba(23, 32, 27, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(23, 32, 27, 0.035) 1px, transparent 1px);
-  background-size: 120px 120px, 42px 42px, 42px 42px;
+  background-size: 120px 120px, 180px 180px, 240px 240px, 42px 42px, 42px 42px;
   mask-image: linear-gradient(to bottom, rgba(0,0,0,.75), rgba(0,0,0,.12));
   animation: vaporDrift 18s linear infinite;
 }
@@ -140,7 +145,7 @@ body.has-pointer .cursor-trail {
 
 @keyframes vaporDrift {
   from { background-position: 0 0, 0 0, 0 0; }
-  to { background-position: 120px 120px, 42px 42px, -42px 42px; }
+  to { background-position: 120px 120px, 180px 120px, -160px 240px, 42px 42px, -42px 42px; }
 }
 
 a,
@@ -433,6 +438,33 @@ body.home .site-header {
   gap: 18px;
 }
 
+.post-group {
+  margin-top: 54px;
+}
+
+.post-group:first-child {
+  margin-top: 0;
+}
+
+.post-group-title {
+  margin-top: 0;
+}
+
+.post-category {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  margin-bottom: 10px;
+  padding: 3px 8px;
+  border: 1px solid rgba(40,120,107,.16);
+  border-radius: 999px;
+  background: rgba(255,255,255,.52);
+  color: var(--accent-2);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
 .section-title h2 {
   margin: 0;
   font-size: clamp(26px, 4vw, 44px);
@@ -567,6 +599,7 @@ body.home .site-header {
   padding-right: 6px;
   color: rgba(23, 32, 27, .82);
   font-size: 15px;
+  line-height: 1.85;
   word-break: break-word;
   scroll-behavior: smooth;
   scrollbar-width: thin;
@@ -1097,11 +1130,19 @@ article img {
 }
 
 .post-card.reveal-on-scroll,
+.post-group.reveal-on-scroll,
 .module-card.reveal-on-scroll,
 .game-card.reveal-on-scroll,
 .feature-card.reveal-on-scroll,
 .link-item.reveal-on-scroll {
   opacity: 1;
+  transform: translateY(0);
+}
+
+.post-card.reveal-on-scroll,
+.module-card.reveal-on-scroll,
+.game-card.reveal-on-scroll,
+.feature-card.reveal-on-scroll {
   transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) translateY(0);
 }
 
@@ -1139,6 +1180,10 @@ article img {
   .music-panel {
     right: 10px;
     bottom: 12px;
+  }
+
+  .post-summary {
+    padding-right: 12px;
   }
 
   #backToTop {
