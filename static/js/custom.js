@@ -1,13 +1,51 @@
 (function () {
   const root = document.documentElement;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
   if (!reduceMotion) {
+    document.body.classList.add("has-pointer");
+    const noise = document.createElement("div");
+    noise.className = "dream-noise";
+    document.body.appendChild(noise);
+
+    const grid = document.createElement("div");
+    grid.className = "vapor-grid";
+    document.body.appendChild(grid);
+
+    const trails = Array.from({ length: 7 }, (_, index) => {
+      const dot = document.createElement("span");
+      dot.className = "cursor-trail";
+      dot.style.width = `${12 + index * 5}px`;
+      dot.style.height = `${12 + index * 5}px`;
+      dot.style.transitionDelay = `${index * 12}ms`;
+      document.body.appendChild(dot);
+      return { el: dot, x: pointer.x, y: pointer.y };
+    });
+
+    const animateTrail = () => {
+      let leadX = pointer.x;
+      let leadY = pointer.y;
+      trails.forEach((trail, index) => {
+        trail.x += (leadX - trail.x) * (0.26 - index * 0.018);
+        trail.y += (leadY - trail.y) * (0.26 - index * 0.018);
+        trail.el.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%) scale(${1 - index * 0.045})`;
+        trail.el.style.opacity = String(Math.max(0.08, 0.48 - index * 0.055));
+        leadX = trail.x;
+        leadY = trail.y;
+      });
+      window.requestAnimationFrame(animateTrail);
+    };
+    animateTrail();
+
     window.addEventListener(
       "pointermove",
       (event) => {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
         root.style.setProperty("--mouse-x", `${event.clientX}px`);
         root.style.setProperty("--mouse-y", `${event.clientY}px`);
+        root.style.setProperty("--cursor-hue", `${160 + (event.clientX / Math.max(1, window.innerWidth)) * 120}deg`);
       },
       { passive: true }
     );
@@ -35,24 +73,46 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
 
+  const musicPanel = document.createElement("div");
+  musicPanel.className = "music-panel";
+  musicPanel.setAttribute("aria-label", "背景音乐控制台");
+
   const musicToggle = document.createElement("button");
   musicToggle.id = "musicToggle";
   musicToggle.type = "button";
   musicToggle.setAttribute("aria-label", "播放或暂停背景音乐");
-  musicToggle.title = "轻音乐";
+  musicToggle.title = "播放氛围音乐";
   musicToggle.textContent = "♪";
-  document.body.appendChild(musicToggle);
+
+  const musicCopy = document.createElement("div");
+  musicCopy.className = "music-copy";
+  musicCopy.innerHTML = '<span class="music-title">Ambient</span><span class="music-status">点击启动</span>';
+
+  const bars = document.createElement("div");
+  bars.className = "music-bars";
+  for (let i = 0; i < 12; i += 1) {
+    const bar = document.createElement("span");
+    bar.style.setProperty("--bar-index", i);
+    bars.appendChild(bar);
+  }
+
+  musicPanel.append(musicToggle, musicCopy, bars);
+  document.body.appendChild(musicPanel);
+  const musicStatus = musicCopy.querySelector(".music-status");
 
   let audioCtx = null;
   let musicTimer = null;
+  let lfoTimer = null;
+  let masterGain = null;
   let playing = false;
+  let step = 0;
 
   const notesByPath = {
-    "/links/": [261.63, 329.63, 392.0, 523.25],
-    "/tools/": [293.66, 369.99, 440.0, 587.33],
-    "/games/": [329.63, 392.0, 493.88, 659.25],
-    "/posts/": [246.94, 329.63, 415.3, 493.88],
-    default: [220.0, 277.18, 329.63, 440.0],
+    "/links/": [261.63, 329.63, 392.0, 523.25, 659.25],
+    "/tools/": [293.66, 369.99, 440.0, 587.33, 739.99],
+    "/games/": [329.63, 392.0, 493.88, 659.25, 783.99],
+    "/posts/": [246.94, 329.63, 415.3, 493.88, 622.25],
+    default: [220.0, 277.18, 329.63, 440.0, 554.37],
   };
 
   const getNotes = () => {
@@ -60,42 +120,88 @@
     return notesByPath[path] || notesByPath.default;
   };
 
-  const playTone = (frequency, time) => {
+  const ensureAudio = async () => {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+    if (!masterGain) {
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.42;
+      masterGain.connect(audioCtx.destination);
+    }
+  };
+
+  const playTone = (frequency, time, index) => {
+    const osc = audioCtx.createOscillator();
+    const shimmer = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    osc.type = index % 3 === 0 ? "triangle" : "sine";
+    shimmer.type = "sine";
+    osc.frequency.setValueAtTime(frequency, time);
+    shimmer.frequency.setValueAtTime(frequency * 2.01, time);
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(720 + index * 42, time);
+    filter.Q.setValueAtTime(4.2, time);
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(0.036, time + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.7);
+    osc.connect(filter);
+    shimmer.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+    osc.start(time);
+    shimmer.start(time + 0.02);
+    osc.stop(time + 1.8);
+    shimmer.stop(time + 1.4);
+  };
+
+  const playPulse = (time, index) => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(frequency, time);
+    osc.type = "square";
+    osc.frequency.setValueAtTime(index % 4 === 0 ? 82.41 : 123.47, time);
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.035, time + 0.08);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.4);
+    gain.gain.exponentialRampToValueAtTime(0.012, time + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(masterGain);
     osc.start(time);
-    osc.stop(time + 1.5);
+    osc.stop(time + 0.22);
   };
 
   const startMusic = async () => {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    await audioCtx.resume();
+    await ensureAudio();
     const notes = getNotes();
-    let index = 0;
     playing = true;
-    musicToggle.classList.add("is-playing");
+    musicPanel.classList.add("is-playing");
+    musicStatus.textContent = "合成器运行中";
+    masterGain.gain.setTargetAtTime(0.38, audioCtx.currentTime, 0.2);
 
     const tick = () => {
       if (!playing) return;
-      playTone(notes[index % notes.length], audioCtx.currentTime);
-      index += 1;
-      musicTimer = window.setTimeout(tick, 1700);
+      const now = audioCtx.currentTime;
+      const note = notes[step % notes.length] * (step % 7 === 0 ? 0.5 : 1);
+      playTone(note, now, step);
+      if (step % 2 === 0) playPulse(now + 0.04, step);
+      step += 1;
+      musicTimer = window.setTimeout(tick, step % 5 === 0 ? 1180 : 1480);
     };
 
     tick();
+    lfoTimer = window.setInterval(() => {
+      if (!masterGain || !playing) return;
+      const value = 0.34 + Math.sin(Date.now() / 900) * 0.08;
+      masterGain.gain.setTargetAtTime(value, audioCtx.currentTime, 0.2);
+    }, 240);
   };
 
   const stopMusic = () => {
     playing = false;
-    musicToggle.classList.remove("is-playing");
+    musicPanel.classList.remove("is-playing");
+    musicStatus.textContent = "点击启动";
     if (musicTimer) window.clearTimeout(musicTimer);
+    if (lfoTimer) window.clearInterval(lfoTimer);
+    if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.15);
   };
 
   musicToggle.addEventListener("click", () => {
@@ -103,7 +209,51 @@
     else startMusic().catch(stopMusic);
   });
 
-  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card");
+  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .link-item");
+  selectableItems.forEach((item) => {
+    item.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = item.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        item.style.setProperty("--card-x", `${x}px`);
+        item.style.setProperty("--card-y", `${y}px`);
+        if (!reduceMotion && !item.classList.contains("link-item")) {
+          const tiltX = ((x / rect.width) - 0.5) * 5.5;
+          const tiltY = ((0.5 - y / rect.height)) * 4.2;
+          item.style.setProperty("--tilt-x", `${tiltX}deg`);
+          item.style.setProperty("--tilt-y", `${tiltY}deg`);
+        }
+      },
+      { passive: true }
+    );
+    item.addEventListener("pointerenter", () => document.body.classList.add("is-card-hovered"));
+    item.addEventListener("pointerleave", () => {
+      document.body.classList.remove("is-card-hovered");
+      item.style.setProperty("--tilt-x", "0deg");
+      item.style.setProperty("--tilt-y", "0deg");
+    });
+  });
+
+  document.querySelectorAll(".post-card").forEach((card) => {
+    const summary = card.querySelector(".post-summary");
+    if (!summary) return;
+    card.addEventListener(
+      "wheel",
+      (event) => {
+        if (!card.matches(":hover")) return;
+        const canScroll = summary.scrollHeight > summary.clientHeight;
+        if (!canScroll) return;
+        const before = summary.scrollTop;
+        summary.scrollTop += event.deltaY;
+        if (summary.scrollTop !== before) event.preventDefault();
+      },
+      { passive: false }
+    );
+  });
+
+  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .link-item");
   if ("IntersectionObserver" in window && !reduceMotion) {
     const observer = new IntersectionObserver(
       (entries) => {

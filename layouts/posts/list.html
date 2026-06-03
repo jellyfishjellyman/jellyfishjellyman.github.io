@@ -1,13 +1,5 @@
 {{ define "main" }}
 <section class="module-page posts-page">
-  <div class="module-intro reveal-on-scroll">
-    <p class="eyebrow">Posts</p>
-    <h1>{{ .Title }}</h1>
-    {{ with .Content }}
-      <div class="module-copy">{{ . }}</div>
-    {{ end }}
-  </div>
-
   <div class="home-grid posts-grid">
     {{ range .Paginator.Pages }}
       <article class="post-card reveal-on-scroll">
@@ -20,7 +12,7 @@
         </div>
 
         <div class="post-summary">
-          {{ .Summary | plainify | truncate 150 }}
+          {{ .Summary | plainify | truncate 900 }}
         </div>
       </article>
     {{ end }}
