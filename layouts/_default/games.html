@@ -14,7 +14,11 @@
           <h2>{{ .name }}</h2>
           <p>{{ .description }}</p>
         </div>
-        <button class="ghost-button" type="button" disabled>准备中</button>
+        {{ if .url }}
+          <a class="ghost-button" href="{{ .url }}">开始</a>
+        {{ else }}
+          <button class="ghost-button" type="button" disabled>准备中</button>
+        {{ end }}
       </article>
     {{ end }}
   </div>

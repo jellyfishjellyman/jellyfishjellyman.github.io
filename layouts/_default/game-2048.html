@@ -1,0 +1,33 @@
+{{ define "main" }}
+<section class="game-play-page">
+  <div class="game-shell reveal-on-scroll" data-game="2048">
+    <div class="game-panel">
+      <p class="eyebrow">Game</p>
+      <h1>{{ .Title }}</h1>
+      <div class="module-copy">{{ .Content }}</div>
+
+      <div class="score-row" aria-label="分数">
+        <div>
+          <span>当前</span>
+          <strong id="score2048">0</strong>
+        </div>
+        <div>
+          <span>最高</span>
+          <strong id="best2048">0</strong>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="primary-button" id="restart2048" type="button">重新开始</button>
+        <a class="ghost-button" href="/games/">返回游戏</a>
+      </div>
+    </div>
+
+    <div class="board-wrap">
+      <div id="board2048" class="board-2048" role="application" aria-label="2048 游戏棋盘" tabindex="0"></div>
+      <p id="message2048" class="game-message" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+<script src="/js/game-2048.js" defer></script>
+{{ end }}
