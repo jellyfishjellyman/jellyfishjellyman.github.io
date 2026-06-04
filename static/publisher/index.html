@@ -25,9 +25,17 @@
       <label>GitHub Token
         <input id="token" type="password" autocomplete="off" placeholder="fine-grained token">
       </label>
-      <label class="check">
-        <input id="rememberToken" type="checkbox">
-        <span>只保存在这台手机</span>
+      <div class="button-line">
+        <label class="check">
+          <input id="rememberToken" type="checkbox">
+          <span>只保存在这台手机</span>
+        </label>
+        <button id="loadPosts" class="secondary" type="button">加载旧文章</button>
+      </div>
+      <label id="postPickerWrap" hidden>选择旧文章
+        <select id="postPicker">
+          <option value="">新建文章</option>
+        </select>
       </label>
     </section>
 
@@ -76,6 +84,7 @@
         <label>插入图片
           <input id="images" type="file" accept="image/*" multiple>
         </label>
+        <div id="imagePreview" class="image-preview" aria-live="polite"></div>
       </section>
 
       <section id="previewPane" class="panel preview-panel" hidden>

@@ -1,20 +1,31 @@
 const repoOwner = "jellyfishjellyman";
 const repoName = "jellyfishjellyman.github.io";
 const branch = "main";
-const apiBase = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
+const repoApi = `https://api.github.com/repos/${repoOwner}/${repoName}`;
 const tzOffset = "+08:00";
 const draftKey = "publisher.currentDraft";
+const tokenKey = "publisher.githubToken";
+
+const state = {
+  imageFiles: [],
+  currentPostPath: "",
+  currentPostSha: ""
+};
 
 const els = {
   form: document.querySelector("#postForm"),
   token: document.querySelector("#token"),
   rememberToken: document.querySelector("#rememberToken"),
+  loadPosts: document.querySelector("#loadPosts"),
+  postPickerWrap: document.querySelector("#postPickerWrap"),
+  postPicker: document.querySelector("#postPicker"),
   title: document.querySelector("#title"),
   slug: document.querySelector("#slug"),
   category: document.querySelector("#category"),
   tags: document.querySelector("#tags"),
   body: document.querySelector("#body"),
   images: document.querySelector("#images"),
+  imagePreview: document.querySelector("#imagePreview"),
   draft: document.querySelector("#draft"),
   output: document.querySelector("#output"),
   writeTab: document.querySelector("#writeTab"),
@@ -25,7 +36,7 @@ const els = {
   clearDraft: document.querySelector("#clearDraft")
 };
 
-const savedToken = localStorage.getItem("publisher.githubToken");
+const savedToken = localStorage.getItem(tokenKey);
 if (savedToken) {
   els.token.value = savedToken;
   els.rememberToken.checked = true;
@@ -36,6 +47,26 @@ renderPreview();
 
 function log(message) {
   els.output.textContent = message;
+}
+
+function authHeaders(token) {
+  return {
+    "Accept": "application/vnd.github+json",
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json"
+  };
+}
+
+async function gh(path, options = {}) {
+  const token = els.token.value.trim();
+  if (!token) throw new Error("缺少 GitHub Token。");
+  const response = await fetch(`${repoApi}${path}`, {
+    ...options,
+    headers: { ...authHeaders(token), ...(options.headers || {}) }
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.message || `GitHub API ${response.status}`);
+  return payload;
 }
 
 function slugify(value) {
@@ -69,7 +100,7 @@ function tagsList(value) {
     .filter(Boolean);
 }
 
-function buildMarkdown(slug) {
+function buildMarkdown() {
   const title = els.title.value.trim();
   const tags = tagsList(els.tags.value);
   const front = [
@@ -123,23 +154,93 @@ document.querySelectorAll("[data-insert]").forEach((button) => {
   });
 });
 
-els.images.addEventListener("change", () => {
+els.images.addEventListener("change", async () => {
   const files = Array.from(els.images.files || []);
   if (!files.length) return;
-  const lines = files.map((file) => `![${file.name}](${safeFileName(file.name)})`).join("\n");
+  log("正在压缩图片...");
+  const prepared = [];
+  for (const file of files) {
+    const image = await compressImage(file);
+    prepared.push(image);
+  }
+  state.imageFiles.push(...prepared);
+  const lines = prepared.map((file) => `![${file.name}](${file.name})`).join("\n");
   insertText(`\n${lines}\n`);
+  renderImages();
+  log(`已准备 ${prepared.length} 张图片。`);
+  els.images.value = "";
 });
 
-function safeFileName(name) {
+function safeFileName(name, fallbackExt = ".jpg") {
   const cleaned = name.split(/[\\/]/).pop().replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[.-]+|[.-]+$/g, "");
-  return cleaned || `image-${Date.now()}.jpg`;
+  return cleaned || `image-${Date.now()}${fallbackExt}`;
+}
+
+async function compressImage(file) {
+  if (!file.type.startsWith("image/")) {
+    return { name: safeFileName(file.name), file, blob: file, previewUrl: URL.createObjectURL(file) };
+  }
+  const bitmap = await loadImageSource(file);
+  const maxSide = 1800;
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const width = Math.round(bitmap.width * scale);
+  const height = Math.round(bitmap.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+  const baseName = safeFileName(file.name).replace(/\.[^.]+$/, "");
+  return {
+    name: `${baseName}.jpg`,
+    file,
+    blob: blob || file,
+    previewUrl: URL.createObjectURL(blob || file)
+  };
+}
+
+async function loadImageSource(file) {
+  if ("createImageBitmap" in window) return createImageBitmap(file);
+  const url = URL.createObjectURL(file);
+  try {
+    return await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = url;
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function renderImages() {
+  els.imagePreview.innerHTML = "";
+  state.imageFiles.forEach((image, index) => {
+    const card = document.createElement("div");
+    card.className = "image-card";
+    card.innerHTML = `<img src="${image.previewUrl}" alt=""><div><strong>${image.name}</strong><span>${formatBytes(image.blob.size)}</span></div>`;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "移除";
+    remove.addEventListener("click", () => {
+      URL.revokeObjectURL(image.previewUrl);
+      state.imageFiles.splice(index, 1);
+      renderImages();
+    });
+    card.appendChild(remove);
+    els.imagePreview.appendChild(card);
+  });
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
 function escapeHtml(value) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function inlineMarkdown(value) {
@@ -155,14 +256,36 @@ function markdownToHtml(markdown) {
   let inCode = false;
   let code = [];
   let list = [];
+  let inNotice = false;
+  let notice = [];
 
   const closeList = () => {
     if (!list.length) return;
     html.push(`<ul>${list.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`);
     list = [];
   };
+  const closeNotice = () => {
+    if (!notice.length) return;
+    html.push(`<aside class="callout">${notice.map((item) => `<p>${inlineMarkdown(item)}</p>`).join("")}</aside>`);
+    notice = [];
+  };
 
   for (const line of lines) {
+    if (line.includes("{{< notice >}}")) {
+      closeList();
+      inNotice = true;
+      notice = [];
+      continue;
+    }
+    if (line.includes("{{< /notice >}}")) {
+      inNotice = false;
+      closeNotice();
+      continue;
+    }
+    if (inNotice) {
+      if (line.trim()) notice.push(line);
+      continue;
+    }
     if (line.startsWith("```")) {
       if (inCode) {
         html.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
@@ -199,15 +322,17 @@ function markdownToHtml(markdown) {
     } else if (line.startsWith("![")) {
       closeList();
       const match = line.match(/^!\[(.*?)\]\((.*?)\)$/);
-      if (match) html.push(`<img alt="${escapeHtml(match[1])}" src="${escapeHtml(match[2])}">`);
-    } else if (line.includes("{{< notice >}}") || line.includes("{{< /notice >}}")) {
-      closeList();
+      if (match) {
+        const localImage = state.imageFiles.find((image) => image.name === match[2]);
+        html.push(`<img alt="${escapeHtml(match[1])}" src="${localImage ? localImage.previewUrl : escapeHtml(match[2])}">`);
+      }
     } else {
       closeList();
       html.push(`<p>${inlineMarkdown(line)}</p>`);
     }
   }
   closeList();
+  closeNotice();
   return html.join("\n");
 }
 
@@ -235,7 +360,8 @@ function saveDraft() {
     category: els.category.value,
     tags: els.tags.value,
     body: els.body.value,
-    draft: els.draft.checked
+    draft: els.draft.checked,
+    currentPostPath: state.currentPostPath
   };
   localStorage.setItem(draftKey, JSON.stringify(data));
 }
@@ -251,6 +377,7 @@ function restoreDraft() {
     els.tags.value = data.tags || "";
     els.body.value = data.body || "";
     els.draft.checked = Boolean(data.draft);
+    state.currentPostPath = data.currentPostPath || "";
   } catch {
     localStorage.removeItem(draftKey);
   }
@@ -267,42 +394,142 @@ function restoreDraft() {
 
 els.clearDraft.addEventListener("click", () => {
   localStorage.removeItem(draftKey);
+  state.currentPostPath = "";
+  state.currentPostSha = "";
+  state.imageFiles.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+  state.imageFiles = [];
   els.form.reset();
+  renderImages();
   renderPreview();
   log("本地草稿已清空。");
 });
 
-async function githubPut(path, contentBase64, message, token) {
-  const response = await fetch(`${apiBase}/${encodeURIComponentPath(path)}`, {
-    method: "PUT",
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message, content: contentBase64, branch })
+async function getRef() {
+  return gh(`/git/ref/heads/${branch}`);
+}
+
+async function createBlob(content, encoding = "utf-8") {
+  return gh("/git/blobs", {
+    method: "POST",
+    body: JSON.stringify({ content, encoding })
   });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.message || `GitHub API ${response.status}`);
-  return payload;
 }
 
-function encodeURIComponentPath(path) {
-  return path.split("/").map(encodeURIComponent).join("/");
+async function createTree(baseTree, entries) {
+  return gh("/git/trees", {
+    method: "POST",
+    body: JSON.stringify({ base_tree: baseTree, tree: entries })
+  });
 }
 
-function toBase64Utf8(value) {
-  return btoa(unescape(encodeURIComponent(value)));
+async function createCommit(message, treeSha, parentSha) {
+  return gh("/git/commits", {
+    method: "POST",
+    body: JSON.stringify({ message, tree: treeSha, parents: [parentSha] })
+  });
 }
 
-function fileToBase64(file) {
+async function updateRef(commitSha) {
+  return gh(`/git/refs/heads/${branch}`, {
+    method: "PATCH",
+    body: JSON.stringify({ sha: commitSha })
+  });
+}
+
+async function blobBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
     reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(blob);
   });
 }
+
+async function publishOnce(basePath, markdown, title) {
+  const ref = await getRef();
+  const parentSha = ref.object.sha;
+  const parentCommit = await gh(`/git/commits/${parentSha}`);
+  const entries = [];
+
+  const articleBlob = await createBlob(markdown, "utf-8");
+  entries.push({ path: `${basePath}/index.md`, mode: "100644", type: "blob", sha: articleBlob.sha });
+
+  for (const image of state.imageFiles) {
+    const content = await blobBase64(image.blob);
+    const blob = await createBlob(content, "base64");
+    entries.push({ path: `${basePath}/${image.name}`, mode: "100644", type: "blob", sha: blob.sha });
+  }
+
+  const tree = await createTree(parentCommit.tree.sha, entries);
+  const commit = await createCommit(`${state.currentPostPath ? "更新文章" : "新增文章"}：${title}`, tree.sha, parentSha);
+  await updateRef(commit.sha);
+  return commit;
+}
+
+async function loadPosts() {
+  log("正在加载文章列表...");
+  const ref = await getRef();
+  const commit = await gh(`/git/commits/${ref.object.sha}`);
+  const tree = await gh(`/git/trees/${commit.tree.sha}?recursive=1`);
+  const posts = tree.tree
+    .filter((item) => item.type === "blob" && item.path.startsWith("content/posts/") && item.path.endsWith("/index.md"))
+    .sort((a, b) => a.path.localeCompare(b.path));
+
+  els.postPicker.innerHTML = '<option value="">新建文章</option>';
+  for (const post of posts) {
+    const option = document.createElement("option");
+    option.value = post.path;
+    option.textContent = post.path.replace("content/posts/", "").replace("/index.md", "");
+    els.postPicker.appendChild(option);
+  }
+  els.postPickerWrap.hidden = false;
+  log(`已加载 ${posts.length} 篇文章。`);
+}
+
+function parseFrontMatter(markdown) {
+  const match = markdown.match(/^\+\+\+\n([\s\S]*?)\n\+\+\+\n?([\s\S]*)$/);
+  if (!match) return { params: {}, body: markdown };
+  const params = {};
+  for (const line of match[1].split("\n")) {
+    const pair = line.match(/^(\w+)\s*=\s*(.*)$/);
+    if (!pair) continue;
+    const key = pair[1];
+    const raw = pair[2].trim();
+    if (raw.startsWith('"')) params[key] = raw.replace(/^"|"$/g, "");
+    else if (raw === "true" || raw === "false") params[key] = raw === "true";
+    else params[key] = raw;
+  }
+  return { params, body: match[2].trim() };
+}
+
+async function loadPost(path) {
+  if (!path) {
+    state.currentPostPath = "";
+    state.currentPostSha = "";
+    els.form.reset();
+    renderPreview();
+    return;
+  }
+  log("正在加载旧文章...");
+  const file = await gh(`/contents/${path}`);
+  const markdown = decodeURIComponent(escape(atob(file.content.replace(/\s/g, ""))));
+  const parsed = parseFrontMatter(markdown);
+  const slug = path.replace("content/posts/", "").replace("/index.md", "");
+  state.currentPostPath = path;
+  state.currentPostSha = file.sha;
+  els.title.value = parsed.params.title || slug;
+  els.slug.value = slug;
+  els.category.value = parsed.params.category || "其他";
+  els.tags.value = "";
+  els.draft.checked = Boolean(parsed.params.draft);
+  els.body.value = parsed.body;
+  saveDraft();
+  renderPreview();
+  log(`已加载：${path}`);
+}
+
+els.loadPosts.addEventListener("click", () => loadPosts().catch((error) => log(`加载失败：${error.message}`)));
+els.postPicker.addEventListener("change", () => loadPost(els.postPicker.value).catch((error) => log(`加载失败：${error.message}`)));
 
 els.form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -311,29 +538,22 @@ els.form.addEventListener("submit", async (event) => {
   if (!token) return log("缺少 GitHub Token。");
   if (!title) return log("标题不能为空。");
 
-  if (els.rememberToken.checked) localStorage.setItem("publisher.githubToken", token);
-  else localStorage.removeItem("publisher.githubToken");
+  if (els.rememberToken.checked) localStorage.setItem(tokenKey, token);
+  else localStorage.removeItem(tokenKey);
 
   const slug = slugify(els.slug.value || title);
-  const basePath = `content/posts/${slug}`;
-  const files = Array.from(els.images.files || []);
+  const basePath = state.currentPostPath ? state.currentPostPath.replace("/index.md", "") : `content/posts/${slug}`;
 
   try {
-    log("正在上传图片...");
-    for (const file of files) {
-      const name = safeFileName(file.name);
-      const content = await fileToBase64(file);
-      await githubPut(`${basePath}/${name}`, content, `上传图片：${name}`, token);
-    }
-
-    log("正在发布文章...");
-    const markdown = buildMarkdown(slug);
-    await githubPut(`${basePath}/index.md`, toBase64Utf8(markdown), `新增文章：${title}`, token);
+    log("正在一次性提交文章和图片...");
+    const markdown = buildMarkdown();
+    const commit = await publishOnce(basePath, markdown, title);
     localStorage.removeItem(draftKey);
-    log(`发布成功：${basePath}/index.md\nGitHub Pages 会自动部署，稍等后刷新网站即可。`);
-    els.form.reset();
-    if (els.rememberToken.checked) els.token.value = token;
-    renderPreview();
+    state.currentPostPath = `${basePath}/index.md`;
+    state.imageFiles.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+    state.imageFiles = [];
+    renderImages();
+    log(`发布成功：${basePath}/index.md\n提交：${commit.sha.slice(0, 7)}\nGitHub Pages 会自动部署，稍等后刷新网站即可。`);
   } catch (error) {
     log(`发布失败：${error.message}`);
   }
