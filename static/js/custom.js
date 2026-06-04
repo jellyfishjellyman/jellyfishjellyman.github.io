@@ -51,6 +51,53 @@
     );
   }
 
+  document.querySelectorAll("[data-resource-tabs]").forEach((shell) => {
+    const tabs = Array.from(shell.querySelectorAll("[data-resource-tab]"));
+    const panels = Array.from(shell.querySelectorAll("[data-resource-panel]"));
+    const modal = shell.querySelector("[data-resource-modal]");
+    const closeButtons = Array.from(shell.querySelectorAll("[data-resource-close]"));
+    let lastActiveTab = tabs.find((tab) => tab.classList.contains("is-active")) || tabs[0];
+
+    const activate = (id) => {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.resourceTab === id;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-expanded", String(active));
+        if (active) lastActiveTab = tab;
+      });
+      panels.forEach((panel) => panel.classList.toggle("is-active", panel.id === id));
+    };
+
+    const openModal = (id) => {
+      activate(id);
+      if (!modal) return;
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("has-resource-modal");
+      const closeButton = modal.querySelector(".resource-close");
+      if (closeButton) closeButton.focus({ preventScroll: true });
+    };
+
+    const closeModal = () => {
+      if (!modal) return;
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("has-resource-modal");
+      if (lastActiveTab) lastActiveTab.focus({ preventScroll: true });
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        openModal(tab.dataset.resourceTab);
+      });
+    });
+
+    closeButtons.forEach((button) => button.addEventListener("click", closeModal));
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
+    });
+  });
+
   if (location.pathname === "/" || location.pathname === "/index.html") {
     document.body.classList.add("home");
   }
@@ -210,7 +257,7 @@
     else startMusic().catch(stopMusic);
   });
 
-  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .link-item");
+  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
   selectableItems.forEach((item) => {
     item.addEventListener(
       "pointermove",
@@ -254,7 +301,7 @@
     );
   });
 
-  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .link-item");
+  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item");
   if ("IntersectionObserver" in window && !reduceMotion) {
     const observer = new IntersectionObserver(
       (entries) => {

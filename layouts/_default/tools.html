@@ -1,14 +1,17 @@
 {{ define "main" }}
-<section class="module-page">
+<section class="module-page tools-page">
   <div class="module-intro reveal-on-scroll">
     <p class="eyebrow">Tools</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>
   </div>
 
-  <div class="module-grid">
+  <div class="module-grid tools-grid">
     {{ range site.Data.tools }}
-      <article class="module-card reveal-on-scroll">
+      {{ $visibleCount := 6 }}
+      {{ $items := .items }}
+      {{ $hiddenCount := sub (len $items) $visibleCount }}
+      <article class="module-card tool-card reveal-on-scroll">
         <div class="module-card-head">
           <span class="module-icon" aria-hidden="true">{{ substr .title 0 1 }}</span>
           <div>
@@ -17,7 +20,7 @@
           </div>
         </div>
         <div class="link-list">
-          {{ range .items }}
+          {{ range first $visibleCount $items }}
             <a class="link-item" href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
               <span>
                 <strong>{{ .name }}</strong>
@@ -25,6 +28,22 @@
               </span>
               <small>{{ .status }}</small>
             </a>
+          {{ end }}
+          {{ if gt $hiddenCount 0 }}
+            <details class="tool-more">
+              <summary>还有 {{ $hiddenCount }} 个</summary>
+              <div class="link-list">
+                {{ range after $visibleCount $items }}
+                  <a class="link-item" href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
+                    <span>
+                      <strong>{{ .name }}</strong>
+                      <em>{{ .note }}</em>
+                    </span>
+                    <small>{{ .status }}</small>
+                  </a>
+                {{ end }}
+              </div>
+            </details>
           {{ end }}
         </div>
       </article>

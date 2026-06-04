@@ -1,34 +1,67 @@
 {{ define "main" }}
-<section class="module-page">
+<section class="module-page resource-page">
   <div class="module-intro reveal-on-scroll">
     <p class="eyebrow">Links</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>
   </div>
 
-  <div class="module-grid">
-    {{ range site.Data.links }}
-      <article class="module-card reveal-on-scroll">
-        <div class="module-card-head">
-          <span class="module-icon" aria-hidden="true">{{ substr .title 0 1 }}</span>
-          <div>
-            <h2>{{ .title }}</h2>
-            <p>{{ .description }}</p>
+  {{ $groups := site.Data.links }}
+  <div class="resource-shell" data-resource-tabs>
+    <div class="resource-tags" aria-label="资源标签">
+      {{ range $index, $group := $groups }}
+        {{ $panelId := printf "resource-panel-%d" $index }}
+        <button
+          class="resource-tag reveal-on-scroll{{ if eq $index 0 }} is-active{{ end }}"
+          type="button"
+          data-resource-tab="{{ $panelId }}"
+          aria-controls="{{ $panelId }}"
+          aria-expanded="{{ if eq $index 0 }}true{{ else }}false{{ end }}"
+        >
+          <span class="resource-tag-index" aria-hidden="true"></span>
+          <span>
+            <strong>{{ $group.title }}</strong>
+            <em>{{ $group.description }}</em>
+          </span>
+          <small>{{ len $group.items }} 个</small>
+        </button>
+      {{ end }}
+    </div>
+
+    <div class="resource-modal" data-resource-modal aria-hidden="true">
+      <div class="resource-modal-backdrop" data-resource-close></div>
+      <div class="resource-dialog" role="dialog" aria-modal="true" aria-label="资源列表">
+        <button class="resource-close" type="button" data-resource-close aria-label="关闭">×</button>
+        <div class="resource-panels">
+      {{ range $index, $group := $groups }}
+        {{ $panelId := printf "resource-panel-%d" $index }}
+        <section
+          id="{{ $panelId }}"
+          class="resource-panel{{ if eq $index 0 }} is-active{{ end }}"
+          data-resource-panel
+          aria-labelledby="{{ $panelId }}-title"
+        >
+          <div class="resource-panel-head">
+            <p class="eyebrow">Tag</p>
+            <h2 id="{{ $panelId }}-title"{{ if eq $index 0 }} data-resource-dialog-title{{ end }}>{{ $group.title }}</h2>
+            <p>{{ $group.description }}</p>
           </div>
+          <div class="link-list resource-link-list">
+            {{ range $group.items }}
+              <a class="link-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+                <span>
+                  <strong>{{ .name }}</strong>
+                  <em>{{ .note }}</em>
+                </span>
+                <span aria-hidden="true">→</span>
+              </a>
+            {{ end }}
+          </div>
+        </section>
+      {{ end }}
         </div>
-        <div class="link-list">
-          {{ range .items }}
-            <a class="link-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
-              <span>
-                <strong>{{ .name }}</strong>
-                <em>{{ .note }}</em>
-              </span>
-              <span aria-hidden="true">↗</span>
-            </a>
-          {{ end }}
-        </div>
-      </article>
-    {{ end }}
+      </div>
+    </div>
   </div>
 </section>
 {{ end }}
