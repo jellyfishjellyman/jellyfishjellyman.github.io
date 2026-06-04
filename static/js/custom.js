@@ -1,9 +1,10 @@
 (function () {
   const root = document.documentElement;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-  if (!reduceMotion) {
+  if (!reduceMotion && finePointer) {
     document.body.classList.add("has-pointer");
     const noise = document.createElement("div");
     noise.className = "dream-noise";
@@ -12,31 +13,6 @@
     const grid = document.createElement("div");
     grid.className = "vapor-grid";
     document.body.appendChild(grid);
-
-    const trails = Array.from({ length: 7 }, (_, index) => {
-      const dot = document.createElement("span");
-      dot.className = "cursor-trail";
-      dot.style.width = `${12 + index * 5}px`;
-      dot.style.height = `${12 + index * 5}px`;
-      dot.style.transitionDelay = `${index * 12}ms`;
-      document.body.appendChild(dot);
-      return { el: dot, x: pointer.x, y: pointer.y };
-    });
-
-    const animateTrail = () => {
-      let leadX = pointer.x;
-      let leadY = pointer.y;
-      trails.forEach((trail, index) => {
-        trail.x += (leadX - trail.x) * (0.26 - index * 0.018);
-        trail.y += (leadY - trail.y) * (0.26 - index * 0.018);
-        trail.el.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%) scale(${1 - index * 0.045})`;
-        trail.el.style.opacity = String(Math.max(0.08, 0.48 - index * 0.055));
-        leadX = trail.x;
-        leadY = trail.y;
-      });
-      window.requestAnimationFrame(animateTrail);
-    };
-    animateTrail();
 
     window.addEventListener(
       "pointermove",
@@ -258,31 +234,33 @@
   });
 
   const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
-  selectableItems.forEach((item) => {
-    item.addEventListener(
-      "pointermove",
-      (event) => {
-        const rect = item.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        item.style.setProperty("--card-x", `${x}px`);
-        item.style.setProperty("--card-y", `${y}px`);
-        if (!reduceMotion && !item.classList.contains("link-item")) {
-          const tiltX = ((x / rect.width) - 0.5) * 5.5;
-          const tiltY = ((0.5 - y / rect.height)) * 4.2;
-          item.style.setProperty("--tilt-x", `${tiltX}deg`);
-          item.style.setProperty("--tilt-y", `${tiltY}deg`);
-        }
-      },
-      { passive: true }
-    );
-    item.addEventListener("pointerenter", () => document.body.classList.add("is-card-hovered"));
-    item.addEventListener("pointerleave", () => {
-      document.body.classList.remove("is-card-hovered");
-      item.style.setProperty("--tilt-x", "0deg");
-      item.style.setProperty("--tilt-y", "0deg");
+  if (finePointer) {
+    selectableItems.forEach((item) => {
+      item.addEventListener(
+        "pointermove",
+        (event) => {
+          const rect = item.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          item.style.setProperty("--card-x", `${x}px`);
+          item.style.setProperty("--card-y", `${y}px`);
+          if (!reduceMotion && !item.classList.contains("link-item")) {
+            const tiltX = ((x / rect.width) - 0.5) * 4;
+            const tiltY = ((0.5 - y / rect.height)) * 3;
+            item.style.setProperty("--tilt-x", `${tiltX}deg`);
+            item.style.setProperty("--tilt-y", `${tiltY}deg`);
+          }
+        },
+        { passive: true }
+      );
+      item.addEventListener("pointerenter", () => document.body.classList.add("is-card-hovered"));
+      item.addEventListener("pointerleave", () => {
+        document.body.classList.remove("is-card-hovered");
+        item.style.setProperty("--tilt-x", "0deg");
+        item.style.setProperty("--tilt-y", "0deg");
+      });
     });
-  });
+  }
 
   document.querySelectorAll(".post-card").forEach((card) => {
     const summary = card.querySelector(".post-summary");
@@ -292,20 +270,6 @@
         if (event.target.closest("a")) return;
         window.location.href = link.href;
       });
-    }
-    if (summary) {
-      card.addEventListener(
-        "wheel",
-        (event) => {
-          if (!card.matches(":hover")) return;
-          const canScroll = summary.scrollHeight > summary.clientHeight;
-          if (!canScroll) return;
-          const before = summary.scrollTop;
-          summary.scrollTop += event.deltaY;
-          if (summary.scrollTop !== before) event.preventDefault();
-        },
-        { passive: false }
-      );
     }
   });
 

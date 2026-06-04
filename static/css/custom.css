@@ -66,7 +66,6 @@ body::before {
     linear-gradient(90deg, rgba(23, 32, 27, 0.035) 1px, transparent 1px);
   background-size: 120px 120px, 180px 180px, 240px 240px, 42px 42px, 42px 42px;
   mask-image: linear-gradient(to bottom, rgba(0,0,0,.75), rgba(0,0,0,.12));
-  animation: vaporDrift 18s linear infinite;
 }
 
 body::after {
@@ -83,8 +82,13 @@ body::after {
     radial-gradient(circle, rgba(255,255,255,.8) 0 2px, transparent 3px),
     radial-gradient(circle, rgba(1,205,253,.18), rgba(255,113,206,.12) 34%, transparent 64%);
   mix-blend-mode: soft-light;
+  opacity: 0;
   transform: translate3d(0, 0, 0);
   transition: left .14s ease-out, top .14s ease-out, opacity .18s ease;
+}
+
+body.has-pointer::after {
+  opacity: .72;
 }
 
 body.is-card-hovered::after {
@@ -311,7 +315,7 @@ main.pb7 {
   padding: 92px 18px 96px;
   margin-top: -64px;
   overflow: hidden;
-  background: url("/images/hero.jpg") center/cover no-repeat;
+  background: url("/images/hero-optimized.jpg") center/cover no-repeat;
 }
 
 .hero::before {
@@ -1466,6 +1470,29 @@ article img {
 }
 
 @media (max-width: 720px) {
+  body::after,
+  .dream-noise,
+  .vapor-grid {
+    display: none;
+  }
+
+  .site-nav,
+  .post-card,
+  .module-card,
+  .game-card,
+  .feature-card,
+  .music-panel,
+  main article.mw8 {
+    backdrop-filter: none;
+  }
+
+  .post-card,
+  .module-card,
+  .game-card,
+  .feature-card {
+    box-shadow: 0 12px 36px rgba(44, 42, 35, .1);
+  }
+
   .resource-modal {
     padding: 12px;
   }
