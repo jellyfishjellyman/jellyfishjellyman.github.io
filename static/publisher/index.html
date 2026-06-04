@@ -15,7 +15,10 @@
         <p>Jellyfish Publisher</p>
         <h1>手机发文</h1>
       </div>
-      <button id="previewButton" type="button">预览</button>
+      <div class="top-actions">
+        <button id="writeTab" class="is-active" type="button">编辑</button>
+        <button id="previewTab" type="button">预览</button>
+      </div>
     </header>
 
     <section class="panel auth-panel">
@@ -28,66 +31,73 @@
       </label>
     </section>
 
-    <form id="postForm" class="panel editor-panel">
-      <label>标题
-        <input id="title" required autocomplete="off">
-      </label>
-
-      <label>文章路径
-        <input id="slug" autocomplete="off" placeholder="不填自动生成">
-      </label>
-
-      <div class="grid">
-        <label>分类
-          <select id="category">
-            <option value="随感">随感</option>
-            <option value="网上文案">网上文案</option>
-            <option value="其他">其他</option>
-          </select>
+    <form id="postForm" class="editor-shell">
+      <section class="panel meta-panel">
+        <label>标题
+          <input id="title" required autocomplete="off">
         </label>
-        <label>标签
-          <input id="tags" autocomplete="off" placeholder="逗号分隔">
+
+        <label>文章路径
+          <input id="slug" autocomplete="off" placeholder="不填自动生成">
         </label>
-      </div>
 
-      <div class="toolbar" aria-label="编辑工具栏">
-        <button type="button" data-insert="bold">B</button>
-        <button type="button" data-insert="h2">H2</button>
-        <button type="button" data-insert="quote">引</button>
-        <button type="button" data-insert="hr">线</button>
-        <button type="button" data-insert="color">颜色</button>
-        <button type="button" data-insert="size">字号</button>
-      </div>
+        <div class="grid">
+          <label>分类
+            <select id="category">
+              <option value="随感">随感</option>
+              <option value="网上文案">网上文案</option>
+              <option value="其他">其他</option>
+            </select>
+          </label>
+          <label>标签
+            <input id="tags" autocomplete="off" placeholder="逗号分隔">
+          </label>
+        </div>
+      </section>
 
-      <label>正文
-        <textarea id="body" required spellcheck="false" placeholder="在这里写文章。上传图片会插入到光标位置。"></textarea>
-      </label>
+      <section id="writePane" class="panel editor-panel">
+        <div class="toolbar" aria-label="Markdown 工具栏">
+          <button type="button" data-insert="h2">H2</button>
+          <button type="button" data-insert="bold">B</button>
+          <button type="button" data-insert="italic">I</button>
+          <button type="button" data-insert="quote">引用</button>
+          <button type="button" data-insert="list">列表</button>
+          <button type="button" data-insert="link">链接</button>
+          <button type="button" data-insert="code">代码</button>
+          <button type="button" data-insert="hr">分割线</button>
+          <button type="button" data-insert="more">摘要</button>
+          <button type="button" data-insert="callout">提示块</button>
+        </div>
 
-      <label>插入图片
-        <input id="images" type="file" accept="image/*" multiple>
-      </label>
+        <label>正文
+          <textarea id="body" required spellcheck="false" placeholder="在这里写文章。工具栏负责结构，图片会插入到光标位置。"></textarea>
+        </label>
 
-      <div class="actions">
+        <label>插入图片
+          <input id="images" type="file" accept="image/*" multiple>
+        </label>
+      </section>
+
+      <section id="previewPane" class="panel preview-panel" hidden>
+        <article id="preview" class="preview"></article>
+      </section>
+
+      <section class="panel publish-panel">
         <label class="check">
           <input id="draft" type="checkbox">
           <span>保存为草稿</span>
         </label>
-        <button type="submit">发布到 GitHub</button>
-      </div>
+        <div class="publish-actions">
+          <button id="clearDraft" class="secondary" type="button">清空本地草稿</button>
+          <button type="submit">发布到 GitHub</button>
+        </div>
+      </section>
     </form>
 
     <section class="panel">
       <h2>输出</h2>
       <pre id="output">准备就绪</pre>
     </section>
-
-    <dialog id="previewDialog">
-      <header>
-        <strong>预览</strong>
-        <button id="closePreview" type="button">关闭</button>
-      </header>
-      <article id="preview"></article>
-    </dialog>
   </main>
   <script src="/publisher/app.js"></script>
 </body>

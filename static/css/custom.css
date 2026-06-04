@@ -1264,6 +1264,19 @@ blockquote {
   border-radius: var(--radius);
 }
 
+.callout {
+  margin: 1.2em 0;
+  padding: 0.85em 1em;
+  border: 1px solid rgba(40,120,107,.18);
+  border-left: 4px solid rgba(40,120,107,.58);
+  border-radius: var(--radius);
+  background: rgba(40,120,107,.08);
+}
+
+.callout p {
+  margin: 0.35em 0;
+}
+
 article img {
   border-radius: var(--radius);
   box-shadow: 0 18px 60px rgba(0,0,0,.14);

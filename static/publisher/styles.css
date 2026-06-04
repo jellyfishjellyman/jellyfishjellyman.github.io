@@ -19,17 +19,23 @@ body {
 }
 
 .app {
-  width: min(880px, 100%);
+  width: min(920px, 100%);
   margin: 0 auto;
   padding: max(18px, env(safe-area-inset-top)) 14px 28px;
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin: -18px -14px 14px;
+  padding: max(18px, env(safe-area-inset-top)) 14px 12px;
+  background: rgba(244,246,242,.9);
+  backdrop-filter: blur(14px);
 }
 
 .topbar p {
@@ -45,17 +51,27 @@ h1 {
   font-size: 28px;
 }
 
+.top-actions,
+.publish-actions,
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .panel {
   margin: 12px 0;
   padding: 14px;
   border: 1px solid rgba(255,255,255,.75);
   border-radius: 8px;
-  background: rgba(255,255,255,.82);
+  background: rgba(255,255,255,.84);
   box-shadow: 0 18px 50px rgba(34,43,36,.11);
 }
 
-form,
-.auth-panel {
+.auth-panel,
+.meta-panel,
+.editor-panel,
+.publish-panel {
   display: grid;
   gap: 13px;
 }
@@ -80,8 +96,8 @@ textarea {
 }
 
 textarea {
-  min-height: 42vh;
-  line-height: 1.7;
+  min-height: 48vh;
+  line-height: 1.72;
   resize: vertical;
 }
 
@@ -89,14 +105,6 @@ textarea {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-}
-
-.toolbar,
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  align-items: center;
 }
 
 button {
@@ -109,11 +117,25 @@ button {
   font-weight: 800;
 }
 
+.toolbar {
+  position: sticky;
+  top: 78px;
+  z-index: 4;
+  padding: 6px 0;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(12px);
+}
+
 .toolbar button,
-.topbar button,
-dialog button {
+.top-actions button,
+.secondary {
   background: #dfe7df;
   color: #263328;
+}
+
+.top-actions .is-active {
+  background: #225b43;
+  color: #fff;
 }
 
 .check {
@@ -126,9 +148,9 @@ dialog button {
   width: auto;
 }
 
-.actions button {
+.publish-actions button {
   flex: 1;
-  min-width: 180px;
+  min-width: 150px;
 }
 
 pre {
@@ -142,35 +164,51 @@ pre {
   white-space: pre-wrap;
 }
 
-dialog {
-  width: min(760px, calc(100% - 22px));
-  max-height: 86vh;
-  border: 0;
-  border-radius: 8px;
-  padding: 0;
-  box-shadow: 0 22px 80px rgba(0,0,0,.24);
+.preview {
+  min-height: 48vh;
+  line-height: 1.86;
+  color: #1d271f;
 }
 
-dialog header {
-  position: sticky;
-  top: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: #fff;
-  border-bottom: 1px solid #e3e7e2;
+.preview h1 {
+  margin: 0 0 12px;
+  font-size: 30px;
+  line-height: 1.2;
 }
 
-#preview {
-  padding: 16px;
-  line-height: 1.8;
+.preview h2 {
+  margin: 26px 0 10px;
+  font-size: 22px;
 }
 
-#preview img {
+.preview blockquote {
+  margin: 14px 0;
+  padding: 8px 12px;
+  border-left: 4px solid #28786b;
+  background: rgba(40,120,107,.08);
+}
+
+.preview img {
   max-width: 100%;
   border-radius: 6px;
+}
+
+.preview code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(19,32,24,.08);
+}
+
+.preview pre {
+  color: #edf7ef;
+}
+
+.preview .callout {
+  margin: 14px 0;
+  padding: 12px;
+  border: 1px solid rgba(40,120,107,.2);
+  border-radius: 6px;
+  background: rgba(40,120,107,.08);
 }
 
 @media (max-width: 620px) {
@@ -178,7 +216,12 @@ dialog header {
     grid-template-columns: 1fr;
   }
 
+  .toolbar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
   .toolbar button {
-    flex: 1;
+    white-space: nowrap;
   }
 }
