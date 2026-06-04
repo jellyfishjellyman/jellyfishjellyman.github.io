@@ -1,20 +1,85 @@
-- name: "2048"
-  slug: "2048"
-  description: "滑动数字方块，合成 2048。适合第一批做成站内小游戏。"
-  status: "可玩"
-  url: "/games/2048/"
-- name: "扫雷"
-  slug: "minesweeper"
-  description: "经典扫雷，逻辑清楚，适合做成轻量单页游戏。"
-  status: "计划内"
-  url: ""
-- name: "小恐龙"
-  slug: "dino"
-  description: "简化版横版躲避游戏，重点是手感和节奏。"
-  status: "计划内"
-  url: ""
-- name: "记忆翻牌"
-  slug: "memory"
-  description: "更容易先落地的小型卡片游戏。"
-  status: "候选"
-  url: ""
+- name: '2048'
+  slug: '2048'
+  description: 滑动数字方块，合成 2048。适合第一批做成站内小游戏。
+  status: 可玩
+  url: /games/2048/
+- name: 扫雷
+  slug: minesweeper
+  description: 经典扫雷，逻辑清楚，适合做成轻量单页游戏。
+  status: 计划内
+  url: ''
+- name: 小恐龙
+  slug: dino
+  description: 简化版横版躲避游戏，重点是手感和节奏。
+  status: 计划内
+  url: ''
+- name: 记忆翻牌
+  slug: memory
+  description: 更容易先落地的小型卡片游戏。
+  status: 候选
+  url: ''
+- name: itch.io
+  slug: ''
+  description: 独立游戏发布、试玩和下载平台。
+  status: 外部链接
+  url: https://itch.io/
+- name: CrazyGames
+  slug: ''
+  description: 在线小游戏集合。
+  status: 外部链接
+  url: https://www.crazygames.com/
+- name: 杉果游戏
+  slug: ''
+  description: 正版游戏购买和资讯平台。
+  status: 外部链接
+  url: https://www.sonkwo.cn/
+- name: Helldivers 2 Companion
+  slug: ''
+  description: Helldivers 2 战况和资料工具。
+  status: 外部链接
+  url: https://helldiverscompanion.com/#
+- name: 星际公民 Starmap
+  slug: ''
+  description: Star Citizen 官方星图。
+  status: 外部链接
+  url: https://robertsspaceindustries.com/starmap
+- name: 三角洲行动地图工具
+  slug: ''
+  description: 《三角洲行动》地图资料工具。
+  status: 外部链接
+  url: https://df.qq.com/cp/a20240729directory/
+- name: Hacker Typer
+  slug: ''
+  description: 模拟代码输入的趣味网页。
+  status: 外部链接
+  url: https://hackertyper.com/
+- name: LKs 网站推荐合集
+  slug: ''
+  description: B 站 UP 主 LKs 推荐的网站合集，偏有趣和探索。
+  status: 外部链接
+  url: https://lkssite.vip/
+- name: MKLab FC Games
+  slug: ''
+  description: 在线小游戏合集。
+  status: 外部链接
+  url: https://mklab.eu.org/FCGames/#/
+- name: 下塔雅 NES
+  slug: ''
+  description: 在线 NES 小游戏合集。
+  status: 外部链接
+  url: https://xiataya.top/nes/#/
+- name: 原神字体转换
+  slug: ''
+  description: 把文字转换成原神风格字体的趣味工具。
+  status: 外部链接
+  url: https://genshin.pro-ivan.com/#/
+- name: Poki
+  slug: ''
+  description: 在线小游戏平台。
+  status: 外部链接
+  url: https://poki.com/zh
+- name: 风叶穿行
+  slug: ''
+  description: B 站活动小游戏，按个人喜欢保留。
+  status: 外部链接
+  url: https://www.bilibili.com/blackboard/fe/activity-HQjQSdd3L8.html

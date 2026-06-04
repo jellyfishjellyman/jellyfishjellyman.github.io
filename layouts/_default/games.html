@@ -15,7 +15,7 @@
           <p>{{ .description }}</p>
         </div>
         {{ if .url }}
-          <a class="ghost-button" href="{{ .url }}">开始</a>
+          <a class="ghost-button" href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>开始</a>
         {{ else }}
           <button class="ghost-button" type="button" disabled>准备中</button>
         {{ end }}

@@ -1,29 +1,120 @@
-- title: "图片处理"
-  description: "图片编辑、压缩、格式转换和辅助创作。"
+- title: 外部工具
+  description: 从收藏夹整理出的常用在线工具。
   items:
-    - name: "在线图片编辑器"
-      url: "https://github.com/mtsee/image-editor"
-      note: "先作为项目入口，后续可评估本地部署。"
-      status: "待集成"
-    - name: "Photopea"
-      url: "https://www.photopea.com/"
-      note: "浏览器里的图像编辑工具。"
-      status: "外部工具"
-- title: "开发与文本"
-  description: "写作、格式化、转换和开发辅助。"
+  - name: Convertio
+    url: https://convertio.co/zh/
+    note: 在线文件格式转换。
+    status: 外部工具
+  - name: iLovePDF
+    url: https://www.ilovepdf.com/zh-cn
+    note: PDF 合并、压缩、转换和常见处理。
+    status: 外部工具
+  - name: Smallpdf
+    url: https://smallpdf.com/cn
+    note: PDF 在线工具集合。
+    status: 外部工具
+  - name: Time.is
+    url: https://time.is/zh/
+    note: 准确时间、时区和时间差查询。
+    status: 外部工具
+  - name: 百度识图
+    url: https://graph.baidu.com/pcpage/index?tpl_from=pc
+    note: 图片反查和相似图片搜索。
+    status: 外部工具
+  - name: 刘明野的工具箱
+    url: http://tool.liumingye.cn/
+    note: 常用在线小工具集合。
+    status: 外部工具
+  - name: 菜鸟工具
+    url: https://c.runoob.com/
+    note: 编码、格式化、转换和开发辅助工具。
+    status: 外部工具
+  - name: AHA Music
+    url: https://www.aha-music.com/
+    note: 浏览器里识别正在播放的音乐。
+    status: 外部工具
+  - name: GeoGebra
+    url: https://www.geogebra.org/classic?lang=zh_CN
+    note: 几何、函数、代数和数学可视化工具。
+    status: 外部工具
+  - name: NSFW JS
+    url: https://nsfwjs.com/
+    note: 浏览器端图像内容安全分类库，适合技术参考。
+    status: 外部工具
+  - name: YouGlish
+    url: https://youglish.com/
+    note: 用 YouTube 例句练习英语发音。
+    status: 外部工具
+  - name: 微软 Excel 视频培训
+    url: https://support.microsoft.com/zh-cn/office/excel-%E8%A7%86%E9%A2%91%E5%9F%B9%E8%AE%AD-9bc05390-e94c-46af-a5b3-d7c22f6990bb
+    note: 微软官方 Excel 入门培训。
+    status: 外部工具
+  - name: Lenovo Support
+    url: https://support.lenovo.com/
+    note: 联想设备驱动、保修和支持入口。
+    status: 外部工具
+  - name: Lenovo
+    url: https://www.lenovo.com/
+    note: 联想官网入口。
+    status: 外部工具
+  - name: Smallpdf
+    url: https://smallpdf.com/cn#r=app
+    note: PDF 在线处理工具，适合压缩、转换、合并和解锁等轻量任务。
+    status: 外部工具
+  - name: SOMD5
+    url: https://www.somd5.com/
+    note: MD5 在线查询和解密工具。
+    status: 外部工具
+  - name: 改图宝
+    url: https://www.gaitubao.com/
+    note: 在线修改图片尺寸、格式、压缩和基础处理。
+    status: 外部工具
+  - name: 原神字体转换
+    url: https://genshin.pro-ivan.com/#/
+    note: 把文字转换成原神风格字体的趣味工具。
+    status: 外部工具
+  - name: SmallSEOTools 以图搜图
+    url: https://smallseotools.com/zh/reverse-image-search/
+    note: 聚合式反向图片搜索工具。
+    status: 外部工具
+  - name: 音悦范
+    url: https://www.yinyue.tw/
+    note: 音乐格式转换工具。
+    status: 外部工具
+  - name: 音乐解锁
+    url: https://demo.unlock-music.dev/
+    note: 本地浏览器端音乐格式解锁工具。
+    status: 外部工具
+  - name: 阿虚同学的储物间
+    url: https://axutongxue.net/
+    note: 互联网工具、资源和软件导航。
+    status: 外部工具
+- title: 图片处理
+  description: 图片编辑、压缩、格式转换和辅助创作。
   items:
-    - name: "菜鸟工具"
-      url: "https://www.jyshare.com/"
-      note: "工具集合站。"
-      status: "参考/外链"
-    - name: "JSON Formatter"
-      url: "https://jsonformatter.org/"
-      note: "JSON 格式化和校验。"
-      status: "外部工具"
-- title: "博客维护"
-  description: "本站维护相关的本地入口。"
+  - name: 在线图片编辑器
+    url: https://github.com/mtsee/image-editor
+    note: 先作为项目入口，后续可评估本地部署。
+    status: 待集成
+  - name: Photopea
+    url: https://www.photopea.com/
+    note: 浏览器里的图像编辑工具。
+    status: 外部工具
+- title: 开发与文本
+  description: 写作、格式化、转换和开发辅助。
   items:
-    - name: "本地预览命令"
-      url: "/about/"
-      note: ".\\.tools\\hugo\\hugo.exe server -D --bind 127.0.0.1 --baseURL http://localhost:1313/ --port 1313"
-      status: "本地"
+  - name: 菜鸟工具
+    url: https://www.jyshare.com/
+    note: 工具集合站。
+    status: 参考/外链
+  - name: JSON Formatter
+    url: https://jsonformatter.org/
+    note: JSON 格式化和校验。
+    status: 外部工具
+- title: 博客维护
+  description: 本站维护相关的本地入口。
+  items:
+  - name: 本地预览命令
+    url: /about/
+    note: .\.tools\hugo\hugo.exe server -D --bind 127.0.0.1 --baseURL http://localhost:1313/ --port 1313
+    status: 本地

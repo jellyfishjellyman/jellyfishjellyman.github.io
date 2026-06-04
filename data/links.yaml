@@ -1,39 +1,448 @@
-- title: "动漫与漫画"
-  icon: "comic"
-  description: "动画、漫画、轻小说和资料站入口，先放稳定常用的，后续慢慢筛。"
+- title: 动漫与漫画
+  description: 番组记录、ACGN 资料库、二次元社区、配音和素材检索。
   items:
-    - name: "Bangumi"
-      url: "https://bangumi.tv/"
-      note: "番组计划，适合记录和查动画资料。"
-    - name: "萌娘百科"
-      url: "https://zh.moegirl.org.cn/"
-      note: "ACGN 百科资料。"
-    - name: "哔哩哔哩番剧"
-      url: "https://www.bilibili.com/anime/"
-      note: "正版番剧与动画。"
-- title: "小说与阅读"
-  icon: "book"
-  description: "小说、电子书、阅读记录相关站点。"
+  - name: Bilibili
+    url: https://www.bilibili.com/
+    note: 综合视频、番剧和学习内容平台。
+  - name: Bilibili 番剧
+    url: https://www.bilibili.com/anime/
+    note: 正版番剧、动画和相关视频入口。
+  - name: Bangumi
+    url: https://bangumi.tv/
+    note: 动画、漫画、游戏条目资料和个人追番记录。
+  - name: AniList
+    url: https://anilist.co/
+    note: 英文动画和漫画记录、发现与评分社区。
+  - name: 萌娘百科
+    url: https://zh.moegirl.org.cn/
+    note: ACGN 角色、作品和梗文化百科。
+  - name: trace.moe
+    url: https://trace.moe/
+    note: 用截图反查动画出处和集数。
+  - name: 巴哈姆特电玩资讯站
+    url: https://www.gamer.com.tw/
+    note: 中文游戏、动漫资讯和玩家社区。
+  - name: ACGNav
+    url: https://www.acgnav.cn/
+    note: ACGN 站点导航；只收首页，不收成人条目页。
+  - name: ikanbot / Animetox
+    url: https://www.animetox.com/
+    note: 动漫观看与检索入口，按你的认可保留。
+  - name: 猫耳 FM
+    url: https://www.missevan.com/
+    note: 广播剧、配音、二次元音频和声音社区。
+  - name: SauceNAO
+    url: https://saucenao.com/
+    note: 图片来源反查，常用于二次元图源和插画来源定位。
+  - name: Dialogue.moe
+    url: http://dialogue.moe/
+    note: 根据台词找动画或视频素材的检索工具。
+  - name: H萌
+    url: https://hmacg.cn/
+    note: H萌主页，二次元和 UP 主相关内容入口。
+  - name: 风叶穿行
+    url: https://www.bilibili.com/blackboard/fe/activity-HQjQSdd3L8.html
+    note: B 站活动小游戏，按个人喜欢保留。
+  - name: 轻小说文库
+    url: https://www.wenku8.net/login.php?jumpurl=http%3A%2F%2Fwww.wenku8.net%2Fmodules%2Farticle%2Farticlelist.php
+    note: 轻小说文库入口，资源很全但访问方式特殊。
+  icon: '?'
+- title: 小说与阅读
+  description: 小说、电子书、古诗文、公共版权文本和阅读资料。
   items:
-    - name: "起点中文网"
-      url: "https://www.qidian.com/"
-      note: "网文阅读。"
-    - name: "豆瓣读书"
-      url: "https://book.douban.com/"
-      note: "书籍资料和短评。"
-    - name: "Project Gutenberg"
-      url: "https://www.gutenberg.org/"
-      note: "公共领域电子书。"
-- title: "视频与学习"
-  icon: "video"
-  description: "视频、课程和知识型内容入口。"
+  - name: 豆瓣读书
+    url: https://book.douban.com/
+    note: 书籍资料、短评和阅读参考。
+  - name: Project Gutenberg
+    url: https://www.gutenberg.org/
+    note: 公共版权电子书资料库。
+  - name: 鸠摩搜索
+    url: https://www.jiumodiary.com/
+    note: 文档和电子书线索搜索。
+  - name: 古诗文网
+    url: https://www.gushiwen.cn/
+    note: 古诗词、文言文和传统文本检索。
+  - name: 起点中文网
+    url: https://www.qidian.com/
+    note: 中文网络文学阅读平台。
+  - name: LK Chen Sword
+    url: https://lkchensword.com/home
+    note: 历史刀剑复原与资料展示站。
+  - name: Z-Library 镜像 1
+    url: https://zh.z-lib.gd/
+    note: Z-Library 可用镜像入口之一，用于找电子书资源。
+  - name: Z-Library 镜像 2
+    url: https://zh.z-library.sk/
+    note: Z-Library 可用镜像入口之一，用于找电子书资源。
+  - name: 轻小说文库
+    url: https://www.wenku8.net/login.php?jumpurl=http%3A%2F%2Fwww.wenku8.net%2Fmodules%2Farticle%2Farticlelist.php
+    note: 轻小说文库入口，资源很全但访问方式特殊。
+  icon: '?'
+- title: 学习与编程
+  description: 课程、编程练习、官方文档、算法训练和自学路线。
   items:
-    - name: "Bilibili"
-      url: "https://www.bilibili.com/"
-      note: "视频、课程、番剧和生活区。"
-    - name: "YouTube"
-      url: "https://www.youtube.com/"
-      note: "公开视频和学习资源。"
-    - name: "Coursera"
-      url: "https://www.coursera.org/"
-      note: "在线课程。"
+  - name: CS 自学指南
+    url: https://csdiy.wiki/
+    note: 计算机课程自学路线和优质公开课索引。
+  - name: 中国大学 MOOC
+    url: https://www.icourse163.org/
+    note: 中文高校公开课与在线课程。
+  - name: 国家中小学智慧教育平台
+    url: https://www.zxx.edu.cn/
+    note: 中小学课程资源和公开教育材料。
+  - name: Python 文档
+    url: https://docs.python.org/3/
+    note: Python 3 官方文档。
+  - name: Git Book 中文版
+    url: https://git-scm.com/book/zh/v2
+    note: Git 官方书籍中文版。
+  - name: Python Tutor
+    url: https://pythontutor.com/
+    note: 可视化理解 Python、C、C++、JavaScript 等代码执行。
+  - name: 洛谷
+    url: https://www.luogu.com.cn/
+    note: 算法题库、训练和竞赛社区。
+  - name: LeetCode 中国
+    url: https://leetcode.cn/
+    note: 算法刷题和面试练习。
+  - name: 菜鸟教程
+    url: https://www.runoob.com/
+    note: 入门级编程和 Web 技术教程。
+  - name: W3School
+    url: https://www.w3school.com.cn/
+    note: Web 前端和基础技术参考。
+  - name: Educoder
+    url: https://www.educoder.net/
+    note: 在线实践教学与编程训练平台。
+  - name: Matiji
+    url: https://www.matiji.net/
+    note: 算法竞赛和题集训练平台。
+  - name: PGCode
+    url: https://pgcode.cn/
+    note: 学校真题和编程练习平台。
+  - name: HITCS 课程资料
+    url: https://github.com/HITLittleZheng/HITCS
+    note: 哈工大计算机课程资料 GitHub 仓库。
+  - name: HIT DSA 资料
+    url: https://github.com/cuttingedge191/HITCS-DSA
+    note: 哈工大数据结构与算法课程资料仓库。
+  - name: 操作系统设计与实现
+    url: https://os.guojunhit.cn/index.html
+    note: 操作系统课程与实验文档。
+  - name: CodePen
+    url: https://codepen.io/
+    note: 前端在线代码编辑与作品社区。
+  - name: codepad
+    url: http://codepad.org/
+    note: 轻量在线代码运行与分享工具。
+  - name: VS Code 入门文档
+    url: https://code.visualstudio.com/docs/introvideos/basics
+    note: Visual Studio Code 官方入门材料。
+  - name: How To Ask Questions
+    url: https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md
+    note: 提问方法经典文章中文版。
+  - name: The Art of Linear Algebra
+    url: https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra/blob/main/README-zh-CN.md
+    note: 线性代数可视化讲义中文版。
+  - name: CSDN
+    url: https://www.csdn.net/
+    note: 中文开发者社区，博客、问答和技术资料都比较多。
+  icon: '?'
+- title: 图片与搜索
+  description: 以图搜图、图片反查、素材定位和视觉搜索。
+  items:
+  - name: 改图宝
+    url: https://www.gaitubao.com/
+    note: 在线修改图片尺寸、格式、压缩和基础处理。
+  - name: SmallSEOTools 以图搜图
+    url: https://smallseotools.com/zh/reverse-image-search/
+    note: 聚合式反向图片搜索工具。
+  - name: SauceNAO
+    url: https://saucenao.com/
+    note: 图片来源反查，常用于二次元图源和插画来源定位。
+  - name: Yandex
+    url: https://yandex.com/
+    note: 搜索引擎，图片搜索能力强，适合搜图。
+  icon: '?'
+- title: 艺术与视觉
+  description: 名画、壁纸、影像资料、交互艺术和审美类网页。
+  items:
+  - name: 麦田艺术
+    url: https://www.nbfox.com/
+    note: 高清世界名画和艺术作品资料。
+  - name: Wallhaven
+    url: https://wallhaven.cc/
+    note: 壁纸搜索和收藏站。
+  - name: Artbreeder
+    url: https://www.artbreeder.com/
+    note: 基于生成模型的图像混合与创作。
+  - name: The Movie Database
+    url: https://www.themoviedb.org/
+    note: 电影、剧集、海报和演职员资料库。
+  - name: Nikon Small World
+    url: https://www.nikonsmallworld.com/
+    note: 显微摄影作品和科学影像。
+  - name: ESO
+    url: https://www.eso.org/
+    note: 欧洲南方天文台影像和天文资料。
+  - name: Hyper-resolution
+    url: https://hyper-resolution.org/
+    note: 超高分辨率艺术图像研究项目。
+  - name: Jackson Pollock
+    url: https://jacksonpollock.org/
+    note: 浏览器里的泼洒绘画交互实验。
+  - name: The Zen Zone
+    url: https://thezen.zone/
+    note: 轻量放松类交互网页。
+  - name: The Useless Web
+    url: https://theuselessweb.com/
+    note: 随机跳转到有趣网页。
+  - name: Move Now Think Later
+    url: https://www.movenowthinklater.com/
+    note: Rafael Rozendaal 的交互艺术网页。
+  - name: Random Colour
+    url: http://randomcolour.com/
+    note: 随机颜色生成网页。
+  - name: Smash The Walls
+    url: https://smashthewalls.com/
+    note: 点击式互动艺术网页。
+  - name: Fotor GoArt
+    url: https://goart.fotor.com/
+    note: 照片艺术化与风格化工具。
+  - name: FAST 全景
+    url: https://www.720yun.com/t/12d2eaa5jef?scene_id=810467
+    note: FAST 射电望远镜全景展示。
+  - name: B-Sketcher
+    url: https://projects.calebevans.me/b-sketcher/
+    note: 浏览器中的创意绘图实验。
+  - name: LKs 网站推荐合集
+    url: https://lkssite.vip/
+    note: B 站 UP 主 LKs 推荐的网站合集，偏有趣和探索。
+  - name: 冷笑话知识卡片
+    url: https://lxqnsys.com/d/#/index
+    note: 每次打开都有小知识或小卡片，适合作为网站灵感参考。
+  - name: Bosch Project
+    url: http://boschproject.org/#/
+    note: 博斯风格的交互艺术与视觉探索网页。
+  - name: tree.fm
+    url: https://www.tree.fm/
+    note: 随机收听世界各地森林声音，很适合放松。
+  - name: 事物与事件
+    url: https://pedantries.com/
+    note: 哲学、语言和观念研究类网站。
+  - name: 随机一起听歌
+    url: https://happy.alang.run/#/
+    note: 随机一起听歌的网页应用。
+  icon: '?'
+- title: AI 与创作
+  description: AI 对话、演示、图像、音频和内容创作工具。
+  items:
+  - name: ChatGPT
+    url: https://chat.openai.com/
+    note: 通用 AI 对话和创作工具。
+  - name: DeepSeek
+    url: https://chat.deepseek.com/
+    note: 中文友好的 AI 对话工具。
+  - name: 文心一言
+    url: https://yiyan.baidu.com/
+    note: 百度的 AI 对话和创作工具。
+  - name: Gamma
+    url: https://gamma.app/
+    note: 用 AI 辅助生成演示文稿和页面。
+  - name: MyEdit
+    url: https://myedit.online/tw
+    note: 在线图片、音频和视频编辑工具。
+  - name: CoolTools AI
+    url: https://cooltools.top/ai.html
+    note: AI 网站和应用导航。
+  - name: 阿虚同学的储物间
+    url: https://axutongxue.net/
+    note: 互联网工具、资源和软件导航。
+  - name: Azure 文本转语音
+    url: https://azure.microsoft.com/zh-cn/products/ai-services/text-to-speech
+    note: 微软 Azure 文本转语音服务介绍。
+  - name: DALL·E
+    url: https://labs.openai.com/
+    note: OpenAI 图像生成旧入口，作为历史入口保留。
+  - name: AI 工具分享
+    url: https://pangmenzuodao.feishu.cn/base/L6E1bStTkan90SsjGbncli8nnpb
+    note: 公开 AI 工具资料表，易变但有索引价值。
+  icon: '?'
+- title: 音乐与声音
+  description: 音乐识别、格式处理、一起听歌、声音素材和氛围声音。
+  items:
+  - name: 猫耳 FM
+    url: https://www.missevan.com/
+    note: 广播剧、配音、二次元音频和声音社区。
+  - name: tree.fm
+    url: https://www.tree.fm/
+    note: 随机收听世界各地森林声音，很适合放松。
+  - name: 音悦范
+    url: https://www.yinyue.tw/
+    note: 音乐格式转换工具。
+  - name: 音乐解锁
+    url: https://demo.unlock-music.dev/
+    note: 本地浏览器端音乐格式解锁工具。
+  - name: 随机一起听歌
+    url: https://happy.alang.run/#/
+    note: 随机一起听歌的网页应用。
+  icon: '?'
+- title: 资源整理
+  description: 综合导航、资源索引、镜像站、磁力搜索和个人整理站。
+  items:
+  - name: Z-Library 镜像 1
+    url: https://zh.z-lib.gd/
+    note: Z-Library 可用镜像入口之一，用于找电子书资源。
+  - name: Z-Library 镜像 2
+    url: https://zh.z-library.sk/
+    note: Z-Library 可用镜像入口之一，用于找电子书资源。
+  - name: 无极磁链
+    url: https://cili.st/
+    note: 磁力链接搜索入口，按私人收藏保留。
+  - name: CSDN
+    url: https://www.csdn.net/
+    note: 中文开发者社区，博客、问答和技术资料都比较多。
+  - name: LKs 网站推荐合集
+    url: https://lkssite.vip/
+    note: B 站 UP 主 LKs 推荐的网站合集，偏有趣和探索。
+  - name: 杠叔资源导航
+    url: https://xydh.fun/gangshu
+    note: 资源整理和导航页面。
+  - name: 阿虚同学的储物间
+    url: https://axutongxue.net/
+    note: 互联网工具、资源和软件导航。
+  icon: '?'
+- title: 影视与素材
+  description: 影视资料、影厅分布、台词检索和素材定位。
+  items:
+  - name: ikanbot / Animetox
+    url: https://www.animetox.com/
+    note: 动漫观看与检索入口，按你的认可保留。
+  - name: Dialogue.moe
+    url: http://dialogue.moe/
+    note: 根据台词找动画或视频素材的检索工具。
+  - name: 33 台词
+    url: https://33tc.net/
+    note: 根据台词找素材的检索工具。
+  - name: 全球 IMAX 及特效影厅分布
+    url: https://docs.qq.com/sheet/DQ3FEUUZJdklNSWJP?tab=eps21i
+    note: 长期更新的全球 IMAX 和特效影厅分布文档。
+  icon: '?'
+- title: 梗与社区
+  description: 梗百科、论坛、社区和兴趣站入口。
+  items:
+  - name: 什么梗
+    url: https://www.shenmegeng.cn/
+    note: 查梗、梗出处和网络流行语。
+  - name: H萌
+    url: https://hmacg.cn/
+    note: H萌主页，二次元和 UP 主相关内容入口。
+  icon: '?'
+- title: 资讯与资料
+  description: 搜索、新闻、公共信息、文档资料和专题资料库入口。
+  items:
+  - name: Google
+    url: https://www.google.com/
+    note: 通用搜索引擎。
+  - name: 百度
+    url: https://www.baidu.com/
+    note: 中文搜索和常用入口。
+  - name: 澎湃新闻
+    url: https://www.thepaper.cn/
+    note: 新闻、时政和思想类内容。
+  - name: 互联网信息服务投诉平台
+    url: https://ts.isc.org.cn/#/home
+    note: 互联网服务投诉和权益维护入口。
+  - name: 三体官方网站
+    url: http://www.threebody.com.cn/
+    note: 《三体》相关官方信息入口。
+  - name: 中国政府网公报
+    url: http://www.gov.cn/zhengce/2011-11/09/content_2619441.htm
+    note: 国务院公报历史资料。
+  - name: Telegram Bot Directory
+    url: https://botfortelegram.com/
+    note: Telegram 机器人、频道和群组目录。
+  - name: PitchSend
+    url: https://pitchsend.com/categories/finance
+    note: 融资和商业演示文稿案例库。
+  - name: AboutPPT
+    url: https://www.aboutppt.com/
+    note: PPT 演示设计网址导航。
+  - name: 冷笑话知识卡片
+    url: https://lxqnsys.com/d/#/index
+    note: 每次打开都有小知识或小卡片，适合作为网站灵感参考。
+  - name: Yandex
+    url: https://yandex.com/
+    note: 搜索引擎，图片搜索能力强，适合搜图。
+  - name: 什么梗
+    url: https://www.shenmegeng.cn/
+    note: 查梗、梗出处和网络流行语。
+  - name: 全球 IMAX 及特效影厅分布
+    url: https://docs.qq.com/sheet/DQ3FEUUZJdklNSWJP?tab=eps21i
+    note: 长期更新的全球 IMAX 和特效影厅分布文档。
+  - name: 事物与事件
+    url: https://pedantries.com/
+    note: 哲学、语言和观念研究类网站。
+  icon: '?'
+- title: 金融与资产
+  description: 公开金融机构和高校资产经营公司官网，适合资料查询。
+  items:
+  - name: 中国人寿资产
+    url: https://www.clamc.com/
+    note: 中国人寿资产管理有限公司官网。
+  - name: 中国长城资产
+    url: https://www.gwamcc.com/
+    note: 中国长城资产管理股份有限公司官网。
+  - name: 中国信达资产
+    url: https://www.cinda.com.cn/home/pc/cn/xdjt/index.shtml
+    note: 中国信达资产管理股份有限公司官网。
+  - name: 中国东方资产
+    url: https://www.coamc.com.cn/
+    note: 中国东方资产管理股份有限公司官网。
+  - name: 中信金融资产
+    url: https://www.famc.citic/
+    note: 中国中信金融资产官网。
+  - name: 中国银河资产
+    url: https://www.galaxyamc.com.cn/
+    note: 中国银河资产管理有限公司官网。
+  - name: 长安资产
+    url: https://www.changanassets.com/
+    note: 长安资产管理有限公司官网。
+  - name: BlackRock
+    url: https://www.blackrock.com/
+    note: 贝莱德官网和投资者资料。
+  - name: Vanguard
+    url: https://global.vanguard.com/
+    note: 先锋集团全球投资者入口。
+  - name: Fidelity
+    url: https://www.fidelity.com/
+    note: 富达投资官网。
+  - name: 复旦资产经营
+    url: https://zcgs.fudan.edu.cn/
+    note: 复旦资产经营有限公司官网。
+  - name: 上海交大企业发展集团
+    url: https://qyjt.sjtu.edu.cn/
+    note: 上海交大企业发展集团官网。
+  - name: 南京大学资产经营公司
+    url: https://ndzcgs.nju.edu.cn/
+    note: 南京大学资产经营公司官网。
+  - name: 浙大控股集团
+    url: http://www.kggs.zju.edu.cn/
+    note: 浙江大学控股集团官网。
+  - name: 西安交大资产经营公司
+    url: http://holding.xjtu.edu.cn/
+    note: 西安交大资产经营公司官网。
+  - name: 北理工资产经营公司
+    url: https://asset.bit.edu.cn/
+    note: 北京理工大学资产经营公司官网。
+  - name: 哈工程资产经营公司
+    url: https://heuam.hrbeu.edu.cn/
+    note: 哈尔滨工程大学资产经营公司官网。
+  icon: '?'
+- title: 其他
+  description: 暂时难以归类，但仍值得保留的公开入口。
+  items:
+  - name: 冷笑话知识卡片
+    url: https://lxqnsys.com/d/#/index
+    note: 每次打开都有小知识或小卡片，适合作为网站灵感参考。
+  icon: '?'
