@@ -8,8 +8,6 @@
         {{ .Date.Format "2006-01-02" }}{{ with .ReadingTime }} · {{ . }} 分钟阅读{{ end }}
       </div>
     </header>
-  {{ else }}
-    <h1>{{ .Title }}</h1>
   {{ end }}
 
   <div class="lh-copy mt4 post-content">
