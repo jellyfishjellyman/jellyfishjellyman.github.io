@@ -80,16 +80,20 @@ function buildMarkdown(slug) {
   return `${front.join("\n")}${els.body.value.trim()}\n`;
 }
 
-function insertText(before, after = "") {
+function insertText(before, after = "", placeholder = "") {
   const input = els.body;
   const start = input.selectionStart;
   const end = input.selectionEnd;
-  const selected = input.value.slice(start, end);
+  const selected = input.value.slice(start, end) || placeholder;
   const next = input.value.slice(0, start) + before + selected + after + input.value.slice(end);
   input.value = next;
-  const cursor = start + before.length + selected.length + after.length;
   input.focus();
-  input.setSelectionRange(cursor, cursor);
+  if (placeholder && start === end) {
+    input.setSelectionRange(start + before.length, start + before.length + selected.length);
+  } else {
+    const cursor = start + before.length + selected.length + after.length;
+    input.setSelectionRange(cursor, cursor);
+  }
 }
 
 document.querySelectorAll("[data-insert]").forEach((button) => {
@@ -99,8 +103,8 @@ document.querySelectorAll("[data-insert]").forEach((button) => {
     if (type === "h2") insertText("\n## ", "\n");
     if (type === "quote") insertText("\n> ", "\n");
     if (type === "hr") insertText("\n---\n");
-    if (type === "color") insertText('{{< text color="#d35400" >}}', "{{< /text >}}");
-    if (type === "size") insertText('{{< text size="20px" >}}', "{{< /text >}}");
+    if (type === "color") insertText('{{< text color="#d35400" >}}', "{{< /text >}}", "彩色文字");
+    if (type === "size") insertText('{{< text size="20px" >}}', "{{< /text >}}", "大号文字");
   });
 });
 
