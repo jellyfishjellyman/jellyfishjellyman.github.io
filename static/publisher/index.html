@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#225b43">
+  <title>手机发文</title>
+  <link rel="manifest" href="/publisher/manifest.webmanifest">
+  <link rel="stylesheet" href="/publisher/styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p>Jellyfish Publisher</p>
+        <h1>手机发文</h1>
+      </div>
+      <button id="previewButton" type="button">预览</button>
+    </header>
+
+    <section class="panel auth-panel">
+      <label>GitHub Token
+        <input id="token" type="password" autocomplete="off" placeholder="fine-grained token">
+      </label>
+      <label class="check">
+        <input id="rememberToken" type="checkbox">
+        <span>只保存在这台手机</span>
+      </label>
+    </section>
+
+    <form id="postForm" class="panel editor-panel">
+      <label>标题
+        <input id="title" required autocomplete="off">
+      </label>
+
+      <label>文章路径
+        <input id="slug" autocomplete="off" placeholder="不填自动生成">
+      </label>
+
+      <div class="grid">
+        <label>分类
+          <select id="category">
+            <option value="随感">随感</option>
+            <option value="网上文案">网上文案</option>
+            <option value="其他">其他</option>
+          </select>
+        </label>
+        <label>标签
+          <input id="tags" autocomplete="off" placeholder="逗号分隔">
+        </label>
+      </div>
+
+      <div class="toolbar" aria-label="编辑工具栏">
+        <button type="button" data-insert="bold">B</button>
+        <button type="button" data-insert="h2">H2</button>
+        <button type="button" data-insert="quote">引</button>
+        <button type="button" data-insert="hr">线</button>
+        <button type="button" data-insert="color">颜色</button>
+        <button type="button" data-insert="size">字号</button>
+      </div>
+
+      <label>正文
+        <textarea id="body" required spellcheck="false" placeholder="在这里写文章。上传图片会插入到光标位置。"></textarea>
+      </label>
+
+      <label>插入图片
+        <input id="images" type="file" accept="image/*" multiple>
+      </label>
+
+      <div class="actions">
+        <label class="check">
+          <input id="draft" type="checkbox">
+          <span>保存为草稿</span>
+        </label>
+        <button type="submit">发布到 GitHub</button>
+      </div>
+    </form>
+
+    <section class="panel">
+      <h2>输出</h2>
+      <pre id="output">准备就绪</pre>
+    </section>
+
+    <dialog id="previewDialog">
+      <header>
+        <strong>预览</strong>
+        <button id="closePreview" type="button">关闭</button>
+      </header>
+      <article id="preview"></article>
+    </dialog>
+  </main>
+  <script src="/publisher/app.js"></script>
+</body>
+</html>

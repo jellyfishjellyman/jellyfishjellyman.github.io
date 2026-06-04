@@ -1,0 +1,9 @@
+{
+  "name": "Jellyfish 手机发文",
+  "short_name": "发文",
+  "start_url": "/publisher/",
+  "scope": "/publisher/",
+  "display": "standalone",
+  "background_color": "#f4f6f2",
+  "theme_color": "#225b43"
+}

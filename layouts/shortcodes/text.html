@@ -1,0 +1,6 @@
+{{- $color := .Get "color" | default "inherit" -}}
+{{- $size := .Get "size" | default "inherit" -}}
+{{- $weight := .Get "weight" | default "inherit" -}}
+<span style="color: {{ $color | safeCSS }}; font-size: {{ $size | safeCSS }}; font-weight: {{ $weight | safeCSS }};">
+  {{- .Inner | markdownify -}}
+</span>
