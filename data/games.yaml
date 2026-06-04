@@ -3,6 +3,16 @@
   description: 滑动数字方块，合成 2048。适合第一批做成站内小游戏。
   status: 可玩
   url: /games/2048/
+- name: 'SERVER: Survival Protocol'
+  slug: server-survival
+  description: 云架构塔防，把服务器、负载均衡、流量洪峰和容灾压力做成可玩的学习场景。
+  status: 可玩
+  url: /games/server-survival/
+- name: 'VIM Master'
+  slug: vimmaster
+  description: 用 h j k l、w、b、dd 等 Vim 指令通关，比背快捷键更容易练出手感。
+  status: 可玩
+  url: /games/vimmaster/
 - name: 扫雷
   slug: minesweeper
   description: 经典扫雷，逻辑清楚，适合做成轻量单页游戏。

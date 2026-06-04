@@ -1,0 +1,28 @@
+{{ define "main" }}
+<section class="embedded-game-page">
+  <div class="embedded-game-head reveal-on-scroll">
+    <p class="eyebrow">{{ .Params.kicker | default "Game" }}</p>
+    <h1>{{ .Title }}</h1>
+    <div class="module-copy">{{ .Content }}</div>
+    <div class="embedded-game-actions">
+      <a class="ghost-button" href="/games/">返回游戏</a>
+      {{ with .Params.source_url }}
+        <a class="ghost-button" href="{{ . }}" target="_blank" rel="noopener noreferrer">源码</a>
+      {{ end }}
+      {{ with .Params.demo_url }}
+        <a class="ghost-button" href="{{ . }}" target="_blank" rel="noopener noreferrer">演示</a>
+      {{ end }}
+    </div>
+  </div>
+
+  <div class="embedded-game-frame-wrap reveal-on-scroll">
+    <iframe
+      class="embedded-game-frame"
+      src="{{ .Params.game_src }}"
+      title="{{ .Title }}"
+      loading="lazy"
+      allow="autoplay; fullscreen; gamepad"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+{{ end }}
