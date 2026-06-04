@@ -1,0 +1,14 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer-inner">
+    <div>
+      <p class="footer-kicker">Jellyfish Lab</p>
+      <a class="footer-brand" href="{{ .Site.Home.Permalink }}">{{ .Site.Title }}</a>
+      <p class="footer-copy">{{ .Site.Params.description }}</p>
+    </div>
+
+    <div class="footer-meta">
+      <span>&copy; {{ now.Format "2006" }}</span>
+      <span>Built with Hugo</span>
+    </div>
+  </div>
+</footer>

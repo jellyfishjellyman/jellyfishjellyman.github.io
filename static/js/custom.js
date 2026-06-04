@@ -18,6 +18,22 @@
     document.body.classList.add("home");
   }
 
+  const progress = document.createElement("div");
+  progress.className = "reading-progress";
+  progress.setAttribute("aria-hidden", "true");
+  document.body.appendChild(progress);
+
+  const updateProgress = () => {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const value = Math.min(1, Math.max(0, window.scrollY / max));
+    progress.style.transform = `scaleX(${value})`;
+    document.body.classList.toggle("is-scrolled", window.scrollY > 48);
+  };
+
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress, { passive: true });
+  updateProgress();
+
   document.querySelectorAll("[data-resource-tabs]").forEach((shell) => {
     const tabs = Array.from(shell.querySelectorAll("[data-resource-tab]"));
     const panels = Array.from(shell.querySelectorAll("[data-resource-panel]"));
