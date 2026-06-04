@@ -1,6 +1,6 @@
 <header class="site-header">
   {{ partial "site-navigation.html" . }}
-  {{ if not .IsHome }}
+  {{ if and (not .IsHome) (not (and .IsPage (eq .Section "posts"))) }}
     <section class="page-hero">
       <p class="eyebrow">{{ .Section | default "Jellyfish" }}</p>
       <h1>{{ .Title | default .Site.Title }}</h1>

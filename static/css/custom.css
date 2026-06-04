@@ -589,6 +589,14 @@ body.home .site-header {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+}
+
+.post-card-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
 }
 
 .post-card h2 {
@@ -609,6 +617,7 @@ body.home .site-header {
 
 .post-summary {
   position: relative;
+  z-index: 2;
   flex: 1;
   min-height: 0;
   max-height: 190px;
@@ -648,14 +657,14 @@ body.home .site-header {
 
 .post-card .post-meta,
 .post-card h2,
-.post-card .post-summary,
+.post-card .post-category,
 .module-card > *,
 .game-card > *,
 .feature-card > *,
 .resource-tag > *,
 .link-item > * {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .feature-strip {
@@ -1200,6 +1209,31 @@ main article.mw8 {
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
   margin-top: 24px;
+}
+
+.post-single {
+  padding-top: 30px;
+}
+
+.post-single-header {
+  margin-bottom: 20px;
+}
+
+.post-single-header .post-category {
+  display: inline-flex;
+  margin-bottom: 14px;
+}
+
+.post-single-header h1 {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.post-content {
+  font-size: 17px;
+  line-height: 1.9;
 }
 
 pre,

@@ -286,19 +286,27 @@
 
   document.querySelectorAll(".post-card").forEach((card) => {
     const summary = card.querySelector(".post-summary");
-    if (!summary) return;
-    card.addEventListener(
-      "wheel",
-      (event) => {
-        if (!card.matches(":hover")) return;
-        const canScroll = summary.scrollHeight > summary.clientHeight;
-        if (!canScroll) return;
-        const before = summary.scrollTop;
-        summary.scrollTop += event.deltaY;
-        if (summary.scrollTop !== before) event.preventDefault();
-      },
-      { passive: false }
-    );
+    const link = card.querySelector(".post-card-hit") || card.querySelector("h2 a");
+    if (link) {
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a")) return;
+        window.location.href = link.href;
+      });
+    }
+    if (summary) {
+      card.addEventListener(
+        "wheel",
+        (event) => {
+          if (!card.matches(":hover")) return;
+          const canScroll = summary.scrollHeight > summary.clientHeight;
+          if (!canScroll) return;
+          const before = summary.scrollTop;
+          summary.scrollTop += event.deltaY;
+          if (summary.scrollTop !== before) event.preventDefault();
+        },
+        { passive: false }
+      );
+    }
   });
 
   const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item");

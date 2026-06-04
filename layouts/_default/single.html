@@ -1,7 +1,18 @@
 {{ define "main" }}
-<article class="mw8 center ph3 pv4">
-  <h1>{{ .Title }}</h1>
-  <div class="lh-copy mt4">
+<article class="post-single mw8 center ph3 pv4">
+  {{ if eq .Section "posts" }}
+    <header class="post-single-header">
+      <span class="post-category">{{ .Params.category | default "其他" }}</span>
+      <h1>{{ .Title }}</h1>
+      <div class="post-meta">
+        {{ .Date.Format "2006-01-02" }}{{ with .ReadingTime }} · {{ . }} 分钟阅读{{ end }}
+      </div>
+    </header>
+  {{ else }}
+    <h1>{{ .Title }}</h1>
+  {{ end }}
+
+  <div class="lh-copy mt4 post-content">
     {{ .Content }}
   </div>
 
