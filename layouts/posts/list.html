@@ -7,6 +7,17 @@
     (dict "name" "其他" "desc" "暂时放不进前两类的内容。")
   }}
 
+  <div class="module-intro module-intro-panel reveal-on-scroll">
+    <p class="eyebrow">Posts</p>
+    <h1>{{ .Title }}</h1>
+    <div class="module-copy">{{ .Content }}</div>
+    <div class="module-stats" aria-label="文章概览">
+      <span><strong>{{ len $pages }}</strong> 篇文章</span>
+      <span><strong>{{ len $groups }}</strong> 个分组</span>
+      <span><strong>{{ with index $pages 0 }}{{ .Date.Format "2006-01-02" }}{{ else }}等待第一篇{{ end }}</strong> 最近更新</span>
+    </div>
+  </div>
+
   {{ range $groups }}
     {{ $name := .name }}
     {{ $items := where $pages "Params.category" $name }}

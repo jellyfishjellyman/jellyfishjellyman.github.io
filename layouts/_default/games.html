@@ -4,6 +4,11 @@
     <p class="eyebrow">Games</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>
+    <div class="module-stats" aria-label="游戏概览">
+      <span><strong>{{ len site.Data.games }}</strong> 个入口</span>
+      <span><strong>2048</strong> 已上线</span>
+      <span><strong>Light</strong> 轻量优先</span>
+    </div>
   </div>
 
   <div class="game-grid">

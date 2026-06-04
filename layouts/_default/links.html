@@ -4,6 +4,13 @@
     <p class="eyebrow">Links</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>
+    {{ $total := 0 }}
+    {{ range site.Data.links }}{{ $total = add $total (len .items) }}{{ end }}
+    <div class="module-stats" aria-label="资源概览">
+      <span><strong>{{ len site.Data.links }}</strong> 个标签</span>
+      <span><strong>{{ $total }}</strong> 个入口</span>
+      <span><strong>Modal</strong> 分组查看</span>
+    </div>
   </div>
 
   {{ $groups := site.Data.links }}

@@ -4,6 +4,13 @@
     <p class="eyebrow">Tools</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>
+    {{ $total := 0 }}
+    {{ range site.Data.tools }}{{ $total = add $total (len .items) }}{{ end }}
+    <div class="module-stats" aria-label="工具概览">
+      <span><strong>{{ len site.Data.tools }}</strong> 个工具组</span>
+      <span><strong>{{ $total }}</strong> 个入口</span>
+      <span><strong>Local</strong> 预留集成</span>
+    </div>
   </div>
 
   <div class="module-grid tools-grid">
