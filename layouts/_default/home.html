@@ -1,44 +1,52 @@
 {{ define "main" }}
 
-<!-- 全屏开场 -->
-<section id="hero" class="hero">
-  <div class="hero-overlay"></div>
+<section id="hero" class="home-hero" data-webgl-hero>
+  <canvas class="home-hero-canvas" data-webgl-canvas aria-hidden="true"></canvas>
+  <div class="home-hero-scan" aria-hidden="true"></div>
 
-  <div class="hero-inner">
-    <h1 class="hero-title hero-animate">欢迎来到我的博客</h1>
-    <p class="hero-sub hero-animate delay-1">
-      {{ .Site.Title }} · {{ .Site.Params.description }}
-    </p>
+  <div class="home-hero-inner">
+    <div class="home-hero-copy">
+      <p class="home-kicker">Jellyfish Lab</p>
+      <h1 class="home-title">记录一点正在发光的东西</h1>
+      <p class="home-sub">
+        <span>学习、技术、生活和偶然出现的想法。</span>
+        <span>首页有一点未来感，文章保持清楚。</span>
+      </p>
 
-    <div class="hero-hint hero-animate delay-2" role="button" tabindex="0">
-      只需要滚动一下 ↓
+      <div class="hero-actions">
+        <a class="primary-button" href="/posts/">读文章</a>
+        <a class="ghost-button" href="/links/">逛资源</a>
+        <a class="ghost-button" href="/tools/">看工具</a>
+      </div>
     </div>
 
-    <div class="hero-actions hero-animate delay-3">
-      <a class="primary-button" href="/posts/">读文章</a>
-      <a class="ghost-button" href="/links/">逛资源</a>
-      <a class="ghost-button" href="/games/">玩一会</a>
+    <div class="home-orb" aria-hidden="true">
+      <span class="home-orb-core"></span>
+      <span class="home-orb-eye"></span>
     </div>
   </div>
+
+  <button class="hero-hint" type="button" data-scroll-target="#homeContent">
+    继续向下
+  </button>
 </section>
 
-<!-- 文章区 -->
-<section id="homeContent" class="home-wrap pt5">
+<section id="homeContent" class="home-wrap home-lab">
   <div class="feature-strip">
+    <a class="feature-card" href="/posts/">
+      <span>Posts</span>
+      <strong>最近写下的东西</strong>
+      <p>保留博客最重要的阅读体验，入口轻一点，内容清楚一点。</p>
+    </a>
     <a class="feature-card" href="/links/">
       <span>Links</span>
       <strong>资源收藏</strong>
-      <p>动漫、小说、视频和常用网站，先从轻量导航开始。</p>
-    </a>
-    <a class="feature-card" href="/tools/">
-      <span>Tools</span>
-      <strong>小工具</strong>
-      <p>图片编辑、文本处理和以后准备集成的浏览器工具。</p>
+      <p>动漫、小说、视频和常用网站，先从轻量导航开始整理。</p>
     </a>
     <a class="feature-card" href="/games/">
       <span>Games</span>
-      <strong>小游戏</strong>
-      <p>2048、扫雷、小恐龙等轻量游戏入口。</p>
+      <strong>小型互动</strong>
+      <p>2048 和以后准备加入的轻量实验，适合偶尔放松一下。</p>
     </a>
   </div>
 

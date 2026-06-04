@@ -2,29 +2,20 @@
   const root = document.documentElement;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+
+  const setPointerVars = (event) => {
+    root.style.setProperty("--mouse-x", `${event.clientX}px`);
+    root.style.setProperty("--mouse-y", `${event.clientY}px`);
+  };
 
   if (!reduceMotion && finePointer) {
     document.body.classList.add("has-pointer");
-    const noise = document.createElement("div");
-    noise.className = "dream-noise";
-    document.body.appendChild(noise);
+    window.addEventListener("pointermove", setPointerVars, { passive: true });
+  }
 
-    const grid = document.createElement("div");
-    grid.className = "vapor-grid";
-    document.body.appendChild(grid);
-
-    window.addEventListener(
-      "pointermove",
-      (event) => {
-        pointer.x = event.clientX;
-        pointer.y = event.clientY;
-        root.style.setProperty("--mouse-x", `${event.clientX}px`);
-        root.style.setProperty("--mouse-y", `${event.clientY}px`);
-        root.style.setProperty("--cursor-hue", `${160 + (event.clientX / Math.max(1, window.innerWidth)) * 120}deg`);
-      },
-      { passive: true }
-    );
+  if (location.pathname === "/" || location.pathname === "/index.html") {
+    document.body.classList.add("home");
   }
 
   document.querySelectorAll("[data-resource-tabs]").forEach((shell) => {
@@ -62,21 +53,12 @@
       if (lastActiveTab) lastActiveTab.focus({ preventScroll: true });
     };
 
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        openModal(tab.dataset.resourceTab);
-      });
-    });
-
+    tabs.forEach((tab) => tab.addEventListener("click", () => openModal(tab.dataset.resourceTab)));
     closeButtons.forEach((button) => button.addEventListener("click", closeModal));
     window.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
     });
   });
-
-  if (location.pathname === "/" || location.pathname === "/index.html") {
-    document.body.classList.add("home");
-  }
 
   const backToTop = document.createElement("button");
   backToTop.id = "backToTop";
@@ -96,143 +78,6 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
 
-  const musicPanel = document.createElement("div");
-  musicPanel.className = "music-panel";
-  musicPanel.setAttribute("aria-label", "背景音乐控制台");
-
-  const musicToggle = document.createElement("button");
-  musicToggle.id = "musicToggle";
-  musicToggle.type = "button";
-  musicToggle.setAttribute("aria-label", "播放或暂停背景音乐");
-  musicToggle.title = "播放氛围音乐";
-  musicToggle.textContent = "♪";
-
-  const musicCopy = document.createElement("div");
-  musicCopy.className = "music-copy";
-  musicCopy.innerHTML = '<span class="music-title">Moonlight</span><span class="music-status">点击启动</span>';
-
-  const bars = document.createElement("div");
-  bars.className = "music-bars";
-  for (let i = 0; i < 12; i += 1) {
-    const bar = document.createElement("span");
-    bar.style.setProperty("--bar-index", i);
-    bars.appendChild(bar);
-  }
-
-  musicPanel.append(musicToggle, musicCopy, bars);
-  document.body.appendChild(musicPanel);
-  const musicStatus = musicCopy.querySelector(".music-status");
-
-  let audioCtx = null;
-  let musicTimer = null;
-  let lfoTimer = null;
-  let masterGain = null;
-  let playing = false;
-  let step = 0;
-
-  const notesByPath = {
-    "/links/": [220.0, 277.18, 329.63, 415.3, 493.88],
-    "/tools/": [196.0, 246.94, 293.66, 369.99, 440.0],
-    "/games/": [174.61, 220.0, 261.63, 329.63, 392.0],
-    "/posts/": [196.0, 246.94, 293.66, 369.99, 493.88],
-    default: [174.61, 220.0, 261.63, 329.63, 392.0],
-  };
-
-  const getNotes = () => {
-    const path = `${location.pathname.replace(/\/$/, "")}/`;
-    return notesByPath[path] || notesByPath.default;
-  };
-
-  const ensureAudio = async () => {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    await audioCtx.resume();
-    if (!masterGain) {
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = 0.42;
-      masterGain.connect(audioCtx.destination);
-    }
-  };
-
-  const playTone = (frequency, time, index) => {
-    const osc = audioCtx.createOscillator();
-    const shimmer = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
-    osc.type = "sine";
-    shimmer.type = "sine";
-    osc.frequency.setValueAtTime(frequency, time);
-    shimmer.frequency.setValueAtTime(frequency * (index % 2 ? 1.5 : 2.0), time);
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(560 + (index % 5) * 34, time);
-    filter.Q.setValueAtTime(1.8, time);
-    gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.026, time + 0.36);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 3.8);
-    osc.connect(filter);
-    shimmer.connect(filter);
-    filter.connect(gain);
-    gain.connect(masterGain);
-    osc.start(time);
-    shimmer.start(time + 0.02);
-    osc.stop(time + 4.0);
-    shimmer.stop(time + 3.2);
-  };
-
-  const playBass = (time, frequency) => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(frequency * 0.5, time);
-    gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.018, time + 0.5);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 4.8);
-    osc.connect(gain);
-    gain.connect(masterGain);
-    osc.start(time);
-    osc.stop(time + 5.0);
-  };
-
-  const startMusic = async () => {
-    await ensureAudio();
-    const notes = getNotes();
-    playing = true;
-    musicPanel.classList.add("is-playing");
-    musicStatus.textContent = "月光模式";
-    masterGain.gain.setTargetAtTime(0.3, audioCtx.currentTime, 0.35);
-
-    const tick = () => {
-      if (!playing) return;
-      const now = audioCtx.currentTime;
-      const note = notes[step % notes.length];
-      playTone(note, now, step);
-      if (step % 3 === 0) playTone(note * 1.25, now + 0.18, step + 2);
-      if (step % 4 === 0) playBass(now + 0.08, note);
-      step += 1;
-      musicTimer = window.setTimeout(tick, step % 4 === 0 ? 2600 : 2100);
-    };
-
-    tick();
-    lfoTimer = window.setInterval(() => {
-      if (!masterGain || !playing) return;
-      const value = 0.26 + Math.sin(Date.now() / 1300) * 0.045;
-      masterGain.gain.setTargetAtTime(value, audioCtx.currentTime, 0.2);
-    }, 240);
-  };
-
-  const stopMusic = () => {
-    playing = false;
-    musicPanel.classList.remove("is-playing");
-    musicStatus.textContent = "点击启动";
-    if (musicTimer) window.clearTimeout(musicTimer);
-    if (lfoTimer) window.clearInterval(lfoTimer);
-    if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.15);
-  };
-
-  musicToggle.addEventListener("click", () => {
-    if (playing) stopMusic();
-    else startMusic().catch(stopMusic);
-  });
-
   const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
   if (finePointer) {
     selectableItems.forEach((item) => {
@@ -245,8 +90,8 @@
           item.style.setProperty("--card-x", `${x}px`);
           item.style.setProperty("--card-y", `${y}px`);
           if (!reduceMotion && !item.classList.contains("link-item")) {
-            const tiltX = ((x / rect.width) - 0.5) * 4;
-            const tiltY = ((0.5 - y / rect.height)) * 3;
+            const tiltX = (x / rect.width - 0.5) * 4;
+            const tiltY = (0.5 - y / rect.height) * 3;
             item.style.setProperty("--tilt-x", `${tiltX}deg`);
             item.style.setProperty("--tilt-y", `${tiltY}deg`);
           }
@@ -263,14 +108,12 @@
   }
 
   document.querySelectorAll(".post-card").forEach((card) => {
-    const summary = card.querySelector(".post-summary");
     const link = card.querySelector(".post-card-hit") || card.querySelector("h2 a");
-    if (link) {
-      card.addEventListener("click", (event) => {
-        if (event.target.closest("a")) return;
-        window.location.href = link.href;
-      });
-    }
+    if (!link) return;
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a")) return;
+      window.location.href = link.href;
+    });
   });
 
   const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item");
@@ -278,10 +121,9 @@
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
         });
       },
       { threshold: 0.12 }
@@ -296,59 +138,174 @@
 
   const hero = document.getElementById("hero");
   const content = document.getElementById("homeContent");
-  if (!hero || !content) return;
-
-  let cooling = false;
-
-  const inHero = () => {
-    const rect = hero.getBoundingClientRect();
-    return rect.top <= 10 && rect.bottom > window.innerHeight * 0.58;
-  };
-
-  const go = () => {
-    if (cooling) return;
-    cooling = true;
+  const hint = document.querySelector("[data-scroll-target]");
+  const goToContent = () => {
+    if (!content) return;
     content.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-    window.setTimeout(() => (cooling = false), 720);
+  };
+  if (hint) hint.addEventListener("click", goToContent);
+
+  const orb = document.querySelector(".home-orb");
+  if (orb && finePointer && !reduceMotion) {
+    let orbFrame = 0;
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (orbFrame) return;
+        orbFrame = window.requestAnimationFrame(() => {
+          const rect = orb.getBoundingClientRect();
+          const dx = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
+          const dy = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
+          orb.style.setProperty("--orb-x", `${Math.max(-1, Math.min(1, dx)) * 14}px`);
+          orb.style.setProperty("--orb-y", `${Math.max(-1, Math.min(1, dy)) * 10}px`);
+          orb.style.setProperty("--orb-rot-x", `${Math.max(-1, Math.min(1, -dy)) * 8}deg`);
+          orb.style.setProperty("--orb-rot-y", `${Math.max(-1, Math.min(1, dx)) * 10}deg`);
+          orbFrame = 0;
+        });
+      },
+      { passive: true }
+    );
+  }
+
+  const canvas = document.querySelector("[data-webgl-canvas]");
+  if (!canvas || !hero || reduceMotion) return;
+
+  const gl = canvas.getContext("webgl", {
+    antialias: false,
+    alpha: true,
+    depth: false,
+    powerPreference: "low-power",
+  });
+  if (!gl) return;
+
+  const density = coarsePointer ? 42 : 78;
+  const vertices = [];
+  for (let y = 0; y < density; y += 1) {
+    for (let x = 0; x < density; x += 1) {
+      vertices.push((x / (density - 1)) * 2 - 1, (y / (density - 1)) * 2 - 1);
+    }
+  }
+
+  const vertexShaderSource = `
+    attribute vec2 a_position;
+    uniform float u_time;
+    uniform vec2 u_pointer;
+    uniform float u_aspect;
+    varying float v_depth;
+
+    void main() {
+      vec2 p = a_position;
+      float wave = sin((p.x * 3.4 + u_time * 0.42)) * 0.055;
+      wave += cos((p.y * 4.1 - u_time * 0.34)) * 0.045;
+      float pull = 0.055 / (distance(vec2(p.x * u_aspect, p.y), vec2(u_pointer.x * u_aspect, u_pointer.y)) + 0.22);
+      p.y += wave + pull * 0.18;
+      p.x += sin(p.y * 3.0 + u_time * 0.18) * 0.018;
+      v_depth = wave + pull;
+      gl_Position = vec4(p, 0.0, 1.0);
+      gl_PointSize = ${coarsePointer ? "1.4" : "1.9"} + v_depth * 9.0;
+    }
+  `;
+
+  const fragmentShaderSource = `
+    precision mediump float;
+    varying float v_depth;
+
+    void main() {
+      vec2 uv = gl_PointCoord - 0.5;
+      float dotShape = smoothstep(0.48, 0.12, length(uv));
+      vec3 cyan = vec3(0.22, 0.86, 1.0);
+      vec3 rose = vec3(1.0, 0.43, 0.72);
+      vec3 color = mix(cyan, rose, clamp(v_depth * 2.2, 0.0, 1.0));
+      gl_FragColor = vec4(color, dotShape * 0.42);
+    }
+  `;
+
+  const createShader = (type, source) => {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
   };
 
-  window.addEventListener(
-    "wheel",
-    (event) => {
-      if (cooling || !inHero() || event.deltaY <= 0) return;
-      event.preventDefault();
-      go();
-    },
-    { passive: false }
-  );
+  const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderSource);
+  const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+  if (!vertexShader || !fragmentShader) return;
 
-  let touchStartY = null;
-  window.addEventListener(
-    "touchstart",
-    (event) => {
-      touchStartY = event.touches?.[0]?.clientY ?? null;
-    },
-    { passive: true }
-  );
+  const program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
 
-  window.addEventListener(
-    "touchmove",
-    (event) => {
-      if (cooling || !inHero() || touchStartY == null) return;
-      const y = event.touches?.[0]?.clientY ?? touchStartY;
-      if (touchStartY - y > 10) go();
-    },
-    { passive: true }
-  );
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  window.addEventListener("keydown", (event) => {
-    if (cooling || !inHero()) return;
-    if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " ") {
-      event.preventDefault();
-      go();
+  const positionLocation = gl.getAttribLocation(program, "a_position");
+  const timeLocation = gl.getUniformLocation(program, "u_time");
+  const pointerLocation = gl.getUniformLocation(program, "u_pointer");
+  const aspectLocation = gl.getUniformLocation(program, "u_aspect");
+
+  const pointer = { x: 0, y: 0 };
+  if (finePointer) {
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
+        pointer.y = -(((event.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1);
+      },
+      { passive: true }
+    );
+  }
+
+  let width = 0;
+  let height = 0;
+  const resize = () => {
+    const scale = Math.min(window.devicePixelRatio || 1, coarsePointer ? 1 : 1.5);
+    width = Math.floor(canvas.clientWidth * scale);
+    height = Math.floor(canvas.clientHeight * scale);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
     }
-  });
+    gl.viewport(0, 0, width, height);
+  };
 
-  const hint = document.querySelector(".hero-hint");
-  if (hint) hint.addEventListener("click", go);
+  let visible = true;
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+      },
+      { threshold: 0.02 }
+    );
+    observer.observe(hero);
+  }
+
+  let animationFrame = 0;
+  const render = (time) => {
+    animationFrame = window.requestAnimationFrame(render);
+    if (!visible) return;
+    resize();
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform1f(timeLocation, time * 0.001);
+    gl.uniform2f(pointerLocation, pointer.x, pointer.y);
+    gl.uniform1f(aspectLocation, width / Math.max(1, height));
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    gl.drawArrays(gl.POINTS, 0, vertices.length / 2);
+  };
+
+  animationFrame = window.requestAnimationFrame(render);
+  window.addEventListener("pagehide", () => window.cancelAnimationFrame(animationFrame), { once: true });
 })();

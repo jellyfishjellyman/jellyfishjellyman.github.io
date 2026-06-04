@@ -10,13 +10,19 @@
     </header>
   {{ end }}
 
+  {{ if in .TableOfContents "<li>" }}
+    <details class="post-toc" open>
+      <summary>目录</summary>
+      {{ .TableOfContents }}
+    </details>
+  {{ end }}
+
   <div class="lh-copy mt4 post-content">
     {{ .Content }}
   </div>
 
   <hr>
 
-  <!-- Giscus 评论开始 -->
   <script src="https://giscus.app/client.js"
         data-repo="jellyfishjellyman/jellyfishjellyman.github.io"
         data-repo-id="R_kgDORL8r7A"
@@ -31,7 +37,5 @@
         crossorigin="anonymous"
         async>
   </script>
-  <!-- Giscus 评论结束 -->
-
 </article>
 {{ end }}
