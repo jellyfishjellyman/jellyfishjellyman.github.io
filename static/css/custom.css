@@ -3069,18 +3069,54 @@ blockquote,
   .site-nav {
     position: relative;
     top: 0;
-    align-items: flex-start;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 38px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
   }
 
   .site-menu {
+    grid-column: 1 / -1;
+    width: 100%;
+    flex-wrap: nowrap;
     justify-content: flex-start;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 0 calc(100% - 26px), transparent);
+  }
+
+  .site-menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-menu li {
+    flex: 0 0 auto;
+    margin: 0;
+  }
+
+  .site-menu a {
+    min-height: 32px;
+    padding: 7px 10px;
+    font-size: 14px;
+  }
+
+  .site-brand {
+    min-width: 0;
+    max-width: calc(100vw - 104px);
+  }
+
+  .site-brand span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .theme-toggle {
-    position: absolute;
-    right: 10px;
-    top: 10px;
+    position: static;
+    justify-self: end;
   }
 
   .hero {

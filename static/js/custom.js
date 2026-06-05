@@ -13,7 +13,7 @@
   const setTheme = (theme) => {
     root.dataset.theme = theme;
     themeToggle?.setAttribute("aria-pressed", String(theme === "night"));
-    themeToggle?.setAttribute("aria-label", theme === "night" ? "Switch to day mode" : "Switch to night mode");
+    themeToggle?.setAttribute("aria-label", theme === "night" ? "切换到白天模式" : "切换到夜间模式");
     themeColorMeta.content = theme === "night" ? "#101412" : "#f6f4ee";
   };
 
@@ -146,8 +146,8 @@
   const backToTop = document.createElement("button");
   backToTop.id = "backToTop";
   backToTop.type = "button";
-  backToTop.setAttribute("aria-label", "Back to top");
-  backToTop.textContent = "^";
+  backToTop.setAttribute("aria-label", "回到顶部");
+  backToTop.textContent = "↑";
   document.body.appendChild(backToTop);
 
   const toggleBackToTop = () => {
@@ -164,19 +164,19 @@
     const button = document.createElement("button");
     button.className = "copy-code-button";
     button.type = "button";
-    button.textContent = "Copy";
+    button.textContent = "复制";
     block.appendChild(button);
 
     button.addEventListener("click", async () => {
       const code = block.querySelector("code")?.innerText || block.innerText.replace(button.innerText, "");
       try {
         await navigator.clipboard.writeText(code.trimEnd());
-        button.textContent = "Copied";
+        button.textContent = "已复制";
       } catch {
-        button.textContent = "Copy failed";
+        button.textContent = "复制失败";
       }
       window.setTimeout(() => {
-        button.textContent = "Copy";
+        button.textContent = "复制";
       }, 1400);
     });
   });
@@ -184,7 +184,7 @@
   const lightbox = document.createElement("div");
   lightbox.className = "image-lightbox";
   lightbox.setAttribute("aria-hidden", "true");
-  lightbox.innerHTML = '<button class="image-lightbox-close" type="button" aria-label="Close image preview">x</button><img alt="">';
+  lightbox.innerHTML = '<button class="image-lightbox-close" type="button" aria-label="关闭图片预览">×</button><img alt="">';
   document.body.appendChild(lightbox);
   const lightboxImage = lightbox.querySelector("img");
   const closeLightbox = () => {
