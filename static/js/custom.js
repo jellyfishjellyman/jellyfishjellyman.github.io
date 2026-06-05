@@ -377,6 +377,29 @@
   window.setTimeout(() => requestQuote({ remote: true }), 360);
   quoteNext?.addEventListener("click", () => requestQuote({ remote: true }));
 
+  const homeTools = document.querySelector("[data-home-tools]");
+  if (homeTools) {
+    const tabs = homeTools.querySelectorAll("[data-tool-tab]");
+    const panels = homeTools.querySelectorAll("[data-tool-panel]");
+    const activateTool = (name) => {
+      const current = homeTools.dataset.activeTool;
+      const next = current === name ? "" : name;
+      homeTools.dataset.activeTool = next;
+      tabs.forEach((tab) => {
+        const active = tab.dataset.toolTab === next;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      panels.forEach((panel) => {
+        panel.classList.toggle("is-active", panel.dataset.toolPanel === next);
+      });
+    };
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => activateTool(tab.dataset.toolTab));
+    });
+    if (window.matchMedia("(max-width: 720px)").matches) activateTool("search");
+  }
+
   const searchForm = document.querySelector("[data-site-search]");
   const searchInput = document.querySelector("[data-search-input]");
   const searchResults = document.querySelector("[data-search-results]");
@@ -435,6 +458,33 @@
       searchInput._searchTimer = window.setTimeout(renderSearch, 160);
     });
   }
+
+  const repairHomeToolText = () => {
+    if (themeToggle) {
+      themeToggle.setAttribute("aria-label", root.dataset.theme === "night" ? "切换到白天模式" : "切换到夜间模式");
+    }
+    document.querySelectorAll(".search-empty").forEach((item) => {
+      const text = item.textContent || "";
+      if (!text || /[�鐨鍗棣鏂璧宸娓鎼鍏鈫澶鍔鎹杈绔瑷]/.test(text)) {
+        item.textContent = searchInput?.value?.trim() ? "暂时没有匹配结果，换个关键词试试。" : "输入关键词后会在这里显示结果。";
+      }
+    });
+    document.querySelectorAll(".search-result span").forEach((item) => {
+      if (/[�鐨鍗棣鏂璧宸娓鎼鍏鈫澶鍔鎹杈绔瑷]/.test(item.textContent || "")) {
+        item.textContent = "站内页面";
+      }
+    });
+    if (quoteNext && /[�鐨鍗棣鏂璧宸娓鎼鍏鈫澶鍔鎹杈绔瑷]/.test(quoteNext.textContent || "")) {
+      quoteNext.textContent = quoteNext.getAttribute("aria-busy") ? "加载中" : "换一句";
+    }
+  };
+
+  repairHomeToolText();
+  if (searchResults) {
+    new MutationObserver(repairHomeToolText).observe(searchResults, { childList: true, subtree: true });
+  }
+  quoteNext?.addEventListener("click", () => window.setTimeout(repairHomeToolText, 0));
+  themeToggle?.addEventListener("click", () => window.setTimeout(repairHomeToolText, 0));
 
   const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
   if (finePointer) {

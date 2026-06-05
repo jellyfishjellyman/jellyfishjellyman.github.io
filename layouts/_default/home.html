@@ -3,135 +3,143 @@
 {{ $latest := first 3 $posts }}
 {{ $datedPosts := where $posts "Date" "gt" (time "2001-01-01") }}
 {{ $firstPost := index (sort $datedPosts "Date" "asc") 0 }}
-{{ $siteStart := cond (ne $firstPost nil) $firstPost.Date (time "2026-01-01") }}
+{{ $siteStart := cond (ne $firstPost nil) $firstPost.Date (time "2026-05-03") }}
 {{ $siteDays := div (sub now.Unix $siteStart.Unix) 86400 }}
 {{ $totalPages := len .Site.RegularPages }}
 {{ $postCount := len $posts }}
 {{ $toolCount := 0 }}
 {{ range site.Data.tools }}{{ $toolCount = add $toolCount (len .items) }}{{ end }}
 
-<section id="hero" class="home-hero" data-webgl-hero>
-  <canvas class="home-hero-canvas" data-webgl-canvas aria-hidden="true"></canvas>
-  <div class="home-hero-scan" aria-hidden="true"></div>
-
+<section id="hero" class="home-hero home-hero-window">
   <div class="home-hero-inner">
+    <aside class="home-side-stack home-side-left" aria-label="页面导航">
+      <div class="home-side-card">
+        <strong>页面导航</strong>
+        <a href="/posts/">最近文章</a>
+        <a href="/links/">资源收藏</a>
+        <a href="/games/">小游戏</a>
+      </div>
+      <div class="home-side-card">
+        <strong>小站天气</strong>
+        <span>今日天气</span>
+        <em>适合慢慢整理思路</em>
+      </div>
+      <a class="home-avatar-card" href="/about/" aria-label="关于本站">
+        <img src="/images/avatar.jpg" alt="">
+        <strong>Jellyfish</strong>
+      </a>
+    </aside>
+
     <div class="home-hero-copy">
-      <p class="home-kicker">Jellyfish Lab</p>
-      <h1 class="home-title">记录一点正在发光的东西</h1>
+      <p class="home-kicker">记录 · 分享 · 探索</p>
+      <h1 class="home-title">Jellyfish 的小站</h1>
       <p class="home-sub">
-        <span>学习、技术、生活和偶然出现的想法。</span>
-        <span>这里有文章、工具、资源，也有一点可以玩的实验。</span>
+        <span>记录所思所想，分享实用经验。</span>
+        <span>把文章、工具、资源和小游戏整理成一个安静好找的个人空间。</span>
       </p>
 
+      <div class="home-badges" aria-label="站点统计">
+        <span><strong>{{ $siteStart.Format "2006年1月2日" }}</strong> 建站日期</span>
+        <span><strong>{{ add $siteDays 1 }} 天</strong> 已存在</span>
+        <span><strong>{{ $postCount }}</strong> 篇文章</span>
+      </div>
+
       <div class="hero-actions">
-        <a class="primary-button" href="/posts/">读文章</a>
-        <a class="ghost-button" href="/games/">玩游戏</a>
-        <a class="ghost-button" href="/tools/">看工具</a>
-      </div>
-
-      <div class="home-portal" aria-label="快速入口">
-        <a href="/games/">
-          <span>Play</span>
-          <strong>进入游戏实验区</strong>
-        </a>
-        <a href="/links/">
-          <span>Explore</span>
-          <strong>翻看灵感资源</strong>
-        </a>
+        <a class="primary-button" href="#homeContent">开始浏览</a>
+        <a class="ghost-button" href="/about/">了解本站</a>
       </div>
     </div>
 
-    <div class="home-orb" aria-hidden="true">
-      <span class="home-orb-core"></span>
-      <span class="home-orb-eye"></span>
-    </div>
+    <aside class="home-side-stack home-side-right" aria-label="站点工具">
+      <div class="home-console" aria-label="站点快捷工具" data-home-tools>
+        <div class="home-tool-dock" role="tablist" aria-label="快捷工具">
+          <button type="button" data-tool-tab="search" aria-selected="false">搜索</button>
+          <button type="button" data-tool-tab="quote" aria-selected="false">一言</button>
+          <button type="button" data-tool-tab="stats" aria-selected="false">小记</button>
+        </div>
+
+        <div class="home-tool-panels">
+          <section class="home-search-panel" data-tool-panel="search">
+            <div class="home-panel-head">
+              <p class="eyebrow">Search</p>
+              <h2>全站搜索</h2>
+              <p>搜索文章和模块，支持模糊匹配。</p>
+            </div>
+            <form class="site-search" data-site-search>
+              <label class="sr-only" for="homeSearchInput">搜索关键词</label>
+              <input id="homeSearchInput" type="search" placeholder="输入关键词，例如 Hugo、游戏、工具" autocomplete="off" data-search-input>
+              <button class="primary-button" type="submit">搜索</button>
+            </form>
+            <div class="search-results" data-search-results aria-live="polite"></div>
+          </section>
+
+          <section class="home-quote-panel" data-tool-panel="quote">
+            <div class="home-panel-head">
+              <p class="eyebrow">Sentence</p>
+              <h2>随机一言</h2>
+            </div>
+            <blockquote class="random-quote" data-random-quote>
+              <p data-quote-text>一往情深深几许？深山夕照深秋雨。</p>
+              <cite data-quote-source>纳兰性德</cite>
+            </blockquote>
+            <button class="ghost-button" type="button" data-quote-next>换一句</button>
+          </section>
+
+          <section class="home-stats-panel" data-tool-panel="stats">
+            <div class="home-panel-head">
+              <p class="eyebrow">Stats</p>
+              <h2>站点小记</h2>
+            </div>
+            <div class="site-stats">
+              <span><strong>{{ $siteStart.Format "2006年1月2日" }}</strong> 建站日期</span>
+              <span><strong>{{ add $siteDays 1 }}</strong> 已存在天数</span>
+              <span><strong>{{ $postCount }}</strong> 篇文章</span>
+              <span><strong>{{ $toolCount }}</strong> 个工具入口</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </aside>
   </div>
-
-  <button class="hero-hint" type="button" data-scroll-target="#homeContent">
-    继续向下
-  </button>
 </section>
 
 <section id="homeContent" class="home-wrap home-lab">
-  <div class="home-now reveal-on-scroll">
-    <div>
-      <p class="eyebrow">Now</p>
-      <h2>最近在搭建这个小型实验室</h2>
-      <p>把博客从“能放文章”继续整理成一个可以阅读、试玩、查资料、记录工具的个人空间。</p>
+  <section class="home-board reveal-on-scroll" aria-label="小站公告板">
+    <div class="home-board-head">
+      <p class="eyebrow">Board</p>
+      <h2>小站公告板</h2>
     </div>
-    <div class="home-now-list" aria-label="最近更新">
-      <span>已上线：云架构塔防</span>
-      <span>已上线：Vim 训练场</span>
-      <span>下一步：阅读体验和游戏区细节</span>
-    </div>
-  </div>
-
-  <div class="home-console reveal-on-scroll" aria-label="站点快捷工具">
-    <section class="home-search-panel">
-      <div class="home-panel-head">
-        <p class="eyebrow">Search</p>
-        <h2>全站搜索</h2>
-        <p>搜索文章和模块，支持标题、摘要和标签。</p>
-      </div>
-      <form class="site-search" data-site-search>
-        <label class="sr-only" for="homeSearchInput">搜索关键词</label>
-        <input id="homeSearchInput" type="search" placeholder="输入关键词，例如 Hugo、游戏、工具" autocomplete="off" data-search-input>
-        <button class="primary-button" type="submit">搜索</button>
-      </form>
-      <div class="search-results" data-search-results aria-live="polite"></div>
-    </section>
-
-    <section class="home-quote-panel">
-      <div class="home-panel-head">
-        <p class="eyebrow">Sentence</p>
-        <h2>随机一言</h2>
-      </div>
-      <blockquote class="random-quote" data-random-quote>
-        <p data-quote-text>一往情深深几许？深山夕照深秋雨。</p>
-        <cite data-quote-source>纳兰性德</cite>
-      </blockquote>
-      <button class="ghost-button" type="button" data-quote-next>换一句</button>
-    </section>
-
-    <section class="home-stats-panel">
-      <div class="home-panel-head">
-        <p class="eyebrow">Stats</p>
-        <h2>站点小记</h2>
-      </div>
-      <div class="site-stats">
-        <span><strong>{{ $siteStart.Format "2006年1月2日" }}</strong> 建站日期</span>
-        <span><strong>{{ add $siteDays 1 }}</strong> 已存在天数</span>
-        <span><strong>{{ $postCount }}</strong> 篇文章</span>
-        <span><strong>{{ $toolCount }}</strong> 个工具入口</span>
-      </div>
-    </section>
-
-    <section class="home-guestbook-panel">
-      <div class="home-panel-head">
-        <p class="eyebrow">Guestbook</p>
-        <h2>游客留言板</h2>
-        <p>静态站不能直接安全写入留言；后续接入后端或评论服务后，可加 IP 时间窗限流。</p>
-      </div>
-      <div class="guestbook-preview">
-        <span>你好，陌生人</span>
-        <strong>世界那么大，凑巧遇见你。</strong>
-      </div>
-      <a class="ghost-button" href="/guestbook/">查看留言板</a>
-    </section>
-  </div>
-
-  <section class="home-image-strip reveal-on-scroll" aria-label="站点图片墙">
-    <div class="home-image-copy">
-      <p class="eyebrow">Gallery</p>
-      <h2>把小站整理得更有画面感</h2>
-      <p>先用站内已有图片做轻量展示，后续写文章时可以继续把配图沉淀进这里。</p>
-      <a class="ghost-button" href="/posts/">翻看文章</a>
-    </div>
-    <div class="home-image-grid" aria-hidden="true">
-      <img src="/images/hero-optimized.jpg" alt="">
-      <img src="/images/avatar.jpg" alt="">
-      <img src="/posts/post-20260604-125629/_20260604124937_151_2.jpg" alt="">
-      <img src="/posts/post-20260604-125629/_20260604125056_152_2.jpg" alt="">
+    <div class="home-board-canvas">
+      <a class="board-note note-blue" href="/posts/">
+        <span>文章</span>
+        <strong>站内内容随缘更新</strong>
+        <em>最近写下的记录</em>
+      </a>
+      <a class="board-note note-green" href="/tools/">
+        <span>工具</span>
+        <strong>浏览小提示</strong>
+        <em>PC 端体验更完整</em>
+      </a>
+      <a class="board-note note-white" href="/links/">
+        <span>资源</span>
+        <strong>最近在整理</strong>
+        <em>资料入口</em>
+      </a>
+      <a class="board-note note-pink" href="/guestbook/">
+        <span>留言板</span>
+        <strong>你好，陌生人</strong>
+        <em>欢迎留下几句</em>
+      </a>
+      <a class="board-note note-lilac" href="/games/">
+        <span>游戏</span>
+        <strong>天又亮了</strong>
+        <em>玩一会儿也可以</em>
+      </a>
+      <a class="board-note note-sky" href="/about/">
+        <span>关于</span>
+        <strong>这里是什么</strong>
+        <em>小站说明</em>
+      </a>
     </div>
   </section>
 
@@ -139,7 +147,7 @@
     <a class="feature-card" href="/posts/">
       <span>Posts</span>
       <strong>最近写下的东西</strong>
-      <p>保留博客最重要的阅读体验，入口轻一点，内容清楚一点。</p>
+      <p>保留博客最重要的阅读体验，让文章入口轻一点，内容清楚一点。</p>
     </a>
     <a class="feature-card" href="/games/">
       <span>Games</span>
@@ -164,7 +172,7 @@
       <h2>最近文章</h2>
       <p>写一点学习、生活和突然想到的东西。</p>
     </div>
-    <a href="/posts/">全部文章 →</a>
+    <a href="/posts/">全部文章</a>
   </div>
 
   <div class="home-grid">
