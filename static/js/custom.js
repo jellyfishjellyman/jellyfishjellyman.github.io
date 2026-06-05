@@ -465,16 +465,16 @@
     }
     document.querySelectorAll(".search-empty").forEach((item) => {
       const text = item.textContent || "";
-      if (!text || /[�鐨鍗棣鏂璧宸娓鎼鍏鈫澶鍔鎹杈绔瑷]/.test(text)) {
+      if (!text || /[\u9428\u9357\u68e3\u93c2\u74a7\u5bb8\u5a13\u93bc\u934f\u922b\u6fb6\u9354\u93b9\u6748\u7ed4\u7477]/.test(text)) {
         item.textContent = searchInput?.value?.trim() ? "暂时没有匹配结果，换个关键词试试。" : "输入关键词后会在这里显示结果。";
       }
     });
     document.querySelectorAll(".search-result span").forEach((item) => {
-      if (/[�鐨鍗棣鏂璧宸娓鎼鍏鈫澶鍔鎹杈绔瑷]/.test(item.textContent || "")) {
+      if (/[\u9428\u9357\u68e3\u93c2\u74a7\u5bb8\u5a13\u93bc\u934f\u922b\u6fb6\u9354\u93b9\u6748\u7ed4\u7477]/.test(item.textContent || "")) {
         item.textContent = "站内页面";
       }
     });
-    if (quoteNext && /[�鐨鍗棣鏂璧宸娓鎼鍏鈫澶鍔鎹杈绔瑷]/.test(quoteNext.textContent || "")) {
+    if (quoteNext && /[\u9428\u9357\u68e3\u93c2\u74a7\u5bb8\u5a13\u93bc\u934f\u922b\u6fb6\u9354\u93b9\u6748\u7ed4\u7477]/.test(quoteNext.textContent || "")) {
       quoteNext.textContent = quoteNext.getAttribute("aria-busy") ? "加载中" : "换一句";
     }
   };
