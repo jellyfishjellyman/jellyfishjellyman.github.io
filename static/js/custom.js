@@ -4,6 +4,22 @@
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
+  const themeToggle = document.querySelector("[data-theme-toggle]");
+  const themeIcon = document.querySelector("[data-theme-icon]");
+  const storedTheme = window.localStorage.getItem("site-theme");
+  const setTheme = (theme) => {
+    root.dataset.theme = theme;
+    themeToggle?.setAttribute("aria-pressed", String(theme === "night"));
+    if (themeIcon) themeIcon.textContent = theme === "night" ? "☀" : "☾";
+  };
+
+  setTheme(storedTheme || "day");
+  themeToggle?.addEventListener("click", () => {
+    const nextTheme = root.dataset.theme === "night" ? "day" : "night";
+    window.localStorage.setItem("site-theme", nextTheme);
+    setTheme(nextTheme);
+  });
+
   const setPointerVars = (event) => {
     root.style.setProperty("--mouse-x", `${event.clientX}px`);
     root.style.setProperty("--mouse-y", `${event.clientY}px`);
@@ -12,19 +28,18 @@
   if (!reduceMotion && finePointer) {
     document.body.classList.add("has-pointer");
     window.addEventListener("pointermove", setPointerVars, { passive: true });
-  }
 
-  if (!reduceMotion && finePointer) {
     let lastSpark = 0;
     let sparkIndex = 0;
     const maxSparks = 24;
+    const gamePage = document.querySelector("[data-game-page]");
 
     const spawnSpark = (event) => {
       const now = performance.now();
       if (now - lastSpark < 42) return;
       lastSpark = now;
       const spark = document.createElement("span");
-      spark.className = "pointer-spark";
+      spark.className = gamePage ? "pointer-spark is-game-spark" : "pointer-spark";
       spark.setAttribute("aria-hidden", "true");
       const drift = 10 + (sparkIndex % 4) * 4;
       const angle = (sparkIndex * 137.5 * Math.PI) / 180;
@@ -98,8 +113,7 @@
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
       document.body.classList.add("has-resource-modal");
-      const closeButton = modal.querySelector(".resource-close");
-      if (closeButton) closeButton.focus({ preventScroll: true });
+      modal.querySelector(".resource-close")?.focus({ preventScroll: true });
     };
 
     const closeModal = () => {
@@ -107,7 +121,7 @@
       modal.classList.remove("is-open");
       modal.setAttribute("aria-hidden", "true");
       document.body.classList.remove("has-resource-modal");
-      if (lastActiveTab) lastActiveTab.focus({ preventScroll: true });
+      lastActiveTab?.focus({ preventScroll: true });
     };
 
     tabs.forEach((tab) => tab.addEventListener("click", () => openModal(tab.dataset.resourceTab)));
@@ -130,9 +144,59 @@
 
   window.addEventListener("scroll", toggleBackToTop, { passive: true });
   toggleBackToTop();
-
   backToTop.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  document.querySelectorAll(".post-content pre").forEach((block) => {
+    const button = document.createElement("button");
+    button.className = "copy-code-button";
+    button.type = "button";
+    button.textContent = "复制";
+    block.appendChild(button);
+
+    button.addEventListener("click", async () => {
+      const code = block.querySelector("code")?.innerText || block.innerText.replace(button.innerText, "");
+      try {
+        await navigator.clipboard.writeText(code.trimEnd());
+        button.textContent = "已复制";
+      } catch {
+        button.textContent = "复制失败";
+      }
+      window.setTimeout(() => {
+        button.textContent = "复制";
+      }, 1400);
+    });
+  });
+
+  const lightbox = document.createElement("div");
+  lightbox.className = "image-lightbox";
+  lightbox.setAttribute("aria-hidden", "true");
+  lightbox.innerHTML = '<button class="image-lightbox-close" type="button" aria-label="关闭图片预览">×</button><img alt="">';
+  document.body.appendChild(lightbox);
+  const lightboxImage = lightbox.querySelector("img");
+  const closeLightbox = () => {
+    lightbox.classList.remove("is-open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("has-lightbox");
+    lightboxImage?.removeAttribute("src");
+  };
+
+  document.querySelectorAll(".post-content img").forEach((image) => {
+    image.addEventListener("click", () => {
+      if (!lightboxImage) return;
+      lightboxImage.src = image.currentSrc || image.src;
+      lightboxImage.alt = image.alt || "";
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("has-lightbox");
+    });
+  });
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox || event.target.closest(".image-lightbox-close")) closeLightbox();
+  });
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
   });
 
   const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
@@ -196,11 +260,8 @@
   const hero = document.getElementById("hero");
   const content = document.getElementById("homeContent");
   const hint = document.querySelector("[data-scroll-target]");
-  const goToContent = () => {
-    if (!content) return;
-    content.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  };
-  if (hint) hint.addEventListener("click", goToContent);
+  const goToContent = () => content?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  hint?.addEventListener("click", goToContent);
 
   const orb = document.querySelector(".home-orb");
   if (orb && finePointer && !reduceMotion) {

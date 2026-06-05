@@ -1,95 +1,152 @@
-- name: '2048'
-  slug: '2048'
-  description: 滑动数字方块，合成 2048。适合第一批做成站内小游戏。
-  status: 可玩
-  url: /games/2048/
-- name: 'SERVER: Survival Protocol'
-  slug: server-survival
-  description: 云架构塔防，把服务器、负载均衡、流量洪峰和容灾压力做成可玩的学习场景。
-  status: 可玩
-  url: /games/server-survival/
-- name: 'VIM Master'
-  slug: vimmaster
-  description: 用 h j k l、w、b、dd 等 Vim 指令通关，比背快捷键更容易练出手感。
-  status: 可玩
-  url: /games/vimmaster/
-- name: 扫雷
-  slug: minesweeper
-  description: 经典扫雷，逻辑清楚，适合做成轻量单页游戏。
-  status: 计划内
-  url: ''
-- name: 小恐龙
-  slug: dino
-  description: 简化版横版躲避游戏，重点是手感和节奏。
-  status: 计划内
-  url: ''
-- name: 记忆翻牌
-  slug: memory
-  description: 更容易先落地的小型卡片游戏。
-  status: 候选
-  url: ''
-- name: itch.io
-  slug: ''
-  description: 独立游戏发布、试玩和下载平台。
-  status: 外部链接
-  url: https://itch.io/
-- name: CrazyGames
-  slug: ''
-  description: 在线小游戏集合。
-  status: 外部链接
-  url: https://www.crazygames.com/
-- name: 杉果游戏
-  slug: ''
-  description: 正版游戏购买和资讯平台。
-  status: 外部链接
-  url: https://www.sonkwo.cn/
-- name: Helldivers 2 Companion
-  slug: ''
-  description: Helldivers 2 战况和资料工具。
-  status: 外部链接
-  url: https://helldiverscompanion.com/#
-- name: 星际公民 Starmap
-  slug: ''
-  description: Star Citizen 官方星图。
-  status: 外部链接
-  url: https://robertsspaceindustries.com/starmap
-- name: 三角洲行动地图工具
-  slug: ''
-  description: 《三角洲行动》地图资料工具。
-  status: 外部链接
-  url: https://df.qq.com/cp/a20240729directory/
-- name: Hacker Typer
-  slug: ''
-  description: 模拟代码输入的趣味网页。
-  status: 外部链接
-  url: https://hackertyper.com/
-- name: LKs 网站推荐合集
-  slug: ''
-  description: B 站 UP 主 LKs 推荐的网站合集，偏有趣和探索。
-  status: 外部链接
-  url: https://lkssite.vip/
-- name: MKLab FC Games
-  slug: ''
-  description: 在线小游戏合集。
-  status: 外部链接
-  url: https://mklab.eu.org/FCGames/#/
-- name: 下塔雅 NES
-  slug: ''
-  description: 在线 NES 小游戏合集。
-  status: 外部链接
-  url: https://xiataya.top/nes/#/
-- name: 原神字体转换
-  slug: ''
-  description: 把文字转换成原神风格字体的趣味工具。
-  status: 外部链接
-  url: https://genshin.pro-ivan.com/#/
-- name: Poki
-  slug: ''
-  description: 在线小游戏平台。
-  status: 外部链接
-  url: https://poki.com/zh
-- name: 风叶穿行
-  slug: ''
-  description: B 站活动小游戏，按个人喜欢保留。
-  status: 外部链接
-  url: https://www.bilibili.com/blackboard/fe/activity-HQjQSdd3L8.html
+- name: "2048"
+  slug: "2048"
+  category: "站内小游戏"
+  status: "可玩"
+  url: "/games/2048/"
+  mood: "数字合成"
+  cover: "2048"
+  description: "滑动数字方块，合成 2048。适合短暂停顿时玩一局。"
+- name: "SERVER: Survival Protocol"
+  slug: "server-survival"
+  category: "学习型游戏"
+  status: "可玩"
+  url: "/games/server-survival/"
+  mood: "云架构塔防"
+  cover: "SRE"
+  description: "把服务器、负载均衡、流量洪峰和容灾压力做成可玩的学习场景。"
+- name: "VIM Master"
+  slug: "vimmaster"
+  category: "学习型游戏"
+  status: "可玩"
+  url: "/games/vimmaster/"
+  mood: "键盘训练"
+  cover: ":wq"
+  description: "用 h j k l、w、b、dd 等 Vim 指令通关，比背快捷键更容易练出手感。"
+- name: "扫雷"
+  slug: "minesweeper"
+  category: "计划中"
+  status: "计划中"
+  url: ""
+  mood: "逻辑推理"
+  cover: "雷"
+  description: "经典扫雷，逻辑清楚，适合做成轻量单页游戏。"
+- name: "小恐龙"
+  slug: "dino"
+  category: "计划中"
+  status: "计划中"
+  url: ""
+  mood: "节奏躲避"
+  cover: "RUN"
+  description: "简化版横版躲避游戏，重点是手感和节奏。"
+- name: "记忆翻牌"
+  slug: "memory"
+  category: "计划中"
+  status: "候选"
+  url: ""
+  mood: "短时记忆"
+  cover: "MEM"
+  description: "容易先落地的小型卡片游戏。"
+- name: "itch.io"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://itch.io/"
+  mood: "独立游戏"
+  cover: "itch"
+  description: "独立游戏发布、试玩和下载平台。"
+- name: "CrazyGames"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://www.crazygames.com/"
+  mood: "在线小游戏"
+  cover: "CG"
+  description: "在线小游戏集合。"
+- name: "杉果游戏"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://www.sonkwo.cn/"
+  mood: "正版游戏"
+  cover: "杉果"
+  description: "正版游戏购买和资讯平台。"
+- name: "Helldivers 2 Companion"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://helldiverscompanion.com/#"
+  mood: "战况工具"
+  cover: "HD2"
+  description: "Helldivers 2 战况和资料工具。"
+- name: "星际公民 Starmap"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://robertsspaceindustries.com/starmap"
+  mood: "星图"
+  cover: "星图"
+  description: "Star Citizen 官方星图。"
+- name: "三角洲行动地图工具"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://df.qq.com/cp/a20240729directory/"
+  mood: "地图资料"
+  cover: "地图"
+  description: "《三角洲行动》地图资料工具。"
+- name: "Hacker Typer"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://hackertyper.com/"
+  mood: "趣味网页"
+  cover: "HT"
+  description: "模拟代码输入的趣味网页。"
+- name: "LKs 网站推荐合集"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://lkssite.vip/"
+  mood: "探索清单"
+  cover: "LKs"
+  description: "B 站 UP 主 LKs 推荐的网站合集，偏有趣和探索。"
+- name: "MKLab FC Games"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://mklab.eu.org/FCGames/#/"
+  mood: "怀旧游戏"
+  cover: "FC"
+  description: "在线小游戏合集。"
+- name: "下塌雅 NES"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://xiataya.top/nes/#/"
+  mood: "NES"
+  cover: "NES"
+  description: "在线 NES 小游戏合集。"
+- name: "原神字体转换"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://genshin.pro-ivan.com/#/"
+  mood: "字体工具"
+  cover: "字"
+  description: "把文字转换成原神风格字体的趣味工具。"
+- name: "Poki"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://poki.com/zh"
+  mood: "在线小游戏"
+  cover: "Poki"
+  description: "在线小游戏平台。"
+- name: "枫叶穿行"
+  slug: ""
+  category: "外部资源"
+  status: "外部链接"
+  url: "https://www.bilibili.com/blackboard/fe/activity-HQjQSdd3L8.html"
+  mood: "活动小游戏"
+  cover: "枫"
+  description: "B 站活动小游戏，按个人喜好保留。"

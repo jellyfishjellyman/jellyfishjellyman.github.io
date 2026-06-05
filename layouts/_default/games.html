@@ -1,30 +1,52 @@
 {{ define "main" }}
-<section class="module-page">
+<section class="module-page games-page">
   <div class="module-intro reveal-on-scroll">
     <p class="eyebrow">Games</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>
+    {{ $playable := where site.Data.games "url" "!=" "" }}
     <div class="module-stats" aria-label="游戏概览">
       <span><strong>{{ len site.Data.games }}</strong> 个入口</span>
-      <span><strong>2048</strong> 已上线</span>
-      <span><strong>Light</strong> 轻量优先</span>
+      <span><strong>{{ len $playable }}</strong> 个可打开</span>
+      <span><strong>Lab</strong> 学习和放松并排</span>
     </div>
   </div>
 
-  <div class="game-grid">
-    {{ range site.Data.games }}
-      <article class="game-card reveal-on-scroll">
-        <div>
-          <span class="game-status">{{ .status }}</span>
-          <h2>{{ .name }}</h2>
-          <p>{{ .description }}</p>
-        </div>
-        {{ if .url }}
-          <a class="ghost-button" href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>开始</a>
-        {{ else }}
-          <button class="ghost-button" type="button" disabled>准备中</button>
-        {{ end }}
-      </article>
+  {{ $groups := slice "学习型游戏" "站内小游戏" "计划中" "外部资源" }}
+  <div class="game-sections">
+    {{ range $groups }}
+      {{ $groupName := . }}
+      {{ $items := where site.Data.games "category" $groupName }}
+      {{ if $items }}
+        <section class="game-section reveal-on-scroll">
+          <div class="game-section-head">
+            <p class="eyebrow">{{ $groupName }}</p>
+            <span>{{ len $items }} 项</span>
+          </div>
+          <div class="game-grid">
+            {{ range $items }}
+              <article class="game-card reveal-on-scroll" data-game-slug="{{ .slug }}">
+                <div class="game-cover" aria-hidden="true">
+                  <span>{{ .cover | default (substr .name 0 1) }}</span>
+                </div>
+                <div>
+                  <div class="game-card-top">
+                    <span class="game-status">{{ .status }}</span>
+                    {{ with .mood }}<span class="game-mood">{{ . }}</span>{{ end }}
+                  </div>
+                  <h2>{{ .name }}</h2>
+                  <p>{{ .description }}</p>
+                </div>
+                {{ if .url }}
+                  <a class="ghost-button" href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>打开</a>
+                {{ else }}
+                  <button class="ghost-button" type="button" disabled>准备中</button>
+                {{ end }}
+              </article>
+            {{ end }}
+          </div>
+        </section>
+      {{ end }}
     {{ end }}
   </div>
 </section>

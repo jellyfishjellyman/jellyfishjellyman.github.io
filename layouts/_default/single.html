@@ -21,6 +21,23 @@
     {{ .Content }}
   </div>
 
+  {{ if eq .Section "posts" }}
+    <nav class="post-neighbors" aria-label="文章导航">
+      {{ with .PrevInSection }}
+        <a href="{{ .RelPermalink }}">
+          <span>上一篇</span>
+          <strong>{{ .Title }}</strong>
+        </a>
+      {{ end }}
+      {{ with .NextInSection }}
+        <a href="{{ .RelPermalink }}">
+          <span>下一篇</span>
+          <strong>{{ .Title }}</strong>
+        </a>
+      {{ end }}
+    </nav>
+  {{ end }}
+
   <hr>
 
   <script src="https://giscus.app/client.js"

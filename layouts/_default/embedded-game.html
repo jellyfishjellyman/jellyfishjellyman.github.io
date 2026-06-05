@@ -1,5 +1,5 @@
 {{ define "main" }}
-<section class="embedded-game-page">
+<section class="embedded-game-page" data-game-page="{{ .File.ContentBaseName }}">
   <div class="embedded-game-head reveal-on-scroll">
     <p class="eyebrow">{{ .Params.kicker | default "Game" }}</p>
     <h1>{{ .Title }}</h1>

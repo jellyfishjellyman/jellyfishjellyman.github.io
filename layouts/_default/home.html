@@ -1,4 +1,6 @@
 {{ define "main" }}
+{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ $latest := first 3 $posts }}
 
 <section id="hero" class="home-hero" data-webgl-hero>
   <canvas class="home-hero-canvas" data-webgl-canvas aria-hidden="true"></canvas>
@@ -10,12 +12,12 @@
       <h1 class="home-title">记录一点正在发光的东西</h1>
       <p class="home-sub">
         <span>学习、技术、生活和偶然出现的想法。</span>
-        <span>首页有一点未来感，文章保持清楚。</span>
+        <span>这里有文章、工具、资源，也有一点可以玩的实验。</span>
       </p>
 
       <div class="hero-actions">
         <a class="primary-button" href="/posts/">读文章</a>
-        <a class="ghost-button" href="/links/">逛资源</a>
+        <a class="ghost-button" href="/games/">玩游戏</a>
         <a class="ghost-button" href="/tools/">看工具</a>
       </div>
     </div>
@@ -32,21 +34,39 @@
 </section>
 
 <section id="homeContent" class="home-wrap home-lab">
+  <div class="home-now reveal-on-scroll">
+    <div>
+      <p class="eyebrow">Now</p>
+      <h2>最近在搭建这个小型实验室</h2>
+      <p>把博客从“能放文章”继续整理成一个可以阅读、试玩、查资料、记录工具的个人空间。</p>
+    </div>
+    <div class="home-now-list" aria-label="最近更新">
+      <span>已上线：云架构塔防</span>
+      <span>已上线：Vim 训练场</span>
+      <span>下一步：阅读体验和游戏区细节</span>
+    </div>
+  </div>
+
   <div class="feature-strip">
     <a class="feature-card" href="/posts/">
       <span>Posts</span>
       <strong>最近写下的东西</strong>
       <p>保留博客最重要的阅读体验，入口轻一点，内容清楚一点。</p>
     </a>
+    <a class="feature-card" href="/games/">
+      <span>Games</span>
+      <strong>可玩的学习实验</strong>
+      <p>2048、云架构塔防、Vim 训练场，以及后续会继续补上的小型互动。</p>
+    </a>
     <a class="feature-card" href="/links/">
       <span>Links</span>
       <strong>资源收藏</strong>
-      <p>动漫、小说、视频和常用网站，先从轻量导航开始整理。</p>
+      <p>动漫、小说、视频、工具和常用网站，先从轻量导航开始整理。</p>
     </a>
-    <a class="feature-card" href="/games/">
-      <span>Games</span>
-      <strong>小型互动</strong>
-      <p>2048 和以后准备加入的轻量实验，适合偶尔放松一下。</p>
+    <a class="feature-card" href="/tools/">
+      <span>Tools</span>
+      <strong>随手可用的工具</strong>
+      <p>把常用流程放到站内，减少下次再找入口的时间。</p>
     </a>
   </div>
 
@@ -60,7 +80,7 @@
   </div>
 
   <div class="home-grid">
-    {{ range first 10 (where .Site.RegularPages "Section" "posts") }}
+    {{ range first 10 $posts }}
       <article class="post-card">
         <a class="post-card-hit" href="{{ .RelPermalink }}" aria-label="阅读：{{ .Title }}"></a>
         <span class="post-category">{{ .Params.category | default "其他" }}</span>
