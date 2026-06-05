@@ -6,27 +6,36 @@
     <div class="module-copy">{{ .Content }}</div>
   </div>
 
-  <div class="guestbook-board reveal-on-scroll" aria-label="留言板预览">
-    <article class="guest-note note-blue">
-      <span>你好，陌生人</span>
-      <strong>世界那么大，凑巧遇见你。</strong>
-      <em>未来留言</em>
-    </article>
-    <article class="guest-note note-green">
-      <span>浏览小提示</span>
-      <strong>PC 端浏览本站体验会更完整。</strong>
-      <em>公告</em>
-    </article>
-    <article class="guest-note note-pink">
-      <span>实现说明</span>
-      <strong>游客留言需要后端保存和限流，静态页不能单独完成。</strong>
-      <em>待接入</em>
-    </article>
-  </div>
+  <div
+    class="guestbook-shell reveal-on-scroll"
+    data-guestbook
+    data-api="https://gwbblog-guestbook-api.demon1jellyfish.workers.dev"
+    data-turnstile-site-key="0x4AAAAAADfcpoEMKo6pARJz"
+  >
+    <form class="guestbook-form" data-guestbook-form>
+      <div class="guestbook-field">
+        <label for="guestName">昵称</label>
+        <input id="guestName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="怎么称呼你" required>
+      </div>
+      <div class="guestbook-field">
+        <label for="guestMessage">留言</label>
+        <textarea id="guestMessage" name="message" maxlength="200" rows="4" placeholder="贴一张小纸条，最多 200 字" required></textarea>
+      </div>
+      <div class="guestbook-form-row">
+        <div class="guestbook-turnstile" data-guestbook-turnstile></div>
+        <button class="primary-button" type="submit">贴上纸条</button>
+      </div>
+      <p class="guestbook-status" data-guestbook-status aria-live="polite"></p>
+    </form>
 
-  <div class="guestbook-plan reveal-on-scroll">
-    <h2>后续接入方案</h2>
-    <p>推荐用 Cloudflare Worker、Vercel Function 或 Netlify Function 保存留言；限流策略可以按 IP 做滑动时间窗，例如每 10 分钟 5 到 10 条，同时加基础关键词过滤和长度限制。</p>
+    <div class="guestbook-board" aria-label="游客留言纸条" data-guestbook-list>
+      <article class="guest-note note-blue">
+        <span>留言加载中</span>
+        <strong>正在翻找大家贴过的小纸条。</strong>
+        <em>请稍候</em>
+      </article>
+    </div>
   </div>
 </section>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 {{ end }}
