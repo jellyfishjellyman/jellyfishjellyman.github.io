@@ -3,27 +3,32 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  const prefersNight = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   const themeToggle = document.querySelector("[data-theme-toggle]");
-  const themeIcon = document.querySelector("[data-theme-icon]");
   const storedTheme = window.localStorage.getItem("site-theme");
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]:not([media])') || document.createElement("meta");
+  themeColorMeta.name = "theme-color";
+  if (!themeColorMeta.parentNode) document.head.appendChild(themeColorMeta);
   const setTheme = (theme) => {
     root.dataset.theme = theme;
     themeToggle?.setAttribute("aria-pressed", String(theme === "night"));
-    if (themeIcon) themeIcon.textContent = theme === "night" ? "☀" : "☾";
+    themeToggle?.setAttribute("aria-label", theme === "night" ? "Switch to day mode" : "Switch to night mode");
+    themeColorMeta.content = theme === "night" ? "#101412" : "#f6f4ee";
   };
 
-  setTheme(storedTheme || "day");
+  setTheme(storedTheme || root.dataset.theme || (prefersNight ? "night" : "day"));
   themeToggle?.addEventListener("click", () => {
     const nextTheme = root.dataset.theme === "night" ? "day" : "night";
     const rect = themeToggle.getBoundingClientRect();
     root.style.setProperty("--switch-x", `${rect.left + rect.width / 2}px`);
+    root.style.setProperty("--switch-y", `${rect.top + rect.height / 2}px`);
     window.localStorage.setItem("site-theme", nextTheme);
     document.body.classList.remove("theme-is-switching", "theme-switch-to-day", "theme-switch-to-night");
     document.body.classList.add("theme-is-switching", `theme-switch-to-${nextTheme === "night" ? "night" : "day"}`);
     window.setTimeout(() => {
       document.body.classList.remove("theme-is-switching", "theme-switch-to-day", "theme-switch-to-night");
-    }, 920);
+    }, reduceMotion ? 0 : 760);
     setTheme(nextTheme);
   });
 
@@ -141,8 +146,8 @@
   const backToTop = document.createElement("button");
   backToTop.id = "backToTop";
   backToTop.type = "button";
-  backToTop.setAttribute("aria-label", "回到顶部");
-  backToTop.textContent = "↑";
+  backToTop.setAttribute("aria-label", "Back to top");
+  backToTop.textContent = "^";
   document.body.appendChild(backToTop);
 
   const toggleBackToTop = () => {
@@ -159,19 +164,19 @@
     const button = document.createElement("button");
     button.className = "copy-code-button";
     button.type = "button";
-    button.textContent = "复制";
+    button.textContent = "Copy";
     block.appendChild(button);
 
     button.addEventListener("click", async () => {
       const code = block.querySelector("code")?.innerText || block.innerText.replace(button.innerText, "");
       try {
         await navigator.clipboard.writeText(code.trimEnd());
-        button.textContent = "已复制";
+        button.textContent = "Copied";
       } catch {
-        button.textContent = "复制失败";
+        button.textContent = "Copy failed";
       }
       window.setTimeout(() => {
-        button.textContent = "复制";
+        button.textContent = "Copy";
       }, 1400);
     });
   });
@@ -179,7 +184,7 @@
   const lightbox = document.createElement("div");
   lightbox.className = "image-lightbox";
   lightbox.setAttribute("aria-hidden", "true");
-  lightbox.innerHTML = '<button class="image-lightbox-close" type="button" aria-label="关闭图片预览">×</button><img alt="">';
+  lightbox.innerHTML = '<button class="image-lightbox-close" type="button" aria-label="Close image preview">x</button><img alt="">';
   document.body.appendChild(lightbox);
   const lightboxImage = lightbox.querySelector("img");
   const closeLightbox = () => {

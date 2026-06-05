@@ -1,1 +1,14 @@
+<script>
+  (function () {
+    try {
+      var storedTheme = window.localStorage.getItem("site-theme");
+      var prefersNight = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = storedTheme || (prefersNight ? "night" : "day");
+    } catch (_) {
+      document.documentElement.dataset.theme = "day";
+    }
+  })();
+</script>
+<meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101412" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="/css/custom.css">
