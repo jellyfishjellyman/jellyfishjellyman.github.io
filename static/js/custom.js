@@ -243,6 +243,14 @@
       parse: (data) => data?.hitokoto
         ? { text: data.hitokoto, source: `${data.from || data.creator || "Hitokoto"} · 公开一言` }
         : null
+    },
+    {
+      name: "770a公开一言",
+      bucket: "public",
+      url: "https://www.770a.cn/yiyan/",
+      parse: (data) => data?.hitokoto
+        ? { text: data.hitokoto, source: `${data.from || data.creator || "770a.cn"} · 公开一言` }
+        : (typeof data === "string" && data ? { text: data, source: "770a.cn · 公开一言" } : null)
     }
   ];
   const quoteFetchTimeout = 5200;

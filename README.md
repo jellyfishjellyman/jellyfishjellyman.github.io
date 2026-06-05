@@ -101,3 +101,26 @@ GitHub Desktop 流程：
 ```text
 https://gwbblog.top/
 ```
+
+## 随机一言接口
+
+首页随机一言默认会直接请求两个无密钥公开接口：
+
+- `https://v1.hitokoto.cn`
+- `https://www.770a.cn/yiyan/`
+
+如果要接入 ALAPI 或接口盒子，不要把 token、id、key 写进前端源码。推荐用 `workers/random-quote-worker.js` 部署 Cloudflare Worker，并在 Worker 环境变量里设置：
+
+```text
+ALAPI_TOKEN=你的 ALAPI token
+APIHZ_ID=你的接口盒子 id
+APIHZ_KEY=你的接口盒子 key
+```
+
+部署后，把 Worker 地址注入页面即可启用代理。可以在 `layouts/partials/head-additions.html` 里加：
+
+```html
+<meta name="random-quote-proxy" content="https://你的-worker地址/">
+```
+
+前端会优先尝试这个代理；代理不可用时，会回退到公开接口和 `static/data/random-lines.json` 本地句库。
