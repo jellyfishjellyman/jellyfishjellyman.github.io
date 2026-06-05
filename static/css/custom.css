@@ -1400,10 +1400,6 @@ body.home .site-header {
 }
 
 .home-guestbook-feature {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, .45fr);
-  gap: 18px;
-  align-items: stretch;
   margin: 22px 0;
   padding: clamp(18px, 4vw, 30px);
 }
@@ -3634,17 +3630,39 @@ body.home .site-nav {
 
 .home-guestbook-feature {
   margin: 0 0 26px;
+  padding: clamp(18px, 3vw, 26px);
   border-color: rgba(154, 184, 238, .5);
   background:
-    linear-gradient(135deg, rgba(255,255,255,.9), rgba(240,247,255,.76)),
-    radial-gradient(520px circle at 8% 0%, rgba(118, 170, 255, .16), transparent 62%),
-    radial-gradient(420px circle at 94% 40%, rgba(255, 141, 190, .13), transparent 62%);
+    linear-gradient(135deg, rgba(255,255,255,.92), rgba(240,247,255,.78)),
+    radial-gradient(520px circle at 8% 0%, rgba(118, 170, 255, .14), transparent 62%),
+    radial-gradient(420px circle at 94% 40%, rgba(255, 141, 190, .11), transparent 62%);
   box-shadow: 0 22px 62px rgba(70, 96, 150, .13);
+}
+
+.home-guestbook-head {
+  display: block;
 }
 
 .home-guestbook-copy h2 {
   color: #294f9b;
   font-size: clamp(30px, 4.8vw, 54px);
+}
+
+.home-guestbook-head h2 {
+  color: #294f9b;
+  font-size: clamp(30px, 4.8vw, 54px);
+}
+
+.home-guestbook-head p:not(.eyebrow) {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.home-guestbook-canvas {
+  min-height: 430px;
 }
 
 .home-guestbook-note {

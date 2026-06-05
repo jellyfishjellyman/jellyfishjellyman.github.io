@@ -1,8 +1,6 @@
 {{ define "main" }}
 {{ $posts := where .Site.RegularPages "Section" "posts" }}
-{{ $datedPosts := where $posts "Date" "gt" (time "2001-01-01") }}
-{{ $firstPost := index (sort $datedPosts "Date" "asc") 0 }}
-{{ $siteStart := cond (ne $firstPost nil) $firstPost.Date (time "2026-05-03") }}
+{{ $siteStart := time "2026-02-01" }}
 {{ $siteDays := div (sub now.Unix $siteStart.Unix) 86400 }}
 {{ $postCount := len $posts }}
 {{ $toolCount := 0 }}
@@ -13,7 +11,7 @@
     <aside class="home-side-stack home-side-left" aria-label="页面导航">
       <div class="home-side-card">
         <strong>页面导航</strong>
-        <a href="#homeBoard">随机版块</a>
+        <a href="#homeGuestbook">游客留言板</a>
         <a href="/about/">关于本站</a>
         <a href="/guestbook/">特别鸣谢</a>
       </div>
@@ -37,8 +35,8 @@
       </p>
 
       <div class="home-badges" aria-label="站点统计">
-        <span><strong>{{ $siteStart.Format "2006年1月2日" }}</strong> 建站日期</span>
-        <span><strong>{{ add $siteDays 1 }} 天</strong> 已存在</span>
+        <span><strong>2026年1-2月</strong> 建站时间</span>
+        <span><strong>{{ add $siteDays 1 }} 天</strong> 约已存在</span>
       </div>
 
       <div class="hero-actions">
@@ -82,54 +80,42 @@
 </section>
 
 <section id="homeContent" class="home-wrap home-lab">
-  <section class="home-guestbook-feature reveal-on-scroll" aria-label="游客留言板">
-    <div class="home-guestbook-copy">
+  <section id="homeGuestbook" class="home-guestbook-feature reveal-on-scroll" aria-label="游客留言板">
+    <div class="home-board-head home-guestbook-head">
       <p class="eyebrow">Guestbook</p>
       <h2>游客留言板</h2>
       <p>这里单独留给路过的人。现在先作为入口展示，后续接入保存、审核和限流后，再开放真正提交。</p>
     </div>
-    <a class="home-guestbook-note" href="/guestbook/">
-      <span>你好，陌生人</span>
-      <strong>世界那么大，凑巧遇见你。</strong>
-      <em>进入留言板</em>
-    </a>
-  </section>
-
-  <section id="homeBoard" class="home-board reveal-on-scroll" aria-label="小站公告板">
-    <div class="home-board-head">
-      <p class="eyebrow">Board</p>
-      <h2>小站公告板</h2>
-    </div>
-    <div class="home-board-canvas">
-      <a class="board-note note-blue" href="/posts/">
-        <span>公告板说明</span>
-        <strong>点击纸条查看完整内容</strong>
-        <em>最近写下的记录</em>
+    <div class="home-board-canvas home-guestbook-canvas">
+      <a class="board-note note-blue" href="/guestbook/">
+        <span>你好，陌生人</span>
+        <strong>世界那么大，凑巧遇见你。</strong>
+        <em>进入留言板</em>
       </a>
-      <a class="board-note note-green" href="/tools/">
-        <span>小提示</span>
-        <strong>PC 端浏览本站体验更好</strong>
-        <em>工具入口</em>
+      <a class="board-note note-green" href="/guestbook/">
+        <span>路过</span>
+        <strong>来都来了，贴张小纸条再走。</strong>
+        <em>未来留言</em>
       </a>
-      <a class="board-note note-white" href="/posts/">
-        <span>笔记</span>
-        <strong>最近在写 C# 相关的小文章</strong>
-        <em>最近在干嘛</em>
+      <a class="board-note note-white" href="/guestbook/">
+        <span>待接入</span>
+        <strong>后续会接入保存、审核和限流。</strong>
+        <em>留言功能</em>
       </a>
-      <a class="board-note note-pink" href="/posts/">
-        <span>随缘中</span>
-        <strong>本站内容随缘更，但不会停止更新</strong>
-        <em>慢慢写</em>
+      <a class="board-note note-pink" href="/guestbook/">
+        <span>小约定</span>
+        <strong>可以随便聊，但别留下会伤人的话。</strong>
+        <em>慢慢来</em>
       </a>
-      <a class="board-note note-lilac" href="/games/">
+      <a class="board-note note-lilac" href="/guestbook/">
         <span>6:00am</span>
-        <strong>天又亮了</strong>
-        <em>啊，又是麻烦的一天呢。</em>
+        <strong>天又亮了，留言板也醒着。</strong>
+        <em>早安</em>
       </a>
-      <a class="board-note note-sky" href="/links/">
-        <span>GitHub</span>
-        <strong>我的 GitHub 主页</strong>
-        <em>资源与项目入口</em>
+      <a class="board-note note-sky" href="/guestbook/">
+        <span>未读</span>
+        <strong>下一张纸条，也许就是你贴的。</strong>
+        <em>等一条留言</em>
       </a>
     </div>
   </section>
