@@ -14,6 +14,47 @@
     window.addEventListener("pointermove", setPointerVars, { passive: true });
   }
 
+  if (!reduceMotion && finePointer) {
+    let lastSpark = 0;
+    let sparkIndex = 0;
+    const maxSparks = 24;
+
+    const spawnSpark = (event) => {
+      const now = performance.now();
+      if (now - lastSpark < 42) return;
+      lastSpark = now;
+      const spark = document.createElement("span");
+      spark.className = "pointer-spark";
+      spark.setAttribute("aria-hidden", "true");
+      const drift = 10 + (sparkIndex % 4) * 4;
+      const angle = (sparkIndex * 137.5 * Math.PI) / 180;
+      spark.style.left = `${event.clientX}px`;
+      spark.style.top = `${event.clientY}px`;
+      spark.style.setProperty("--spark-x", `${Math.cos(angle) * drift}px`);
+      spark.style.setProperty("--spark-y", `${Math.sin(angle) * drift}px`);
+      document.body.appendChild(spark);
+      sparkIndex += 1;
+      while (document.querySelectorAll(".pointer-spark").length > maxSparks) {
+        document.querySelector(".pointer-spark")?.remove();
+      }
+      spark.addEventListener("animationend", () => spark.remove(), { once: true });
+    };
+
+    const spawnRipple = (event) => {
+      if (event.button !== 0) return;
+      const ripple = document.createElement("span");
+      ripple.className = "pointer-ripple";
+      ripple.setAttribute("aria-hidden", "true");
+      ripple.style.left = `${event.clientX}px`;
+      ripple.style.top = `${event.clientY}px`;
+      document.body.appendChild(ripple);
+      ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+    };
+
+    window.addEventListener("pointermove", spawnSpark, { passive: true });
+    window.addEventListener("pointerdown", spawnRipple, { passive: true });
+  }
+
   if (location.pathname === "/" || location.pathname === "/index.html") {
     document.body.classList.add("home");
   }
