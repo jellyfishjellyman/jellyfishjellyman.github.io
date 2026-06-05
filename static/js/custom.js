@@ -211,28 +211,54 @@
     if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
   });
 
-  const fallbackQuotes = [
-    { text: "一往情深深几许？深山夕照深秋雨。", source: "纳兰性德" },
-    { text: "明月松间照，清泉石上流。", source: "王维" },
-    { text: "山中何事？松花酿酒，春水煎茶。", source: "张可久" },
-    { text: "夜暗方显万颗星，灯明始见一缕尘。", source: "站内小记" },
-    { text: "把复杂的事写清楚，也是一种慢慢变强。", source: "Jellyfish Lab" },
-    { text: "玻璃晴朗，橘子辉煌。", source: "北岛" },
-    { text: "人间有味是清欢。", source: "苏轼" },
-    { text: "且将新火试新茶，诗酒趁年华。", source: "苏轼" }
-  ];
-
   const quoteText = document.querySelector("[data-quote-text]");
   const quoteSource = document.querySelector("[data-quote-source]");
   const quoteNext = document.querySelector("[data-quote-next]");
+  const quoteProxyUrl = document.querySelector('meta[name="random-quote-proxy"]')?.content || window.siteRandomQuoteProxy || "";
+  const fallbackQuotes = [
+    { text: "一往情深深几许？深山夕照深秋雨。", source: "纳兰性德 · 本地句库" },
+    { text: "明月松间照，清泉石上流。", source: "王维 · 本地句库" },
+    { text: "山中何事？松花酿酒，春水煎茶。", source: "张可久 · 本地句库" },
+    { text: "夜暗方显万颗星，灯明始见一缕尘。", source: "站内小记 · 本地句库" },
+    { text: "把复杂的事写清楚，也是一种慢慢变强。", source: "Jellyfish Lab · 本地句库" },
+    { text: "玻璃晴朗，橘子辉煌。", source: "北岛 · 本地句库" },
+    { text: "人间有味是清欢。", source: "苏轼 · 本地句库" },
+    { text: "且将新火试新茶，诗酒趁年华。", source: "苏轼 · 本地句库" }
+  ];
+  const remoteQuoteSources = [
+    {
+      name: "站点代理",
+      bucket: "proxy",
+      url: quoteProxyUrl,
+      parse: (data) => {
+        const text = data?.text || data?.content || data?.hitokoto || data?.quote;
+        return text ? { text, source: data?.source || "站点代理 · 随机灵感" } : null;
+      },
+      enabled: () => Boolean(quoteProxyUrl)
+    },
+    {
+      name: "Hitokoto公开一言",
+      bucket: "public",
+      url: "https://v1.hitokoto.cn",
+      parse: (data) => data?.hitokoto
+        ? { text: data.hitokoto, source: `${data.from || data.creator || "Hitokoto"} · 公开一言` }
+        : null
+    }
+  ];
+  const quoteFetchTimeout = 5200;
+  const quoteClickGap = 1300;
+  const quoteDailySoftLimit = 18;
   let quotes = fallbackQuotes;
   let quoteIndex = Math.floor(Math.random() * quotes.length);
-  const renderQuote = () => {
+  let quoteSourceIndex = Math.floor(Math.random() * remoteQuoteSources.length);
+  let quoteLoading = false;
+  let lastQuoteRequestAt = 0;
+  const renderQuote = (quote) => {
     if (!quoteText || !quoteSource) return;
-    const quote = quotes[quoteIndex % quotes.length];
-    quoteText.textContent = quote.text;
-    quoteSource.textContent = quote.source;
-    quoteIndex += 1;
+    const nextQuote = quote || quotes[quoteIndex % quotes.length];
+    quoteText.textContent = nextQuote.text;
+    quoteSource.textContent = nextQuote.source;
+    if (!quote) quoteIndex += 1;
   };
   const loadQuotes = async () => {
     if (!quoteText || !quoteSource) return;
@@ -245,7 +271,7 @@
         .filter((item) => item && item.text)
         .map((item) => ({
           text: item.text,
-          source: item.source || item.type || "随机一言"
+          source: `${item.source || item.type || "随机一言"} · 本地句库`
         }));
       quoteIndex = Math.floor(Math.random() * quotes.length);
       renderQuote();
@@ -253,9 +279,95 @@
       quotes = fallbackQuotes;
     }
   };
+  const fetchWithTimeout = async (url) => {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), quoteFetchTimeout);
+    try {
+      const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+      const text = await response.text();
+      if (!response.ok) return null;
+      try {
+        return JSON.parse(text);
+      } catch (_) {
+        return text.trim();
+      }
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
+  };
+  const getQuoteUsage = () => {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const usage = JSON.parse(window.localStorage.getItem("random-quote-usage") || "{}");
+      return usage.date === today ? usage : { date: today, proxy: 0, public: 0 };
+    } catch (_) {
+      return { date: "", proxy: 0, public: 0 };
+    }
+  };
+  const markQuoteUsage = (bucket) => {
+    try {
+      const usage = getQuoteUsage();
+      usage[bucket] = (usage[bucket] || 0) + 1;
+      window.localStorage.setItem("random-quote-usage", JSON.stringify(usage));
+    } catch (_) {
+      return;
+    }
+  };
+  const canUseQuoteSource = (source) => {
+    if (source.enabled && !source.enabled()) return false;
+    if (source.bucket !== "proxy") return true;
+    const usage = getQuoteUsage();
+    return (usage.proxy || 0) < quoteDailySoftLimit;
+  };
+  const fetchRemoteQuote = async () => {
+    const orderedSources = [
+      ...remoteQuoteSources.slice(quoteSourceIndex),
+      ...remoteQuoteSources.slice(0, quoteSourceIndex)
+    ];
+    quoteSourceIndex = (quoteSourceIndex + 1) % remoteQuoteSources.length;
+    for (const source of orderedSources) {
+      if (!canUseQuoteSource(source)) continue;
+      try {
+        const data = await fetchWithTimeout(source.url);
+        const quote = data && source.parse(data);
+        if (quote?.text) {
+          markQuoteUsage(source.bucket);
+          return quote;
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
+  };
+  const requestQuote = async ({ remote = false } = {}) => {
+    if (!quoteText || !quoteSource || quoteLoading) return;
+    const now = Date.now();
+    if (remote && now - lastQuoteRequestAt < quoteClickGap) {
+      renderQuote();
+      return;
+    }
+    lastQuoteRequestAt = now;
+    if (!remote) {
+      renderQuote();
+      return;
+    }
+    quoteLoading = true;
+    quoteNext?.setAttribute("aria-busy", "true");
+    if (quoteNext) quoteNext.textContent = "加载中";
+    try {
+      const remoteQuote = await fetchRemoteQuote();
+      renderQuote(remoteQuote || undefined);
+    } finally {
+      quoteLoading = false;
+      quoteNext?.removeAttribute("aria-busy");
+      if (quoteNext) quoteNext.textContent = "换一句";
+    }
+  };
   renderQuote();
   loadQuotes();
-  quoteNext?.addEventListener("click", renderQuote);
+  window.setTimeout(() => requestQuote({ remote: true }), 360);
+  quoteNext?.addEventListener("click", () => requestQuote({ remote: true }));
 
   const searchForm = document.querySelector("[data-site-search]");
   const searchInput = document.querySelector("[data-search-input]");
