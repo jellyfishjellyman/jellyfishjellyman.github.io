@@ -80,42 +80,23 @@
 </section>
 
 <section id="homeContent" class="home-wrap home-lab">
-  <section id="homeGuestbook" class="home-guestbook-feature reveal-on-scroll" aria-label="游客留言板">
+  <section
+    id="homeGuestbook"
+    class="home-guestbook-feature reveal-on-scroll"
+    aria-label="游客留言板"
+    data-guestbook
+    data-api="https://gwbblog-guestbook-api.demon1jellyfish.workers.dev"
+  >
     <div class="home-board-head home-guestbook-head">
       <p class="eyebrow">Guestbook</p>
       <h2>游客留言板</h2>
-      <p>这里单独留给路过的人。现在先作为入口展示，后续接入保存、审核和限流后，再开放真正提交。</p>
+      <p>路过的人会把话留成纸条。想贴一张新的，就进入留言板。</p>
     </div>
-    <div class="home-board-canvas home-guestbook-canvas">
+    <div class="home-board-canvas home-guestbook-canvas" data-guestbook-list>
       <a class="board-note note-blue" href="/guestbook/">
-        <span>你好，陌生人</span>
-        <strong>世界那么大，凑巧遇见你。</strong>
-        <em>进入留言板</em>
-      </a>
-      <a class="board-note note-green" href="/guestbook/">
-        <span>路过</span>
-        <strong>来都来了，贴张小纸条再走。</strong>
-        <em>未来留言</em>
-      </a>
-      <a class="board-note note-white" href="/guestbook/">
-        <span>待接入</span>
-        <strong>后续会接入保存、审核和限流。</strong>
-        <em>留言功能</em>
-      </a>
-      <a class="board-note note-pink" href="/guestbook/">
-        <span>小约定</span>
-        <strong>可以随便聊，但别留下会伤人的话。</strong>
-        <em>慢慢来</em>
-      </a>
-      <a class="board-note note-lilac" href="/guestbook/">
-        <span>6:00am</span>
-        <strong>天又亮了，留言板也醒着。</strong>
-        <em>早安</em>
-      </a>
-      <a class="board-note note-sky" href="/guestbook/">
-        <span>未读</span>
-        <strong>下一张纸条，也许就是你贴的。</strong>
-        <em>等一条留言</em>
+        <span>留言加载中</span>
+        <strong>正在翻找大家贴过的小纸条。</strong>
+        <em>请稍候</em>
       </a>
     </div>
   </section>

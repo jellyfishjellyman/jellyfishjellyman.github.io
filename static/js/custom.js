@@ -494,6 +494,7 @@
     const list = guestbook.querySelector("[data-guestbook-list]");
     const status = guestbook.querySelector("[data-guestbook-status]");
     const turnstileTarget = guestbook.querySelector("[data-guestbook-turnstile]");
+    const isHomeGuestbook = list?.classList.contains("home-guestbook-canvas");
     let turnstileWidgetId = null;
     const noteClasses = ["note-blue", "note-green", "note-pink", "note-lilac", "note-sky", "note-white"];
 
@@ -527,7 +528,13 @@
     const renderGuestMessages = (messages) => {
       if (!list) return;
       if (!messages.length) {
-        list.innerHTML = `
+        list.innerHTML = isHomeGuestbook ? `
+          <a class="board-note note-blue" href="/guestbook/">
+            <span>你好，陌生人</span>
+            <strong>留言板刚擦干净，第一张纸条等你来贴。</strong>
+            <em>进入留言板</em>
+          </a>
+        ` : `
           <article class="guest-note note-blue">
             <span>你好，陌生人</span>
             <strong>留言板刚擦干净，第一张纸条等你来贴。</strong>
@@ -537,13 +544,25 @@
         return;
       }
 
-      list.innerHTML = messages.map((item, index) => `
-        <article class="guest-note ${noteClasses[index % noteClasses.length]}">
-          <span>${escapeText(item.name || "路过的人")}</span>
-          <strong>${escapeText(item.message || "")}</strong>
-          <em>${formatGuestTime(item.created_at)}</em>
-        </article>
-      `).join("");
+      list.innerHTML = messages.map((item, index) => {
+        const noteClass = noteClasses[index % noteClasses.length];
+        const name = escapeText(item.name || "路过的人");
+        const message = escapeText(item.message || "");
+        const time = formatGuestTime(item.created_at);
+        return isHomeGuestbook ? `
+          <a class="board-note ${noteClass}" href="/guestbook/">
+            <span>${name}</span>
+            <strong>${message}</strong>
+            <em>${time}</em>
+          </a>
+        ` : `
+          <article class="guest-note ${noteClass}">
+            <span>${name}</span>
+            <strong>${message}</strong>
+            <em>${time}</em>
+          </article>
+        `;
+      }).join("");
     };
 
     const loadGuestMessages = async () => {
@@ -613,7 +632,7 @@
       }
     });
 
-    waitForTurnstile();
+    if (turnstileTarget && siteKey) waitForTurnstile();
     loadGuestMessages();
   }
 
