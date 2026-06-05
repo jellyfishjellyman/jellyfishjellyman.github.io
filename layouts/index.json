@@ -1,0 +1,14 @@
+{{- $items := slice -}}
+{{- range site.Pages -}}
+  {{- if and .Title .RelPermalink (ne .RelPermalink "/") (ne .Kind "taxonomy") (ne .Kind "term") (not .Params.private) -}}
+    {{- $items = $items | append (dict
+      "title" (.Title | plainify)
+      "url" .RelPermalink
+      "section" (.Section | default .Kind)
+      "summary" (.Summary | plainify | truncate 180)
+      "date" (.Date.Format "2006-01-02")
+      "tags" (.Params.tags | default (slice))
+    ) -}}
+  {{- end -}}
+{{- end -}}
+{{- $items | jsonify -}}

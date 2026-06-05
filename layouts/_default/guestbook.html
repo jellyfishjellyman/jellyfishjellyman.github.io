@@ -1,0 +1,32 @@
+{{ define "main" }}
+<section class="module-page guestbook-page">
+  <div class="module-intro reveal-on-scroll">
+    <p class="eyebrow">Guestbook</p>
+    <h1>{{ .Title }}</h1>
+    <div class="module-copy">{{ .Content }}</div>
+  </div>
+
+  <div class="guestbook-board reveal-on-scroll" aria-label="留言板预览">
+    <article class="guest-note note-blue">
+      <span>你好，陌生人</span>
+      <strong>世界那么大，凑巧遇见你。</strong>
+      <em>未来留言</em>
+    </article>
+    <article class="guest-note note-green">
+      <span>浏览小提示</span>
+      <strong>PC 端浏览本站体验会更完整。</strong>
+      <em>公告</em>
+    </article>
+    <article class="guest-note note-pink">
+      <span>实现说明</span>
+      <strong>游客留言需要后端保存和限流，静态页不能单独完成。</strong>
+      <em>待接入</em>
+    </article>
+  </div>
+
+  <div class="guestbook-plan reveal-on-scroll">
+    <h2>后续接入方案</h2>
+    <p>推荐用 Cloudflare Worker、Vercel Function 或 Netlify Function 保存留言；限流策略可以按 IP 做滑动时间窗，例如每 10 分钟 5 到 10 条，同时加基础关键词过滤和长度限制。</p>
+  </div>
+</section>
+{{ end }}

@@ -211,6 +211,111 @@
     if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
   });
 
+  const fallbackQuotes = [
+    { text: "一往情深深几许？深山夕照深秋雨。", source: "纳兰性德" },
+    { text: "明月松间照，清泉石上流。", source: "王维" },
+    { text: "山中何事？松花酿酒，春水煎茶。", source: "张可久" },
+    { text: "夜暗方显万颗星，灯明始见一缕尘。", source: "站内小记" },
+    { text: "把复杂的事写清楚，也是一种慢慢变强。", source: "Jellyfish Lab" },
+    { text: "玻璃晴朗，橘子辉煌。", source: "北岛" },
+    { text: "人间有味是清欢。", source: "苏轼" },
+    { text: "且将新火试新茶，诗酒趁年华。", source: "苏轼" }
+  ];
+
+  const quoteText = document.querySelector("[data-quote-text]");
+  const quoteSource = document.querySelector("[data-quote-source]");
+  const quoteNext = document.querySelector("[data-quote-next]");
+  let quotes = fallbackQuotes;
+  let quoteIndex = Math.floor(Math.random() * quotes.length);
+  const renderQuote = () => {
+    if (!quoteText || !quoteSource) return;
+    const quote = quotes[quoteIndex % quotes.length];
+    quoteText.textContent = quote.text;
+    quoteSource.textContent = quote.source;
+    quoteIndex += 1;
+  };
+  const loadQuotes = async () => {
+    if (!quoteText || !quoteSource) return;
+    try {
+      const response = await fetch("/data/random-lines.json", { cache: "no-store" });
+      if (!response.ok) return;
+      const items = await response.json();
+      if (!Array.isArray(items) || !items.length) return;
+      quotes = items
+        .filter((item) => item && item.text)
+        .map((item) => ({
+          text: item.text,
+          source: item.source || item.type || "随机一言"
+        }));
+      quoteIndex = Math.floor(Math.random() * quotes.length);
+      renderQuote();
+    } catch (_) {
+      quotes = fallbackQuotes;
+    }
+  };
+  renderQuote();
+  loadQuotes();
+  quoteNext?.addEventListener("click", renderQuote);
+
+  const searchForm = document.querySelector("[data-site-search]");
+  const searchInput = document.querySelector("[data-search-input]");
+  const searchResults = document.querySelector("[data-search-results]");
+  let searchIndexPromise = null;
+  const getSearchIndex = () => {
+    if (!searchIndexPromise) {
+      searchIndexPromise = fetch("/index.json")
+        .then((response) => response.ok ? response.json() : [])
+        .catch(() => []);
+    }
+    return searchIndexPromise;
+  };
+  const normalize = (value) => String(value || "").toLowerCase().trim();
+  const renderSearch = async () => {
+    if (!searchInput || !searchResults) return;
+    const query = normalize(searchInput.value);
+    if (!query) {
+      searchResults.innerHTML = '<div class="search-empty">输入关键词后会在这里显示结果。</div>';
+      return;
+    }
+    const items = await getSearchIndex();
+    const terms = query.split(/\s+/).filter(Boolean);
+    const matches = items
+      .map((item) => {
+        const haystack = normalize([item.title, item.section, item.summary, (item.tags || []).join(" ")].join(" "));
+        const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
+        return { item, score };
+      })
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || String(b.item.date || "").localeCompare(String(a.item.date || "")))
+      .slice(0, 6);
+    if (!matches.length) {
+      searchResults.innerHTML = '<div class="search-empty">暂时没有匹配结果，换个关键词试试。</div>';
+      return;
+    }
+    searchResults.replaceChildren(...matches.map(({ item }) => {
+      const link = document.createElement("a");
+      const title = document.createElement("strong");
+      const summary = document.createElement("span");
+      link.className = "search-result";
+      link.href = item.url;
+      title.textContent = item.title;
+      summary.textContent = item.summary || item.section || "站内页面";
+      link.append(title, summary);
+      return link;
+    }));
+  };
+  if (searchForm) {
+    searchResults.innerHTML = '<div class="search-empty">输入关键词后会在这里显示结果。</div>';
+    searchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      renderSearch();
+    });
+    searchInput?.addEventListener("input", () => {
+      window.clearTimeout(searchInput._searchTimer);
+      searchInput._searchTimer = window.setTimeout(renderSearch, 160);
+    });
+  }
+
   const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
   if (finePointer) {
     selectableItems.forEach((item) => {

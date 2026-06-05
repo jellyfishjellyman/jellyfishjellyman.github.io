@@ -1,0 +1,23 @@
+{{ define "main" }}
+<section class="module-page search-page">
+  <div class="module-intro reveal-on-scroll">
+    <p class="eyebrow">Search</p>
+    <h1>{{ .Title }}</h1>
+    <div class="module-copy">{{ .Content }}</div>
+  </div>
+
+  <div class="search-page-panel home-search-panel reveal-on-scroll">
+    <div class="home-panel-head">
+      <p class="eyebrow">Index</p>
+      <h2>全站搜索</h2>
+      <p>搜索文章、资源、工具和游戏页面。</p>
+    </div>
+    <form class="site-search" data-site-search>
+      <label class="sr-only" for="searchPageInput">搜索关键词</label>
+      <input id="searchPageInput" type="search" placeholder="输入关键词，例如 Hugo、工具、Vim" autocomplete="off" data-search-input>
+      <button class="primary-button" type="submit">搜索</button>
+    </form>
+    <div class="search-results" data-search-results aria-live="polite"></div>
+  </div>
+</section>
+{{ end }}

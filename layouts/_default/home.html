@@ -1,6 +1,14 @@
 {{ define "main" }}
 {{ $posts := where .Site.RegularPages "Section" "posts" }}
 {{ $latest := first 3 $posts }}
+{{ $datedPosts := where $posts "Date" "gt" (time "2001-01-01") }}
+{{ $firstPost := index (sort $datedPosts "Date" "asc") 0 }}
+{{ $siteStart := cond (ne $firstPost nil) $firstPost.Date (time "2026-01-01") }}
+{{ $siteDays := div (sub now.Unix $siteStart.Unix) 86400 }}
+{{ $totalPages := len .Site.RegularPages }}
+{{ $postCount := len $posts }}
+{{ $toolCount := 0 }}
+{{ range site.Data.tools }}{{ $toolCount = add $toolCount (len .items) }}{{ end }}
 
 <section id="hero" class="home-hero" data-webgl-hero>
   <canvas class="home-hero-canvas" data-webgl-canvas aria-hidden="true"></canvas>
@@ -57,6 +65,75 @@
       <span>下一步：阅读体验和游戏区细节</span>
     </div>
   </div>
+
+  <div class="home-console reveal-on-scroll" aria-label="站点快捷工具">
+    <section class="home-search-panel">
+      <div class="home-panel-head">
+        <p class="eyebrow">Search</p>
+        <h2>全站搜索</h2>
+        <p>搜索文章和模块，支持标题、摘要和标签。</p>
+      </div>
+      <form class="site-search" data-site-search>
+        <label class="sr-only" for="homeSearchInput">搜索关键词</label>
+        <input id="homeSearchInput" type="search" placeholder="输入关键词，例如 Hugo、游戏、工具" autocomplete="off" data-search-input>
+        <button class="primary-button" type="submit">搜索</button>
+      </form>
+      <div class="search-results" data-search-results aria-live="polite"></div>
+    </section>
+
+    <section class="home-quote-panel">
+      <div class="home-panel-head">
+        <p class="eyebrow">Sentence</p>
+        <h2>随机一言</h2>
+      </div>
+      <blockquote class="random-quote" data-random-quote>
+        <p data-quote-text>一往情深深几许？深山夕照深秋雨。</p>
+        <cite data-quote-source>纳兰性德</cite>
+      </blockquote>
+      <button class="ghost-button" type="button" data-quote-next>换一句</button>
+    </section>
+
+    <section class="home-stats-panel">
+      <div class="home-panel-head">
+        <p class="eyebrow">Stats</p>
+        <h2>站点小记</h2>
+      </div>
+      <div class="site-stats">
+        <span><strong>{{ $siteStart.Format "2006年1月2日" }}</strong> 建站日期</span>
+        <span><strong>{{ add $siteDays 1 }}</strong> 已存在天数</span>
+        <span><strong>{{ $postCount }}</strong> 篇文章</span>
+        <span><strong>{{ $toolCount }}</strong> 个工具入口</span>
+      </div>
+    </section>
+
+    <section class="home-guestbook-panel">
+      <div class="home-panel-head">
+        <p class="eyebrow">Guestbook</p>
+        <h2>游客留言板</h2>
+        <p>静态站不能直接安全写入留言；后续接入后端或评论服务后，可加 IP 时间窗限流。</p>
+      </div>
+      <div class="guestbook-preview">
+        <span>你好，陌生人</span>
+        <strong>世界那么大，凑巧遇见你。</strong>
+      </div>
+      <a class="ghost-button" href="/guestbook/">查看留言板</a>
+    </section>
+  </div>
+
+  <section class="home-image-strip reveal-on-scroll" aria-label="站点图片墙">
+    <div class="home-image-copy">
+      <p class="eyebrow">Gallery</p>
+      <h2>把小站整理得更有画面感</h2>
+      <p>先用站内已有图片做轻量展示，后续写文章时可以继续把配图沉淀进这里。</p>
+      <a class="ghost-button" href="/posts/">翻看文章</a>
+    </div>
+    <div class="home-image-grid" aria-hidden="true">
+      <img src="/images/hero-optimized.jpg" alt="">
+      <img src="/images/avatar.jpg" alt="">
+      <img src="/posts/post-20260604-125629/_20260604124937_151_2.jpg" alt="">
+      <img src="/posts/post-20260604-125629/_20260604125056_152_2.jpg" alt="">
+    </div>
+  </section>
 
   <div class="feature-strip">
     <a class="feature-card" href="/posts/">

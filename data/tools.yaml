@@ -1,6 +1,22 @@
 - title: 外部工具
   description: 从收藏夹整理出的常用在线工具。
   items:
+  - name: 二维码生成器
+    url: https://cli.im/
+    note: 把文字、链接等内容快速生成二维码。
+    status: 在线工具
+  - name: Markdown 表格生成器
+    url: https://www.tablesgenerator.com/markdown_tables
+    note: 把表格内容整理成 Markdown 表格。
+    status: 在线工具
+  - name: 文本差异对比器
+    url: https://www.diffchecker.com/text-compare/
+    note: 对比两段文本，找出新增、删除和修改的地方。
+    status: 在线工具
+  - name: 在线文本去重
+    url: https://www.sojson.com/removeDuplicate.html
+    note: 整理列表、去除重复行，适合轻量文本清理。
+    status: 在线工具
   - name: Convertio
     url: https://convertio.co/zh/
     note: 在线文件格式转换。
