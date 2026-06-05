@@ -1,0 +1,38 @@
+{{ define "main" }}
+<section class="game-play-page">
+  <div class="game-shell game-shell-wide reveal-on-scroll" data-game="memory">
+    <div class="game-panel">
+      <p class="eyebrow">Game</p>
+      <h1>{{ .Title }}</h1>
+      <div class="module-copy">{{ .Content }}</div>
+
+      <div class="score-row score-row-three" aria-label="记忆翻牌状态">
+        <div>
+          <span>步数</span>
+          <strong id="memoryMoves">0</strong>
+        </div>
+        <div>
+          <span>配对</span>
+          <strong id="memoryPairs">0</strong>
+        </div>
+        <div>
+          <span>最好</span>
+          <strong id="memoryBest">-</strong>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="primary-button" id="restartMemory" type="button">重新开始</button>
+        <button class="ghost-button" id="memoryMode" type="button">普通</button>
+        <a class="ghost-button" href="/games/">返回游戏</a>
+      </div>
+    </div>
+
+    <div class="board-wrap memory-wrap">
+      <div id="memoryBoard" class="memory-board" role="grid" aria-label="记忆翻牌棋盘"></div>
+      <p id="memoryMessage" class="game-message" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+<script src="/js/game-memory.js" defer></script>
+{{ end }}

@@ -1,0 +1,33 @@
+{{ define "main" }}
+<section class="game-play-page">
+  <div class="game-shell game-shell-wide reveal-on-scroll" data-game="dino">
+    <div class="game-panel">
+      <p class="eyebrow">Game</p>
+      <h1>{{ .Title }}</h1>
+      <div class="module-copy">{{ .Content }}</div>
+
+      <div class="score-row" aria-label="小恐龙分数">
+        <div>
+          <span>距离</span>
+          <strong id="dinoScore">0</strong>
+        </div>
+        <div>
+          <span>最高</span>
+          <strong id="dinoBest">0</strong>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="primary-button" id="restartDino" type="button">重新开始</button>
+        <a class="ghost-button" href="/games/">返回游戏</a>
+      </div>
+    </div>
+
+    <div class="board-wrap dino-wrap">
+      <canvas id="dinoCanvas" class="dino-canvas" width="920" height="360" role="img" aria-label="小恐龙跑酷画面"></canvas>
+      <p id="dinoMessage" class="game-message" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+<script src="/js/game-dino.js" defer></script>
+{{ end }}

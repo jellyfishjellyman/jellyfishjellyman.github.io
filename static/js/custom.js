@@ -16,7 +16,14 @@
   setTheme(storedTheme || "day");
   themeToggle?.addEventListener("click", () => {
     const nextTheme = root.dataset.theme === "night" ? "day" : "night";
+    const rect = themeToggle.getBoundingClientRect();
+    root.style.setProperty("--switch-x", `${rect.left + rect.width / 2}px`);
     window.localStorage.setItem("site-theme", nextTheme);
+    document.body.classList.remove("theme-is-switching", "theme-switch-to-day", "theme-switch-to-night");
+    document.body.classList.add("theme-is-switching", `theme-switch-to-${nextTheme === "night" ? "night" : "day"}`);
+    window.setTimeout(() => {
+      document.body.classList.remove("theme-is-switching", "theme-switch-to-day", "theme-switch-to-night");
+    }, 920);
     setTheme(nextTheme);
   });
 

@@ -224,6 +224,9 @@
   - name: Bosch Project
     url: http://boschproject.org/#/
     note: 博斯风格的交互艺术与视觉探索网页。
+  - name: SimonAKing/HomePage
+    url: https://github.com/SimonAKing/HomePage
+    note: 带流体动画、双屏入口和平滑转场的个人主页模板，适合作为首页动效灵感参考。
   - name: tree.fm
     url: https://www.tree.fm/
     note: 随机收听世界各地森林声音，很适合放松。

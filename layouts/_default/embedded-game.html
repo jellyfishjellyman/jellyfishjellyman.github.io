@@ -1,9 +1,10 @@
 {{ define "main" }}
 <section class="embedded-game-page" data-game-page="{{ .File.ContentBaseName }}">
   <div class="embedded-game-head reveal-on-scroll">
-    <p class="eyebrow">{{ .Params.kicker | default "Game" }}</p>
-    <h1>{{ .Title }}</h1>
-    <div class="module-copy">{{ .Content }}</div>
+    <div>
+      <p class="eyebrow">{{ .Params.kicker | default "Game" }}</p>
+      <h1>{{ .Title }}</h1>
+    </div>
     <div class="embedded-game-actions">
       <a class="ghost-button" href="/games/">返回游戏</a>
       {{ with .Params.source_url }}
@@ -13,6 +14,10 @@
         <a class="ghost-button" href="{{ . }}" target="_blank" rel="noopener noreferrer">演示</a>
       {{ end }}
     </div>
+  </div>
+
+  <div class="game-tutorial reveal-on-scroll">
+    <div class="module-copy">{{ .Content }}</div>
   </div>
 
   <div class="embedded-game-frame-wrap reveal-on-scroll">
