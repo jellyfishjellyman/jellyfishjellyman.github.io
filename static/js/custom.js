@@ -497,16 +497,40 @@
     const randomNameButton = guestbook.querySelector("[data-guestbook-random-name]");
     const isHomeGuestbook = list?.classList.contains("home-guestbook-canvas");
     const noteClasses = ["note-blue", "note-green", "note-pink", "note-lilac", "note-sky", "note-white"];
-    const nicknameProxyUrl = document.querySelector('meta[name="nickname-proxy"]')?.content || "";
-    const guestNamePrefixes = [
-      "匿名用户", "路过水母", "云边访客", "夜航纸条", "小站旅人", "漂流星星",
-      "月亮邮差", "晚风收藏家", "海盐小熊", "银河值班员", "橘子汽水", "松间听雨",
-      "半颗薄荷糖", "玻璃水母", "夜航纸飞机", "小镇观星人", "雨后蘑菇", "蒲公英旅客",
-      "星星保管员", "风铃便利店", "奶油小行星", "雾里看花人", "春日逃课生", "蓝莓气泡",
-      "猫耳耳机", "雪糕巡逻员", "凌晨三点半", "芝士月球", "晴天备用伞", "不吃香菜星人",
-      "便利店诗人", "软糖工程师", "海边旧信箱", "咖啡续命师", "树洞管理员", "云朵修理铺",
-      "星河漫游者", "柠檬味晚霞", "蘑菇云游客", "西瓜小电台", "迷路的信号", "夏夜放映员",
-      "纸船观察员", "奶茶不加冰", "宇宙小便签", "小熊不营业", "云端打字员", "汽水观察家"
+    const guestNameAdjectives = [
+      "隐秘", "迅捷", "冷静", "精准", "破晓", "暗影", "锋利", "坚韧", "炽热", "霜冷",
+      "雷鸣", "潮湿", "荒芜", "漂泊", "回响", "寂静", "湮灭", "灰烬", "极昼", "逆光",
+      "历战", "凶猛", "巨型", "古老", "狩猎", "冰封", "灼烧", "毒蚀", "狂怒", "敏锐",
+      "守护", "量子", "纳米", "共生", "星际", "轨道", "民主", "深岩", "矿脉", "黏性",
+      "黄金", "音速", "波动", "铁壁", "杀意", "神圣", "混沌", "灵能", "不屈", "猩红",
+      "褪色", "腐败", "癫狂", "暗月", "熔炉", "重力", "秘藏", "爆裂", "腐蚀", "冰冻",
+      "幸存", "孤岛", "洞穴", "野性", "无形", "鹰眼", "信仰", "夜雀", "温暖", "幻想",
+      "天命", "如意", "定身", "铜头", "聚形", "刚毅", "流光", "雾蓝", "白玉", "竹影",
+      "黑旗", "圣殿", "失落", "虚空", "边境", "高能", "跃迁", "警戒", "灼目", "幽蓝",
+      "银白", "赤红", "翠绿", "苍蓝", "玄黑", "琥珀", "松弛", "可靠", "离谱", "认真",
+      "疲惫", "无畏", "坚固", "机敏", "温柔", "暴躁", "沉默", "勇敢", "闪耀", "迷路"
+    ];
+    const guestNameNouns = [
+      "特遣队员", "侦察兵", "突击手", "医疗兵", "工兵", "狙击手", "指挥官", "战术犬", "补给箱", "信标",
+      "不死鸟", "贤者", "夜露", "炼狱", "零", "捷风", "霓虹", "星芒阵", "幽影", "尖塔",
+      "旅行者", "神之眼", "风之翼", "尘世之锁", "千岩长枪", "雾切", "若陀龙王", "特瓦林", "丘丘人", "史莱姆",
+      "漂泊者", "共鸣器", "声骸", "无音区", "潮汐猎手", "回响乐师", "残象", "鸣式", "荒石", "弥音兽",
+      "构造体", "升格者", "指挥官", "意识海", "红潮", "露西亚", "丽芙", "神威", "比安卡", "机体",
+      "猎人", "艾露猫", "火龙", "轰龙", "灭尽龙", "冰牙龙", "雷狼龙", "金狮子", "冥灯龙", "煌黑龙",
+      "猎空", "源氏", "半藏", "温斯顿", "查莉娅", "天使", "死神", "黑影", "巴蒂斯特", "西格玛",
+      "蜘蛛侠", "毒液", "共生体", "瓦坎达", "阿斯加德", "量子通道", "纳米战甲", "蛛丝发射器", "迈尔斯", "章鱼博士",
+      "地狱潜兵", "解放者", "轨道炮", "补给仓", "机甲", "虫族克星", "超级地球", "民主之刃", "空投舱", "榴弹兵",
+      "矮人矿工", "钻机手", "侦察员", "炮手", "工程师", "墨菱石", "异虫蜂后", "空降舱", "黄金矿脉", "酒吧杯",
+      "隆", "肯", "春丽", "古烈", "嘉米", "布兰卡", "本田", "波动拳", "升龙拳", "音速手刀",
+      "星际战士", "机械教士", "灵能者", "审判官", "战斗修女", "欧克兽人", "钛星人", "灵族游侠", "链锯剑", "动力甲",
+      "褪色者", "梅琳娜", "菈妮", "碎星", "女武神", "恶兆王", "满月女王", "黑剑", "龙王", "赐福",
+      "秘藏猎人", "小吵闹", "魔女", "兽王", "特工", "枪手", "疯子", "大骗子", "天使", "毁灭者",
+      "幸存者", "野人", "变异体", "石斧", "木屋", "洞穴探险家", "图腾", "潜水器", "篝火", "飞机餐",
+      "艾吉奥", "阿泰尔", "康纳", "爱德华", "巴耶克", "卡珊德拉", "艾沃尔", "袖剑", "鹰眼视觉", "信仰之跃",
+      "米斯蒂娅", "夜雀老板娘", "烤鳗鱼", "幻之酒", "油豆腐", "白玉丸子", "竹取玉", "宴席桌", "幻想乡来客", "夜市招牌",
+      "天命人", "狼妖", "蛇女", "虎先锋", "石先锋", "黄风怪", "亢金龙", "灵虚子", "六丁六甲", "葫芦",
+      "边境电台", "月面仓库", "雪原火把", "废墟路标", "星港售票员", "裂隙档案", "备用钥匙", "风暴望远镜", "旧城区地图", "雨夜终端",
+      "训练场靶子", "料理锅", "矿车", "任务板", "传送锚点", "篝火看守", "弹药袋", "药水瓶", "护符", "远征旗"
     ];
 
     const refreshGuestbookStartedAt = () => {
@@ -514,30 +538,15 @@
     };
 
     const randomGuestName = () => {
-      const prefix = guestNamePrefixes[Math.floor(Math.random() * guestNamePrefixes.length)];
-      const suffix = String(Math.floor(1000 + Math.random() * 9000));
-      return `${prefix}${suffix}`;
+      const adjective = guestNameAdjectives[Math.floor(Math.random() * guestNameAdjectives.length)];
+      const noun = guestNameNouns[Math.floor(Math.random() * guestNameNouns.length)];
+      return cleanText(`${adjective}${noun}`).slice(0, 20);
     };
 
-    const fetchNickname = async () => {
-      if (!nicknameProxyUrl) return "";
-      const response = await fetch(nicknameProxyUrl, { cache: "no-store", headers: { Accept: "application/json" } });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error || "nickname request failed");
-      return cleanText(data?.nickname).slice(0, 20);
-    };
-
-    const fillRandomGuestName = async () => {
+    const fillRandomGuestName = () => {
       if (!nameInput) return;
-      if (randomNameButton) randomNameButton.disabled = true;
-      try {
-        nameInput.value = await fetchNickname() || randomGuestName();
-      } catch (_) {
-        nameInput.value = randomGuestName();
-      } finally {
-        if (randomNameButton) randomNameButton.disabled = false;
-        nameInput.dispatchEvent(new Event("input", { bubbles: true }));
-      }
+      nameInput.value = randomGuestName();
+      nameInput.dispatchEvent(new Event("input", { bubbles: true }));
     };
 
     const setGuestbookStatus = (message, type = "") => {
