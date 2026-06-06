@@ -10,9 +10,10 @@
     class="guestbook-shell reveal-on-scroll"
     data-guestbook
     data-api="https://guestbook-api.gwbblog.top"
-    data-turnstile-site-key="0x4AAAAAADfcpoEMKo6pARJz"
   >
     <form class="guestbook-form" data-guestbook-form>
+      <input class="guestbook-trap" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input name="startedAt" type="hidden" data-guestbook-started-at>
       <div class="guestbook-field">
         <label for="guestName">昵称</label>
         <input id="guestName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="怎么称呼你" required>
@@ -22,7 +23,6 @@
         <textarea id="guestMessage" name="message" maxlength="200" rows="4" placeholder="贴一张小纸条，最多 200 字" required></textarea>
       </div>
       <div class="guestbook-form-row">
-        <div class="guestbook-turnstile" data-guestbook-turnstile></div>
         <button class="primary-button" type="submit">贴上纸条</button>
       </div>
       <p class="guestbook-status" data-guestbook-status aria-live="polite"></p>
@@ -37,5 +37,4 @@
     </div>
   </div>
 </section>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 {{ end }}

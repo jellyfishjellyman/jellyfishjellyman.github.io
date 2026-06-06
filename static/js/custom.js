@@ -489,14 +489,16 @@
   const guestbook = document.querySelector("[data-guestbook]");
   if (guestbook) {
     const apiBase = guestbook.dataset.api || "";
-    const siteKey = guestbook.dataset.turnstileSiteKey || "";
     const form = guestbook.querySelector("[data-guestbook-form]");
     const list = guestbook.querySelector("[data-guestbook-list]");
     const status = guestbook.querySelector("[data-guestbook-status]");
-    const turnstileTarget = guestbook.querySelector("[data-guestbook-turnstile]");
+    const startedAtField = guestbook.querySelector("[data-guestbook-started-at]");
     const isHomeGuestbook = list?.classList.contains("home-guestbook-canvas");
-    let turnstileWidgetId = null;
     const noteClasses = ["note-blue", "note-green", "note-pink", "note-lilac", "note-sky", "note-white"];
+
+    const refreshGuestbookStartedAt = () => {
+      if (startedAtField) startedAtField.value = String(Date.now());
+    };
 
     const setGuestbookStatus = (message, type = "") => {
       if (!status) return;
@@ -578,34 +580,11 @@
       }
     };
 
-    const renderTurnstile = () => {
-      if (!turnstileTarget || !siteKey || !window.turnstile || turnstileWidgetId !== null) return;
-      turnstileWidgetId = window.turnstile.render(turnstileTarget, {
-        sitekey: siteKey,
-        theme: root.dataset.theme === "night" ? "dark" : "light",
-      });
-    };
-
-    const waitForTurnstile = () => {
-      if (window.turnstile) {
-        renderTurnstile();
-        return;
-      }
-      window.setTimeout(waitForTurnstile, 250);
-    };
-
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!apiBase) return;
       const submitButton = form.querySelector('button[type="submit"]');
       const formData = new FormData(form);
-      const token = window.turnstile && turnstileWidgetId !== null ? window.turnstile.getResponse(turnstileWidgetId) : "";
-
-      if (!token) {
-        setGuestbookStatus("请先完成人机验证。", "error");
-        return;
-      }
-
       if (submitButton) submitButton.disabled = true;
       setGuestbookStatus("正在贴上纸条...");
       try {
@@ -615,24 +594,24 @@
           body: JSON.stringify({
             name: formData.get("name"),
             message: formData.get("message"),
-            turnstileToken: token,
+            website: formData.get("website"),
+            startedAt: formData.get("startedAt"),
           }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data?.error || "留言提交失败。");
         form.reset();
-        window.turnstile?.reset(turnstileWidgetId);
+        refreshGuestbookStartedAt();
         setGuestbookStatus("纸条贴好了。", "success");
         await loadGuestMessages();
       } catch (error) {
-        window.turnstile?.reset(turnstileWidgetId);
         setGuestbookStatus(error.message || "留言提交失败。", "error");
       } finally {
         if (submitButton) submitButton.disabled = false;
       }
     });
 
-    if (turnstileTarget && siteKey) waitForTurnstile();
+    refreshGuestbookStartedAt();
     loadGuestMessages();
   }
 

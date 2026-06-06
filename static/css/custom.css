@@ -1708,16 +1708,21 @@ body.home .site-header {
   resize: vertical;
 }
 
+.guestbook-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .guestbook-form-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
-}
-
-.guestbook-turnstile {
-  min-height: 65px;
 }
 
 .guestbook-status {
