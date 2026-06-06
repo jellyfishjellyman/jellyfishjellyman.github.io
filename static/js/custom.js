@@ -497,7 +497,17 @@
     const randomNameButton = guestbook.querySelector("[data-guestbook-random-name]");
     const isHomeGuestbook = list?.classList.contains("home-guestbook-canvas");
     const noteClasses = ["note-blue", "note-green", "note-pink", "note-lilac", "note-sky", "note-white"];
-    const guestNamePrefixes = ["匿名用户", "路过水母", "云边访客", "夜航纸条", "小站旅人", "漂流星星"];
+    const nicknameProxyUrl = document.querySelector('meta[name="nickname-proxy"]')?.content || "";
+    const guestNamePrefixes = [
+      "匿名用户", "路过水母", "云边访客", "夜航纸条", "小站旅人", "漂流星星",
+      "月亮邮差", "晚风收藏家", "海盐小熊", "银河值班员", "橘子汽水", "松间听雨",
+      "半颗薄荷糖", "玻璃水母", "夜航纸飞机", "小镇观星人", "雨后蘑菇", "蒲公英旅客",
+      "星星保管员", "风铃便利店", "奶油小行星", "雾里看花人", "春日逃课生", "蓝莓气泡",
+      "猫耳耳机", "雪糕巡逻员", "凌晨三点半", "芝士月球", "晴天备用伞", "不吃香菜星人",
+      "便利店诗人", "软糖工程师", "海边旧信箱", "咖啡续命师", "树洞管理员", "云朵修理铺",
+      "星河漫游者", "柠檬味晚霞", "蘑菇云游客", "西瓜小电台", "迷路的信号", "夏夜放映员",
+      "纸船观察员", "奶茶不加冰", "宇宙小便签", "小熊不营业", "云端打字员", "汽水观察家"
+    ];
 
     const refreshGuestbookStartedAt = () => {
       if (startedAtField) startedAtField.value = String(Date.now());
@@ -509,10 +519,25 @@
       return `${prefix}${suffix}`;
     };
 
-    const fillRandomGuestName = () => {
+    const fetchNickname = async () => {
+      if (!nicknameProxyUrl) return "";
+      const response = await fetch(nicknameProxyUrl, { cache: "no-store", headers: { Accept: "application/json" } });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "nickname request failed");
+      return cleanText(data?.nickname).slice(0, 20);
+    };
+
+    const fillRandomGuestName = async () => {
       if (!nameInput) return;
-      nameInput.value = randomGuestName();
-      nameInput.dispatchEvent(new Event("input", { bubbles: true }));
+      if (randomNameButton) randomNameButton.disabled = true;
+      try {
+        nameInput.value = await fetchNickname() || randomGuestName();
+      } catch (_) {
+        nameInput.value = randomGuestName();
+      } finally {
+        if (randomNameButton) randomNameButton.disabled = false;
+        nameInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
     };
 
     const setGuestbookStatus = (message, type = "") => {
