@@ -1,6 +1,6 @@
 <header class="site-header">
   {{ partial "site-navigation.html" . }}
-  {{ $moduleLayouts := slice "links" "tools" "games" "game-2048" }}
+  {{ $moduleLayouts := slice "links" "tools" "games" "game-2048" "search" }}
   {{ if and (not .IsHome) (ne .Section "posts") (not (in $moduleLayouts .Layout)) }}
     <section class="page-hero">
       <p class="eyebrow">{{ .Section | default "Jellyfish" }}</p>

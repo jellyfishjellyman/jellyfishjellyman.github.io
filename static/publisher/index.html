@@ -3,111 +3,194 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#225b43">
+  <meta name="theme-color" content="#1f6b52">
+  <meta name="description" content="Jellyfish 博客移动端发布器">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="发文">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>手机发文</title>
   <link rel="manifest" href="/publisher/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/publisher/icon-192.png">
+  <link rel="icon" href="/publisher/icon-192.png">
   <link rel="stylesheet" href="/publisher/styles.css">
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div>
-        <p>Jellyfish Publisher</p>
-        <h1>手机发文</h1>
+  <main class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">J</span>
+        <div>
+          <p>Jellyfish Publisher</p>
+          <h1>写文章</h1>
+        </div>
       </div>
-      <div class="top-actions">
-        <button id="writeTab" class="is-active" type="button">编辑</button>
-        <button id="previewTab" type="button">预览</button>
-      </div>
+      <span id="saveStatus" class="save-status" aria-live="polite">准备就绪</span>
     </header>
 
-    <section class="panel auth-panel">
-      <label>GitHub Token
-        <input id="token" type="password" autocomplete="off" placeholder="fine-grained token">
-      </label>
-      <div class="button-line">
-        <label class="check">
-          <input id="rememberToken" type="checkbox">
-          <span>只保存在这台手机</span>
-        </label>
-        <button id="loadPosts" class="secondary" type="button">加载旧文章</button>
+    <nav class="mode-tabs" aria-label="发布器视图">
+      <button id="writeTab" class="is-active" type="button" data-pane="write">写作</button>
+      <button id="previewTab" type="button" data-pane="preview">预览</button>
+      <button id="publishTab" type="button" data-pane="publish">发布</button>
+    </nav>
+
+    <section class="status-strip" aria-label="文章状态">
+      <div>
+        <span>当前</span>
+        <strong id="currentPostLabel">新文章</strong>
       </div>
-      <label id="postPickerWrap" hidden>选择旧文章
-        <select id="postPicker">
-          <option value="">新建文章</option>
-        </select>
-      </label>
+      <div>
+        <span>字数</span>
+        <strong id="wordCount">0</strong>
+      </div>
+      <div>
+        <span>图片</span>
+        <strong id="imageCount">0</strong>
+      </div>
     </section>
 
-    <form id="postForm" class="editor-shell">
-      <section class="panel meta-panel">
-        <label>标题
-          <input id="title" required autocomplete="off">
-        </label>
-
-        <label>文章路径
-          <input id="slug" autocomplete="off" placeholder="不填自动生成">
-        </label>
-
-        <div class="grid">
-          <label>分类
-            <select id="category">
-              <option value="随感">随感</option>
-              <option value="网上文案">网上文案</option>
-              <option value="其他">其他</option>
-            </select>
+    <form id="postForm" class="post-form">
+      <section id="writePane" class="pane is-active" data-pane="write">
+        <section class="sheet meta-sheet" aria-label="文章信息">
+          <label class="field title-field" for="title">
+            <span>标题</span>
+            <input id="title" required autocomplete="off" placeholder="给这篇文章一个名字">
           </label>
-          <label>标签
+
+          <div class="meta-grid">
+            <label class="field" for="slug">
+              <span>路径</span>
+              <input id="slug" autocomplete="off" placeholder="不填自动生成">
+            </label>
+            <label class="field" for="category">
+              <span>分类</span>
+              <select id="category">
+                <option value="随感">随感</option>
+                <option value="网上文案">网上文案</option>
+                <option value="其他">其他</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field" for="tags">
+            <span>标签</span>
             <input id="tags" autocomplete="off" placeholder="逗号分隔">
           </label>
-        </div>
+        </section>
+
+        <section class="writer-card" aria-label="正文编辑">
+          <div class="toolbar" aria-label="Markdown 工具栏">
+            <button type="button" data-insert="h2" title="二级标题">H2</button>
+            <button type="button" data-insert="bold" title="加粗">B</button>
+            <button type="button" data-insert="italic" title="斜体">I</button>
+            <button type="button" data-insert="quote" title="引用">“</button>
+            <button type="button" data-insert="list" title="列表">-</button>
+            <button type="button" data-insert="link" title="链接">Link</button>
+            <button type="button" data-insert="code" title="代码块">&lt;/&gt;</button>
+            <button type="button" data-insert="hr" title="分割线">---</button>
+            <button type="button" data-insert="more" title="摘要分隔">More</button>
+            <button type="button" data-insert="callout" title="提示块">Tip</button>
+          </div>
+
+          <label class="sr-only" for="body">正文</label>
+          <textarea id="body" required spellcheck="false" placeholder="写点什么。"></textarea>
+
+          <div class="writer-actions">
+            <button id="insertImageTrigger" class="secondary" type="button">插图</button>
+            <button id="jumpPreview" class="secondary" type="button">预览</button>
+            <button id="jumpPublish" type="button">发布</button>
+          </div>
+        </section>
+
+        <section class="sheet image-dock" aria-label="图片">
+          <div class="section-head">
+            <div>
+              <h2>图片</h2>
+              <p id="imageHint">图片会先压缩，再随文章一起提交。</p>
+            </div>
+            <label class="upload-button" for="images">选择图片</label>
+            <input id="images" class="file-input" type="file" accept="image/*" multiple>
+          </div>
+          <div id="imagePreview" class="image-preview" aria-live="polite"></div>
+        </section>
       </section>
 
-      <section id="writePane" class="panel editor-panel">
-        <div class="toolbar" aria-label="Markdown 工具栏">
-          <button type="button" data-insert="h2">H2</button>
-          <button type="button" data-insert="bold">B</button>
-          <button type="button" data-insert="italic">I</button>
-          <button type="button" data-insert="quote">引用</button>
-          <button type="button" data-insert="list">列表</button>
-          <button type="button" data-insert="link">链接</button>
-          <button type="button" data-insert="code">代码</button>
-          <button type="button" data-insert="hr">分割线</button>
-          <button type="button" data-insert="more">摘要</button>
-          <button type="button" data-insert="callout">提示块</button>
-        </div>
-
-        <label>正文
-          <textarea id="body" required spellcheck="false" placeholder="在这里写文章。工具栏负责结构，图片会插入到光标位置。"></textarea>
-        </label>
-
-        <label>插入图片
-          <input id="images" type="file" accept="image/*" multiple>
-        </label>
-        <div id="imagePreview" class="image-preview" aria-live="polite"></div>
+      <section id="previewPane" class="pane" data-pane="preview" hidden>
+        <section class="sheet preview-shell">
+          <div class="section-head">
+            <div>
+              <h2>预览</h2>
+              <p id="previewMeta">本地 Markdown 预览</p>
+            </div>
+            <button id="backToWrite" class="secondary" type="button">继续写</button>
+          </div>
+          <article id="preview" class="preview"></article>
+        </section>
       </section>
 
-      <section id="previewPane" class="panel preview-panel" hidden>
-        <article id="preview" class="preview"></article>
-      </section>
+      <section id="publishPane" class="pane" data-pane="publish" hidden>
+        <section class="sheet auth-panel" aria-label="GitHub">
+          <div class="section-head">
+            <div>
+              <h2>发布</h2>
+              <p>目标：jellyfishjellyman.github.io / main</p>
+            </div>
+          </div>
 
-      <section class="panel publish-panel">
-        <label class="check">
-          <input id="draft" type="checkbox">
-          <span>保存为草稿</span>
-        </label>
-        <div class="publish-actions">
-          <button id="clearDraft" class="secondary" type="button">清空本地草稿</button>
-          <button type="submit">发布到 GitHub</button>
-        </div>
+          <label class="field" for="token">
+            <span>GitHub Token</span>
+            <input id="token" type="password" autocomplete="off" placeholder="fine-grained token">
+          </label>
+
+          <div class="option-row">
+            <label class="check">
+              <input id="rememberToken" type="checkbox">
+              <span>只保存在这台设备</span>
+            </label>
+            <label class="check">
+              <input id="draft" type="checkbox">
+              <span>保存为草稿</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="sheet old-posts" aria-label="旧文章">
+          <div class="section-head">
+            <div>
+              <h2>旧文章</h2>
+              <p id="postPickerHelp">加载后可选择文章继续编辑。</p>
+            </div>
+            <button id="loadPosts" class="secondary" type="button">加载</button>
+          </div>
+          <label id="postPickerWrap" class="field" for="postPicker" hidden>
+            <span>文章</span>
+            <select id="postPicker">
+              <option value="">新建文章</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="sheet publish-panel">
+          <div class="publish-actions">
+            <button id="clearDraft" class="secondary danger-light" type="button">清空本地草稿</button>
+            <button id="publishButton" type="submit">发布到 GitHub</button>
+          </div>
+          <pre id="output" class="publish-log" aria-live="polite">准备就绪</pre>
+        </section>
       </section>
     </form>
-
-    <section class="panel">
-      <h2>输出</h2>
-      <pre id="output">准备就绪</pre>
-    </section>
   </main>
+
+  <dialog id="confirmDialog" class="confirm-dialog">
+    <form method="dialog">
+      <h2>确认发布</h2>
+      <p id="confirmSummary"></p>
+      <div class="dialog-actions">
+        <button class="secondary" value="cancel" type="submit">取消</button>
+        <button id="confirmPublish" value="confirm" type="submit">确认发布</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="/publisher/app.js"></script>
 </body>
 </html>

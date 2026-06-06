@@ -414,6 +414,15 @@
     return searchIndexPromise;
   };
   const normalize = (value) => String(value || "").toLowerCase().trim();
+  const getSearchKindLabel = (item) => {
+    if (item.kind === "link") return "资源外链";
+    if (item.kind === "tool") return item.external ? "工具外链" : "工具";
+    if (item.kind === "game") return item.external ? "游戏外链" : "游戏";
+    if (item.section === "posts") return "文章";
+    if (item.section === "links") return "资源页";
+    if (item.section === "tools") return "工具页";
+    return "站内页面";
+  };
   const renderSearch = async () => {
     if (!searchInput || !searchResults) return;
     const query = normalize(searchInput.value);
@@ -423,28 +432,50 @@
     }
     const items = await getSearchIndex();
     const terms = query.split(/\s+/).filter(Boolean);
+    const seen = new Set();
     const matches = items
       .map((item) => {
-        const haystack = normalize([item.title, item.section, item.summary, (item.tags || []).join(" ")].join(" "));
-        const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
+        const titleText = normalize(item.title);
+        const sectionText = normalize([item.section, item.group, item.kind].join(" "));
+        const bodyText = normalize([item.summary, item.url, (item.tags || []).join(" ")].join(" "));
+        const score = terms.reduce((sum, term) => {
+          if (!term) return sum;
+          return sum
+            + (titleText.includes(term) ? 4 : 0)
+            + (sectionText.includes(term) ? 2 : 0)
+            + (bodyText.includes(term) ? 1 : 0);
+        }, 0);
         return { item, score };
       })
       .filter((entry) => entry.score > 0)
+      .filter(({ item }) => {
+        const key = `${normalize(item.title)}|${normalize(item.url)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .sort((a, b) => b.score - a.score || String(b.item.date || "").localeCompare(String(a.item.date || "")))
-      .slice(0, 6);
+      .slice(0, 8);
     if (!matches.length) {
       searchResults.innerHTML = '<div class="search-empty">暂时没有匹配结果，换个关键词试试。</div>';
       return;
     }
     searchResults.replaceChildren(...matches.map(({ item }) => {
       const link = document.createElement("a");
+      const meta = document.createElement("small");
       const title = document.createElement("strong");
       const summary = document.createElement("span");
-      link.className = "search-result";
+      const metaText = [getSearchKindLabel(item), item.group].filter(Boolean).join(" / ");
+      link.className = item.external ? "search-result is-external" : "search-result";
       link.href = item.url;
+      if (item.external) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+      meta.textContent = metaText;
       title.textContent = item.title;
       summary.textContent = item.summary || item.section || "站内页面";
-      link.append(title, summary);
+      link.append(meta, title, summary);
       return link;
     }));
   };

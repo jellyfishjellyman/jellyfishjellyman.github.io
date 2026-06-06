@@ -1587,11 +1587,43 @@ body.home .site-header {
 }
 
 .search-result {
+  position: relative;
   color: var(--text);
+  text-decoration: none;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.search-result::after {
+  content: "→";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.search-result:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--vapor-cyan) 40%, var(--chip-border));
+  background: var(--panel-hover);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--shadow-color) 34%, transparent);
 }
 
 .search-result strong {
+  padding-right: 20px;
   font-size: 1rem;
+}
+
+.search-result small {
+  width: fit-content;
+  max-width: 100%;
+  padding: 2px 8px;
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  background: color-mix(in srgb, var(--vapor-cyan) 10%, transparent);
+  font-size: 12px;
+  font-weight: 850;
 }
 
 .search-result span,
@@ -1665,7 +1697,15 @@ body.home .site-header {
 }
 
 .search-page-panel {
-  padding: clamp(18px, 4vw, 28px);
+  padding: clamp(18px, 4vw, 30px);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--panel-strong) 94%, white), var(--panel)),
+    radial-gradient(420px circle at 92% 8%, color-mix(in srgb, var(--dream-rose) 16%, transparent), transparent 65%),
+    radial-gradient(360px circle at 0% 100%, color-mix(in srgb, var(--dream-mint) 18%, transparent), transparent 64%);
+}
+
+.search-page .module-intro {
+  margin-bottom: clamp(22px, 5vw, 44px);
 }
 
 .guestbook-shell {
@@ -2958,6 +2998,10 @@ blockquote {
 }
 
 article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.4em auto;
   border-radius: var(--radius);
   box-shadow: 0 18px 60px rgba(0,0,0,.14);
   cursor: var(--paw-cursor);
@@ -4298,6 +4342,18 @@ blockquote,
     grid-template-columns: 1fr;
   }
 
+  .game-play-page {
+    width: min(100% - 24px, 1080px);
+    padding-top: 28px;
+  }
+
+  .game-panel,
+  .board-wrap {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+
   .score-row-three {
     grid-template-columns: 1fr;
   }
@@ -4351,7 +4407,7 @@ blockquote,
   }
 
   .board-2048 {
-    width: min(88vw, 420px);
+    width: min(100%, calc(100vw - 56px), 420px);
     gap: 8px;
     padding: 8px;
   }

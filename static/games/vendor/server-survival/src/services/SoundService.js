@@ -3,14 +3,8 @@ class SoundService {
         this.ctx = null;
         this.muted = true;
         this.masterGain = null;
-        this.gameBgm = new Audio('assets/sounds/game-background.mp3');
-        this.gameBgm.loop = true;
-        this.gameBgm.volume = 0.2;
-
-        this.menuBgm = new Audio('assets/sounds/menu.mp3');
-        this.menuBgm.loop = true;
-        this.menuBgm.volume = 0.3;
-
+        this.gameBgm = null;
+        this.menuBgm = null;
         this.currentBgm = null;
 
         this.sfxHover = new Audio('assets/sounds/click-5.mp3');
@@ -47,15 +41,16 @@ class SoundService {
     }
 
     playMenuBGM() {
-        this.switchBGM(this.menuBgm);
+        this.switchBGM(null);
     }
 
     playGameBGM() {
-        this.switchBGM(this.gameBgm);
+        this.switchBGM(null);
     }
 
     switchBGM(newBgm) {
         if (this.currentBgm === newBgm) {
+            if (!this.currentBgm) return;
             if (this.currentBgm.paused && !this.muted && this.ctx && this.ctx.state === 'running') {
                 this.currentBgm.play().catch(e => { });
             }
@@ -68,7 +63,7 @@ class SoundService {
         }
 
         this.currentBgm = newBgm;
-        if (!this.muted) {
+        if (this.currentBgm && !this.muted) {
             // If context is running, play immediately. Otherwise it will be picked up by resumeAudio
             if (this.ctx && this.ctx.state === 'running') {
                 this.currentBgm.play().catch(e => console.log("Waiting for interaction to play BGM"));

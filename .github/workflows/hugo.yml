@@ -31,7 +31,17 @@ jobs:
         run: python scripts/check_encoding.py
 
       - name: Build
+        env:
+          HUGO_ENV: production
         run: hugo --minify
+
+      - name: Verify production robots
+        run: |
+          if grep -R "noindex" public/index.html; then
+            echo "Homepage contains noindex in production build."
+            exit 1
+          fi
+          grep -R 'name=robots content="index, follow"\|name="robots" content="index, follow"' public/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -3,6 +3,7 @@
   <div class="module-intro reveal-on-scroll">
     <p class="eyebrow">Search</p>
     <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
     <div class="module-copy">{{ .Content }}</div>
   </div>
 
@@ -10,11 +11,11 @@
     <div class="home-panel-head">
       <p class="eyebrow">Index</p>
       <h2>全站搜索</h2>
-      <p>搜索文章、资源、工具和游戏页面。</p>
+      <p>搜索文章、资源网站、工具网站和游戏入口。</p>
     </div>
     <form class="site-search" data-site-search>
       <label class="sr-only" for="searchPageInput">搜索关键词</label>
-      <input id="searchPageInput" type="search" placeholder="输入关键词，例如 Hugo、工具、Vim" autocomplete="off" data-search-input>
+      <input id="searchPageInput" type="search" placeholder="输入关键词，例如 知识、PDF、Vim、小游戏" autocomplete="off" data-search-input>
       <button class="primary-button" type="submit">搜索</button>
     </form>
     <div class="search-results" data-search-results aria-live="polite"></div>

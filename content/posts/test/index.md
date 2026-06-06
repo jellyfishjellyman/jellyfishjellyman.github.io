@@ -1,7 +1,8 @@
 +++
 title = "test"
 date = 2026-06-04T13:42:18+08:00
-draft = false
+draft = true
+no_search = true
 category = "其他"
 +++
 测试

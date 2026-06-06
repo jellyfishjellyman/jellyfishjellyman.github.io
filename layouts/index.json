@@ -1,13 +1,67 @@
 {{- $items := slice -}}
 {{- range site.Pages -}}
-  {{- if and .Title .RelPermalink (ne .RelPermalink "/") (ne .Kind "taxonomy") (ne .Kind "term") (not .Params.private) -}}
+  {{- if and .Title .RelPermalink (ne .RelPermalink "/") (ne .Kind "taxonomy") (ne .Kind "term") (not .Draft) (not .Params.private) (not .Params.no_search) -}}
     {{- $items = $items | append (dict
       "title" (.Title | plainify)
       "url" .RelPermalink
       "section" (.Section | default .Kind)
+      "kind" "page"
+      "group" ""
       "summary" (.Summary | plainify | truncate 180)
       "date" (.Date.Format "2006-01-02")
       "tags" (.Params.tags | default (slice))
+      "external" false
+    ) -}}
+  {{- end -}}
+{{- end -}}
+{{- range site.Data.links -}}
+  {{- $group := . -}}
+  {{- range .items -}}
+    {{- if and .name .url -}}
+      {{- $items = $items | append (dict
+        "title" (.name | plainify)
+        "url" .url
+        "section" "资源"
+        "kind" "link"
+        "group" ($group.title | plainify)
+        "summary" ((printf "%s %s" (.note | default "") ($group.description | default "")) | plainify | truncate 180)
+        "date" ""
+        "tags" (slice ($group.title | plainify) ($group.description | default "" | plainify))
+        "external" (hasPrefix .url "http")
+      ) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- range site.Data.tools -}}
+  {{- $group := . -}}
+  {{- range .items -}}
+    {{- if and .name .url -}}
+      {{- $items = $items | append (dict
+        "title" (.name | plainify)
+        "url" .url
+        "section" "工具"
+        "kind" "tool"
+        "group" ($group.title | plainify)
+        "summary" ((printf "%s %s" (.note | default "") ($group.description | default "")) | plainify | truncate 180)
+        "date" ""
+        "tags" (slice ($group.title | plainify) (.status | default "" | plainify))
+        "external" (hasPrefix .url "http")
+      ) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- range site.Data.games -}}
+  {{- if and .name .url -}}
+    {{- $items = $items | append (dict
+      "title" (.name | plainify)
+      "url" .url
+      "section" "游戏"
+      "kind" "game"
+      "group" (.category | default "" | plainify)
+      "summary" ((printf "%s %s" (.description | default "") (.mood | default "")) | plainify | truncate 180)
+      "date" ""
+      "tags" (slice (.category | default "" | plainify) (.status | default "" | plainify) (.mood | default "" | plainify))
+      "external" (hasPrefix .url "http")
     ) -}}
   {{- end -}}
 {{- end -}}

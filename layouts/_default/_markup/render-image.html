@@ -1,0 +1,8 @@
+{{ $alt := .Text | default (.Title | default (path.Base .Destination)) }}
+<img
+  src="{{ .Destination | safeURL }}"
+  alt="{{ $alt }}"
+  loading="lazy"
+  decoding="async"
+  {{ with .Title }}title="{{ . }}"{{ end }}
+>
