@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>欢迎来到我的博客 | Jellyfish 的博客</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="记录学习、技术和生活">
+    <meta name="generator" content="Hugo 0.155.2">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+    <script src="/js/custom.js" defer></script>
+
+    
+      
+
+    
+
+    
+    
+      <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Jellyfish 的博客" />
+      <link href="/index.xml" rel="feed" type="application/rss+xml" title="Jellyfish 的博客" />
+      
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/">
+    <meta property="og:url" content="http://localhost:1313/">
+  <meta property="og:site_name" content="Jellyfish 的博客">
+  <meta property="og:title" content="欢迎来到我的博客">
+  <meta property="og:description" content="你好，我是 Jellyfish
+这里记录：
+学习笔记 技术探索 项目经历 生活随想">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="欢迎来到我的博客">
+  <meta itemprop="description" content="你好，我是 Jellyfish
+这里记录：
+学习笔记 技术探索 项目经历 生活随想">
+  <meta itemprop="datePublished" content="2026-06-04T13:42:18+08:00">
+  <meta itemprop="dateModified" content="2026-06-04T13:42:18+08:00">
+  <meta itemprop="wordCount" content="7">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="欢迎来到我的博客">
+  <meta name="twitter:description" content="你好，我是 Jellyfish
+这里记录：
+学习笔记 技术探索 项目经历 生活随想">
+
+    <script>
+  (function () {
+    try {
+      var storedTheme = window.localStorage.getItem("site-theme");
+      var prefersNight = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = storedTheme || (prefersNight ? "night" : "day");
+    } catch (_) {
+      document.documentElement.dataset.theme = "day";
+    }
+  })();
+</script>
+<meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101412" media="(prefers-color-scheme: dark)">
+<meta name="random-quote-proxy" content="https://gwbblogsuijiyiyan.demon1jellyfish.workers.dev/">
+<link rel="stylesheet" href="/css/custom.css">
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+    <header class="site-header">
+  <nav class="site-nav" role="navigation" aria-label="主导航">
+  <a class="site-brand" href="/" aria-label="Jellyfish 的博客">
+    
+      <img src="/images/avatar.jpg" alt="" />
+    
+    <span>Jellyfish 的博客</span>
+  </a>
+
+  
+    <ul class="site-menu">
+      
+      
+        
+        <li>
+          <a class="is-active" href="/">首页</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/posts/">文章</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/links/">资源</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/tools/">工具</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/games/">游戏</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/search/">搜索</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/about/">关于</a>
+        </li>
+      
+    </ul>
+  
+
+  <button class="theme-toggle" type="button" aria-label="切换主题" aria-pressed="false" data-theme-toggle>
+    <span aria-hidden="true"></span>
+  </button>
+</nav>
+
+  
+  
+</header>
+
+    <main class="pb7" role="main">
+      
+
+
+
+
+
+
+
+
+
+<section id="hero" class="home-hero home-hero-window">
+  <div class="home-hero-inner">
+    <aside class="home-side-stack home-side-left" aria-label="页面导航">
+      <div class="home-side-card">
+        <strong>页面导航</strong>
+        <a href="#homeBoard">随机版块</a>
+        <a href="/about/">关于本站</a>
+        <a href="/guestbook/">特别鸣谢</a>
+      </div>
+      <div class="home-side-card">
+        <strong>小站天气</strong>
+        <span>今日天气</span>
+        <em>半透明晴，适合慢慢翻页</em>
+      </div>
+      <a class="home-avatar-card" href="/about/" aria-label="关于本站">
+        <img src="/images/avatar.jpg" alt="">
+        <strong>Jellyfish</strong>
+      </a>
+    </aside>
+
+    <div class="home-hero-copy">
+      <p class="home-kicker">记录 · 分享 · 探索</p>
+      <h1 class="home-title">Jellyfish 的小站</h1>
+      <p class="home-sub">
+        <span>记录所思所想，分享实用经验。</span>
+        <span>探索有趣世界，和你一起成长。</span>
+      </p>
+
+      <div class="home-badges" aria-label="站点统计">
+        <span><strong>2022年7月21日</strong> 建站日期</span>
+        <span><strong>1416 天</strong> 已存在</span>
+      </div>
+
+      <div class="hero-actions">
+        <a class="primary-button" href="#homeContent">开始浏览</a>
+        <a class="ghost-button" href="/about/">了解本站</a>
+      </div>
+    </div>
+
+    <aside class="home-floating-tools" aria-label="悬浮工具" data-home-tools>
+      <div class="floating-card search-float-card">
+        <div class="home-panel-head">
+          <p class="eyebrow">Search</p>
+          <h2>全站搜索</h2>
+          <p>搜索版块和文章，支持模糊匹配。</p>
+        </div>
+        <form class="site-search" data-site-search>
+          <label class="sr-only" for="homeSearchInput">搜索关键词</label>
+          <input id="homeSearchInput" type="search" placeholder="输入关键词，例如 GitHub、游戏、工具" autocomplete="off" data-search-input>
+          <button class="primary-button" type="submit">搜索</button>
+        </form>
+        <div class="search-results" data-search-results aria-live="polite"></div>
+      </div>
+
+      <div class="floating-card quote-float-card">
+        <div class="floating-card-title">
+          <h2>随机一言</h2>
+          <button class="ghost-button" type="button" data-quote-next>换一句</button>
+        </div>
+        <blockquote class="random-quote" data-random-quote>
+          <p data-quote-text>一往情深深几许？深山夕照深秋雨。</p>
+          <cite data-quote-source>纳兰性德</cite>
+        </blockquote>
+      </div>
+
+      <div class="floating-card compact-stats-card">
+        <span><strong>16</strong> 篇文章</span>
+        <span><strong>31</strong> 个工具</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="homeContent" class="home-wrap home-lab">
+  <section class="home-guestbook-feature reveal-on-scroll" aria-label="游客留言板">
+    <div class="home-guestbook-copy">
+      <p class="eyebrow">Guestbook</p>
+      <h2>游客留言板</h2>
+      <p>这里单独留给路过的人。现在先作为入口展示，后续接入保存、审核和限流后，再开放真正提交。</p>
+    </div>
+    <a class="home-guestbook-note" href="/guestbook/">
+      <span>你好，陌生人</span>
+      <strong>世界那么大，凑巧遇见你。</strong>
+      <em>进入留言板</em>
+    </a>
+  </section>
+
+  <section id="homeBoard" class="home-board reveal-on-scroll" aria-label="小站公告板">
+    <div class="home-board-head">
+      <p class="eyebrow">Board</p>
+      <h2>小站公告板</h2>
+    </div>
+    <div class="home-board-canvas">
+      <a class="board-note note-blue" href="/posts/">
+        <span>公告板说明</span>
+        <strong>点击纸条查看完整内容</strong>
+        <em>最近写下的记录</em>
+      </a>
+      <a class="board-note note-green" href="/tools/">
+        <span>小提示</span>
+        <strong>PC 端浏览本站体验更好</strong>
+        <em>工具入口</em>
+      </a>
+      <a class="board-note note-white" href="/posts/">
+        <span>笔记</span>
+        <strong>最近在写 C# 相关的小文章</strong>
+        <em>最近在干嘛</em>
+      </a>
+      <a class="board-note note-pink" href="/posts/">
+        <span>随缘中</span>
+        <strong>本站内容随缘更，但不会停止更新</strong>
+        <em>慢慢写</em>
+      </a>
+      <a class="board-note note-lilac" href="/games/">
+        <span>6:00am</span>
+        <strong>天又亮了</strong>
+        <em>啊，又是麻烦的一天呢。</em>
+      </a>
+      <a class="board-note note-sky" href="/links/">
+        <span>GitHub</span>
+        <strong>我的 GitHub 主页</strong>
+        <em>资源与项目入口</em>
+      </a>
+    </div>
+  </section>
+
+  <div class="feature-strip">
+    <a class="feature-card" href="/posts/">
+      <span>Posts</span>
+      <strong>最近写下的东西</strong>
+      <p>保留博客最重要的阅读体验，让文章入口轻一点，内容清楚一点。</p>
+    </a>
+    <a class="feature-card" href="/games/">
+      <span>Games</span>
+      <strong>可玩的学习实验</strong>
+      <p>2048、云架构塔防、Vim 训练场，以及后续会继续补上的小型互动。</p>
+    </a>
+    <a class="feature-card" href="/links/">
+      <span>Links</span>
+      <strong>资源收藏</strong>
+      <p>动漫、小说、视频、工具和常用网站，先从轻量导航开始整理。</p>
+    </a>
+    <a class="feature-card" href="/tools/">
+      <span>Tools</span>
+      <strong>随手可用的工具</strong>
+      <p>把常用流程放到站内，减少下次再找入口的时间。</p>
+    </a>
+  </div>
+
+  <div class="section-title">
+    <div>
+      <p class="eyebrow">Posts</p>
+      <h2>最近文章</h2>
+      <p>写一点学习、生活和突然想到的东西。</p>
+    </div>
+    <a href="/posts/">全部文章</a>
+  </div>
+
+  <div class="home-grid">
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/test/" aria-label="阅读：test"></a>
+        <span class="post-category">其他</span>
+        <h2 class="f3">
+          <a href="/posts/test/">test</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-06-04 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          测试 ****测试
+测试
+测试
+测试 测试 测试
+
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/post-20260604-125629/" aria-label="阅读：记录之前做的两个梦"></a>
+        <span class="post-category">随感</span>
+        <h2 class="f3">
+          <a href="/posts/post-20260604-125629/">记录之前做的两个梦</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-06-04 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          zsbd
+
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/post-20260604-124452/" aria-label="阅读：编译原理"></a>
+        <span class="post-category">其他</span>
+        <h2 class="f3">
+          <a href="/posts/post-20260604-124452/">编译原理</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-06-04 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          我们不说“NFA转换DFA”，但是可以说“我不会”。 我们不说“LR(1)文法”，但是可以说“我不会”。 我们不说“语法制导翻译”，但是可以说“我不会”。 我们不说“中间代码优化”，但是可以说“我不会”。 我们不说“活跃变量分析”，但是可以 …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/post-20260604-123721/" aria-label="阅读：一个有意思的提示词"></a>
+        <span class="post-category">网上文案</span>
+        <h2 class="f3">
+          <a href="/posts/post-20260604-123721/">一个有意思的提示词</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-06-04 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          根据【主题】自动生成一张收藏版史诗叙事海报：巨大优雅的人物侧脸剪影作为外轮廓，剪影内部自动生长出最契合该主题的完整世界观、标志性场景、角色关系、象征符号、关键建筑、生物、道具与氛围。整体不是普通拼贴，而是高级的剪影轮廓填充式叙事合成，带有双 …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/post-20260604-122155/" aria-label="阅读：发呆"></a>
+        <span class="post-category">其他</span>
+        <h2 class="f3">
+          <a href="/posts/post-20260604-122155/">发呆</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-06-04 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          我爱爱我的人，我恨恨我的人，这句话从小时候的觉得很酷的一句话在重复中逐渐慢慢的变成了我人生中的底色，我总是也总能权衡别人如何对待我，然后我再加以计算我该如何对待别人，有人说过这样一种人生智慧，最能检验一个人的时候，比如说你和朋友合伙做生意按 …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/encourage-cousin-gaokao/" aria-label="阅读：想鼓励高三的表妹前倒是先感动了自己"></a>
+        <span class="post-category">随感</span>
+        <h2 class="f3">
+          <a href="/posts/encourage-cousin-gaokao/">想鼓励高三的表妹前倒是先感动了自己</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-06-03 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          快高考了，感觉也应该和你说点什么。但是思来想去，好像也没有什么非说不可的话。
+如果是高考前一天说，或许会引出杂念，反而让人心神不宁；如果等到高考之后再说，那又失去了意义。高考前一周，现在这个时间，应该刚刚好。
+“把它当成一次普通的小考试”“ …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/after-grandpa-grandma-visit/" aria-label="阅读：爷爷走后，回去看奶奶"></a>
+        <span class="post-category">随感</span>
+        <h2 class="f3">
+          <a href="/posts/after-grandpa-grandma-visit/">爷爷走后，回去看奶奶</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-03-22 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          记得小时候，我不喜欢在奶奶家玩，更喜欢去姥姥家。固然有姥姥做的鸡蛋汤更好喝，而奶奶拿手的丸子往往只有过年炸的时候才能吃到的缘故；但更主要的，还是我潜意识里觉得和爷爷奶奶玩很无聊。
+那时其实并没有什么“老”的概念，只是觉得爷爷奶奶都很“笨”， …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/anda-daocun/" aria-label="阅读：岛村之刃"></a>
+        <span class="post-category">网上文案</span>
+        <h2 class="f3">
+          <a href="/posts/anda-daocun/">岛村之刃</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-02-24 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          「我！讨厌岛村在我不知道的地方露出笑容！也讨厌你跟其他人牵手！我希望你只牵我的手！只待在我身旁！祭典也是，我也很想去啊！我希望岛村很开心的时候，笑的时候，我可以在你身边！我想要那样！我头好痛，好痛苦！我一直在想岛村的事情，感觉都要……发疯了 …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/audio-power/" aria-label="阅读：玩音响，最后都是玩电"></a>
+        <span class="post-category">网上文案</span>
+        <h2 class="f3">
+          <a href="/posts/audio-power/">玩音响，最后都是玩电</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-02-09 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          玩了二十多年音响，其实玩到最后就是玩电。
+用火电的力度大点，声音偏暖；用水电的声底偏冷，但解析力很高。
+水电中，以葛州坝的电音色最好；火电中以北仑电厂的电音质最好，因为烧的无烟煤比例最高。
+同一套器材，晚上 8 点到 10 点的时候音色就感 …
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <a class="post-card-hit" href="/posts/%E7%AC%AC%E4%BA%8C%E7%AF%87/" aria-label="阅读：第二篇"></a>
+        <span class="post-category">其他</span>
+        <h2 class="f3">
+          <a href="/posts/%E7%AC%AC%E4%BA%8C%E7%AF%87/">第二篇</a>
+        </h2>
+
+        <div class="post-meta">
+          2026-02-09 · 1 分钟阅读
+        </div>
+
+        <div class="post-summary">
+          真的假的
+
+        </div>
+      </article>
+    
+  </div>
+</section>
+
+
+    </main>
+    <footer class="site-footer" role="contentinfo">
+  <div class="site-footer-inner">
+    <div>
+      <p class="footer-kicker">Jellyfish Lab</p>
+      <a class="footer-brand" href="http://localhost:1313/">Jellyfish 的博客</a>
+      <p class="footer-copy">记录学习、技术和生活</p>
+    </div>
+
+    <div class="footer-meta">
+      <span>&copy; 2026</span>
+      <span>Built with Hugo 0.155.2</span>
+      <span>Updated 2026-06-05 21:36</span>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>
