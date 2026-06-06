@@ -16,7 +16,10 @@
       <input name="startedAt" type="hidden" data-guestbook-started-at>
       <div class="guestbook-field">
         <label for="guestName">昵称</label>
-        <input id="guestName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="怎么称呼你" required>
+        <div class="guestbook-name-row">
+          <input id="guestName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="怎么称呼你">
+          <button class="ghost-button guestbook-random-name" type="button" data-guestbook-random-name>随机</button>
+        </div>
       </div>
       <div class="guestbook-field">
         <label for="guestMessage">留言</label>

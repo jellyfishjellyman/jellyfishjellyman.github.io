@@ -493,11 +493,26 @@
     const list = guestbook.querySelector("[data-guestbook-list]");
     const status = guestbook.querySelector("[data-guestbook-status]");
     const startedAtField = guestbook.querySelector("[data-guestbook-started-at]");
+    const nameInput = guestbook.querySelector('input[name="name"]');
+    const randomNameButton = guestbook.querySelector("[data-guestbook-random-name]");
     const isHomeGuestbook = list?.classList.contains("home-guestbook-canvas");
     const noteClasses = ["note-blue", "note-green", "note-pink", "note-lilac", "note-sky", "note-white"];
+    const guestNamePrefixes = ["匿名用户", "路过水母", "云边访客", "夜航纸条", "小站旅人", "漂流星星"];
 
     const refreshGuestbookStartedAt = () => {
       if (startedAtField) startedAtField.value = String(Date.now());
+    };
+
+    const randomGuestName = () => {
+      const prefix = guestNamePrefixes[Math.floor(Math.random() * guestNamePrefixes.length)];
+      const suffix = String(Math.floor(1000 + Math.random() * 9000));
+      return `${prefix}${suffix}`;
+    };
+
+    const fillRandomGuestName = () => {
+      if (!nameInput) return;
+      nameInput.value = randomGuestName();
+      nameInput.dispatchEvent(new Event("input", { bubbles: true }));
     };
 
     const setGuestbookStatus = (message, type = "") => {
@@ -585,6 +600,11 @@
       if (!apiBase) return;
       const submitButton = form.querySelector('button[type="submit"]');
       const formData = new FormData(form);
+      if (!cleanText(formData.get("name"))) {
+        const generatedName = randomGuestName();
+        formData.set("name", generatedName);
+        if (nameInput) nameInput.value = generatedName;
+      }
       if (submitButton) submitButton.disabled = true;
       setGuestbookStatus("正在贴上纸条...");
       try {
@@ -612,6 +632,7 @@
     });
 
     refreshGuestbookStartedAt();
+    randomNameButton?.addEventListener("click", fillRandomGuestName);
     loadGuestMessages();
   }
 

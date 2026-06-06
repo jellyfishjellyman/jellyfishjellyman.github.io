@@ -1703,6 +1703,19 @@ body.home .site-header {
   background: var(--field-bg);
 }
 
+.guestbook-name-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.guestbook-random-name {
+  min-height: 44px;
+  padding-inline: 16px;
+  white-space: nowrap;
+}
+
 .guestbook-field textarea {
   min-height: 118px;
   resize: vertical;
