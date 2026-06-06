@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post Loop</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #f8f5ee;
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    [data-composition-id="post-loop"] {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background:
+        radial-gradient(760px circle at 16% 18%, rgba(229, 245, 241, .86), transparent 74%),
+        radial-gradient(780px circle at 84% 74%, rgba(240, 166, 201, .13), transparent 72%),
+        linear-gradient(135deg, #f8f5ee 0%, #fffdf8 54%, #eef5ff 100%);
+      color: #315aa4;
+    }
+
+    .paper-grain,
+    .light-sweep,
+    .soft-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .paper-grain {
+      z-index: 1;
+      opacity: .24;
+      background-image:
+        linear-gradient(rgba(49, 90, 164, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(49, 90, 164, .04) 1px, transparent 1px);
+      background-size: 86px 86px;
+      mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    }
+
+    .scene-content {
+      position: relative;
+      z-index: 3;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      padding: 112px 158px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 28px;
+    }
+
+    .page-sheet {
+      position: relative;
+      grid-column: 3 / span 8;
+      grid-row: 2 / span 5;
+      border: 1px solid rgba(126, 162, 214, .22);
+      border-radius: 26px;
+      background: rgba(255, 253, 248, .5);
+      box-shadow: 0 28px 90px rgba(61, 95, 148, .1);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      will-change: transform, opacity;
+    }
+
+    .page-sheet::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(420px circle at 18% 18%, rgba(229, 245, 241, .2), transparent 70%),
+        radial-gradient(420px circle at 88% 84%, rgba(240, 166, 201, .09), transparent 72%);
+    }
+
+    .margin-line {
+      position: absolute;
+      top: 76px;
+      bottom: 76px;
+      left: 150px;
+      width: 1px;
+      background: rgba(240, 166, 201, .2);
+    }
+
+    .writing-line {
+      position: absolute;
+      left: 214px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(49, 90, 164, .11);
+      will-change: transform, opacity;
+    }
+
+    .writing-line.mint {
+      background: rgba(107, 207, 197, .15);
+    }
+
+    .l1 { top: 114px; width: 56%; }
+    .l2 { top: 164px; width: 68%; }
+    .l3 { top: 214px; width: 48%; }
+    .l4 { top: 300px; width: 63%; }
+    .l5 { top: 350px; width: 72%; }
+    .l6 { top: 400px; width: 44%; }
+    .l7 { top: 492px; width: 58%; }
+    .l8 { top: 542px; width: 66%; }
+    .l9 { top: 592px; width: 38%; }
+
+    .side-note {
+      position: absolute;
+      border: 1px solid rgba(126, 162, 214, .2);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .34);
+      box-shadow: 0 20px 62px rgba(61, 95, 148, .08);
+      backdrop-filter: blur(16px);
+      will-change: transform, opacity;
+    }
+
+    .note-left {
+      left: 144px;
+      top: 286px;
+      width: 280px;
+      height: 184px;
+    }
+
+    .note-right {
+      right: 160px;
+      top: 500px;
+      width: 300px;
+      height: 202px;
+    }
+
+    .side-note::before,
+    .side-note::after {
+      content: "";
+      position: absolute;
+      left: 32px;
+      right: 34px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(49, 90, 164, .09);
+    }
+
+    .side-note::before { top: 54px; }
+    .side-note::after {
+      top: 92px;
+      right: 84px;
+      background: rgba(107, 207, 197, .13);
+    }
+
+    .particle {
+      position: absolute;
+      z-index: 4;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(107, 207, 197, .6);
+      box-shadow: 0 0 18px rgba(107, 207, 197, .28);
+      will-change: transform, opacity;
+    }
+
+    .particle.rose {
+      background: rgba(240, 166, 201, .58);
+      box-shadow: 0 0 18px rgba(240, 166, 201, .24);
+    }
+
+    .p1 { left: 426px; top: 260px; }
+    .p2 { left: 1340px; top: 300px; }
+    .p3 { left: 560px; top: 760px; }
+    .p4 { left: 1180px; top: 704px; }
+    .p5 { left: 1508px; top: 590px; }
+
+    .light-sweep {
+      z-index: 5;
+      width: 42%;
+      opacity: .42;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .58), rgba(229, 245, 241, .18), transparent);
+      filter: blur(16px);
+      transform: skewX(-14deg) translateX(-130%);
+    }
+
+    .soft-vignette {
+      z-index: 6;
+      box-shadow: inset 0 0 168px rgba(255, 255, 255, .78);
+    }
+  </style>
+</head>
+<body>
+  <div data-composition-id="post-loop" data-start="0" data-duration="6" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="paper-grain" aria-hidden="true"></div>
+    <span class="particle p1"></span>
+    <span class="particle rose p2"></span>
+    <span class="particle p3"></span>
+    <span class="particle rose p4"></span>
+    <span class="particle p5"></span>
+
+    <div class="scene-content">
+      <div class="side-note note-left"></div>
+      <div class="side-note note-right"></div>
+      <article class="page-sheet">
+        <span class="margin-line"></span>
+        <span class="writing-line l1"></span>
+        <span class="writing-line mint l2"></span>
+        <span class="writing-line l3"></span>
+        <span class="writing-line l4"></span>
+        <span class="writing-line mint l5"></span>
+        <span class="writing-line l6"></span>
+        <span class="writing-line mint l7"></span>
+        <span class="writing-line l8"></span>
+        <span class="writing-line l9"></span>
+      </article>
+    </div>
+
+    <div class="light-sweep" aria-hidden="true"></div>
+    <div class="soft-vignette" aria-hidden="true"></div>
+  </div>
+
+  <script src="./assets/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
+
+    tl.fromTo(".paper-grain", { x: -8, y: -6, opacity: .18 }, { x: 8, y: 6, opacity: .28, duration: 3, yoyo: true, repeat: 1 }, 0);
+    tl.fromTo(".page-sheet", { y: 8, opacity: .56 }, { y: -8, opacity: .76, duration: 3, yoyo: true, repeat: 1 }, 0);
+    tl.fromTo(".side-note", { y: 12, opacity: .32, filter: "blur(3px)" }, { y: -8, opacity: .5, filter: "blur(0px)", duration: 3, yoyo: true, repeat: 1, stagger: .18 }, 0);
+    tl.fromTo(".writing-line", { x: -12, opacity: .24 }, { x: 12, opacity: .58, duration: 3, yoyo: true, repeat: 1, stagger: { each: .06, from: "center" } }, 0);
+    tl.fromTo(".particle", { y: -8, scale: .8, opacity: .32 }, { y: 8, scale: 1.08, opacity: .66, duration: 3, yoyo: true, repeat: 1, stagger: { each: .12, from: "center" } }, 0);
+    tl.fromTo(".light-sweep", { x: "-135%" }, { x: "430%", duration: 6, ease: "sine.inOut" }, 0);
+
+    window.__timelines["post-loop"] = tl;
+  </script>
+</body>
+</html>

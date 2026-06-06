@@ -1,6 +1,7 @@
 {{ define "main" }}
 <section class="module-page resource-page">
   <div class="module-intro reveal-on-scroll">
+    {{ partial "ambient-video.html" (dict "base" "resource-tools-loop" "class" "ambient-bg-video module-intro-video" "autoplay" true) }}
     <p class="eyebrow">Links</p>
     <h1>{{ .Title }}</h1>
     <div class="module-copy">{{ .Content }}</div>

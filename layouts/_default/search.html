@@ -1,6 +1,7 @@
 {{ define "main" }}
 <section class="module-page search-page">
   <div class="module-intro reveal-on-scroll">
+    {{ partial "ambient-video.html" (dict "base" "search-loop" "class" "ambient-bg-video module-intro-video search-intro-video" "autoplay" true) }}
     <p class="eyebrow">Search</p>
     <h1>{{ .Title }}</h1>
     {{ with .Description }}<p>{{ . }}</p>{{ end }}
@@ -8,6 +9,7 @@
   </div>
 
   <div class="search-page-panel home-search-panel reveal-on-scroll">
+    {{ partial "ambient-video.html" (dict "base" "search-loop" "class" "ambient-bg-video search-panel-video" "autoplay" true) }}
     <div class="home-panel-head">
       <p class="eyebrow">Index</p>
       <h2>全站搜索</h2>

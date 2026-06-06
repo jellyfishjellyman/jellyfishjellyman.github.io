@@ -772,12 +772,81 @@
 
   document.querySelectorAll(".post-card").forEach((card) => {
     const link = card.querySelector(".post-card-hit") || card.querySelector("h2 a");
+    const cardVideo = card.querySelector(".post-card-video");
+    if (cardVideo) {
+      cardVideo.pause();
+      cardVideo.currentTime = 0;
+      const playCardVideo = () => {
+        if (reduceMotion) return;
+        cardVideo.play().catch(() => {});
+      };
+      const pauseCardVideo = () => {
+        cardVideo.pause();
+        cardVideo.currentTime = 0;
+      };
+      card.addEventListener("pointerenter", playCardVideo);
+      card.addEventListener("focusin", playCardVideo);
+      card.addEventListener("pointerleave", pauseCardVideo);
+      card.addEventListener("focusout", pauseCardVideo);
+    }
     if (!link) return;
     card.addEventListener("click", (event) => {
       if (event.target.closest("a")) return;
       window.location.href = link.href;
     });
   });
+
+  const ambientPanel = document.querySelector("[data-ambient-player]");
+  const ambientToggle = document.querySelector("[data-ambient-toggle]");
+  const ambientStatus = document.querySelector("[data-ambient-status]");
+  if (ambientPanel && ambientToggle) {
+    let ambientAudio = null;
+    let ambientState = "off";
+    const ambientSrc = cleanText(ambientPanel.dataset.audioSrc);
+
+    const setAmbientState = (state, label, status) => {
+      ambientState = state;
+      ambientPanel.dataset.state = state;
+      ambientPanel.classList.toggle("is-playing", state === "playing");
+      ambientPanel.classList.toggle("is-paused", state === "paused");
+      ambientToggle.setAttribute("aria-pressed", String(state === "playing"));
+      ambientToggle.setAttribute("aria-label", label);
+      if (ambientStatus) ambientStatus.textContent = status;
+    };
+
+    const ensureAmbientAudio = () => {
+      if (!ambientSrc) return null;
+      if (ambientAudio) return ambientAudio;
+      ambientAudio = new Audio(ambientSrc);
+      ambientAudio.loop = true;
+      ambientAudio.volume = 0.12;
+      ambientAudio.preload = "none";
+      ambientAudio.addEventListener("ended", () => setAmbientState("paused", "继续氛围声音", "已暂停"));
+      ambientAudio.addEventListener("error", () => setAmbientState("off", "开启氛围声音", "音频不可用"));
+      return ambientAudio;
+    };
+
+    ambientToggle.addEventListener("click", async () => {
+      const audio = ensureAmbientAudio();
+      if (!audio) {
+        setAmbientState("off", "开启氛围声音", "请先添加音频");
+        return;
+      }
+      if (ambientState === "playing") {
+        audio.pause();
+        setAmbientState("paused", "继续氛围声音", "已暂停");
+        return;
+      }
+      try {
+        await audio.play();
+        setAmbientState("playing", "暂停氛围声音", "低音量播放中");
+      } catch (_) {
+        setAmbientState("off", "开启氛围声音", "点击后再试");
+      }
+    });
+
+    setAmbientState("off", "开启氛围声音", "默认关闭");
+  }
 
   const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item");
   if ("IntersectionObserver" in window && !reduceMotion) {

@@ -2,6 +2,7 @@
 <article class="post-single mw8 center ph3 pv4">
   {{ if eq .Section "posts" }}
     <header class="post-single-header">
+      {{ partial "ambient-video.html" (dict "base" "post-loop" "class" "ambient-bg-video post-hero-video" "autoplay" true) }}
       <span class="post-category">{{ .Params.category | default "其他" }}</span>
       <h1>{{ .Title }}</h1>
       <div class="post-meta">

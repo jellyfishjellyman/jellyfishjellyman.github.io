@@ -13,3 +13,16 @@
     </div>
   </div>
 </footer>
+
+<div class="music-panel ambient-player" data-ambient-player data-state="off" data-audio-src="">
+  <button id="musicToggle" type="button" data-ambient-toggle aria-label="开启氛围声音" aria-pressed="false">
+    <span class="ambient-player-icon" aria-hidden="true"></span>
+  </button>
+  <span class="music-copy">
+    <span class="music-title">Ambient</span>
+    <span class="music-status" data-ambient-status>默认关闭</span>
+  </span>
+  <span class="music-bars" aria-hidden="true">
+    {{ range seq 12 }}<span style="--bar-index: {{ . }}"></span>{{ end }}
+  </span>
+</div>

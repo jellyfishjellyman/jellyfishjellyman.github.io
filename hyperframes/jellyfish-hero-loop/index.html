@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jellyfish Hero Loop</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: #f8f5ee;
+      overflow: hidden;
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    [data-composition-id="jellyfish-hero-loop"] {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: #f8f5ee;
+      color: #2f58a5;
+    }
+
+    .scene-content {
+      position: relative;
+      z-index: 3;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      padding: 118px 160px;
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr) 360px;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .hero-photo,
+    .hero-wash,
+    .hero-vignette,
+    .soft-grid,
+    .particle-field,
+    .light-scan {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hero-photo {
+      z-index: 0;
+      background-image: url("./assets/hero-optimized.jpg");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.78) brightness(1.22);
+      transform: scale(1.035);
+      opacity: 0.58;
+    }
+
+    .hero-wash {
+      z-index: 1;
+      background:
+        linear-gradient(90deg, rgba(248, 245, 238, .86), rgba(234, 247, 244, .62) 24%, rgba(248, 245, 238, .5) 50%, rgba(220, 232, 255, .64) 74%, rgba(248, 245, 238, .9)),
+        radial-gradient(720px circle at 18% 18%, rgba(234, 247, 244, .82), transparent 68%),
+        radial-gradient(760px circle at 82% 72%, rgba(242, 169, 206, .34), transparent 68%);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-vignette {
+      z-index: 5;
+      box-shadow: inset 0 0 160px rgba(255, 255, 255, .75);
+    }
+
+    .soft-grid {
+      z-index: 2;
+      opacity: .32;
+      background-image:
+        linear-gradient(rgba(47, 88, 165, .12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 88, 165, .1) 1px, transparent 1px);
+      background-size: 96px 96px;
+      mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    }
+
+    .light-scan {
+      z-index: 4;
+      width: 32%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .56), transparent);
+      transform: skewX(-14deg) translateX(-120%);
+      opacity: .68;
+      filter: blur(8px);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 26px;
+      align-content: center;
+    }
+
+    .side-stack.left {
+      justify-items: start;
+    }
+
+    .side-stack.right {
+      justify-items: end;
+    }
+
+    .glass-card {
+      position: relative;
+      width: 286px;
+      min-height: 118px;
+      box-sizing: border-box;
+      padding: 22px 24px;
+      border: 1px solid rgba(127, 163, 216, .4);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .58);
+      box-shadow: 0 28px 80px rgba(61, 95, 148, .14);
+      backdrop-filter: blur(18px);
+      will-change: transform, opacity;
+    }
+
+    .glass-card.small {
+      width: 226px;
+      min-height: 96px;
+    }
+
+    .glass-card.wide {
+      width: 330px;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 14px 16px auto;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(47, 88, 165, .24), rgba(112, 211, 203, .22), rgba(242, 169, 206, .2));
+    }
+
+    .glass-card::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 22px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(127, 163, 216, .22);
+      background:
+        linear-gradient(90deg, rgba(47, 88, 165, .16) 0 18%, transparent 18% 28%, rgba(47, 88, 165, .1) 28% 66%, transparent 66%),
+        rgba(248, 251, 255, .52);
+    }
+
+    .card-kicker {
+      display: inline-block;
+      margin-top: 26px;
+      color: rgba(47, 88, 165, .72);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .card-line {
+      width: 64%;
+      height: 13px;
+      margin-top: 14px;
+      border-radius: 999px;
+      background: rgba(47, 88, 165, .16);
+    }
+
+    .center-reserve {
+      min-height: 560px;
+      border-radius: 36px;
+      border: 1px solid rgba(255, 255, 255, .5);
+      background:
+        radial-gradient(420px circle at 50% 46%, rgba(255, 255, 255, .42), transparent 72%),
+        linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .08));
+      box-shadow: inset 0 0 80px rgba(255, 255, 255, .34);
+      opacity: .58;
+    }
+
+    .particle {
+      position: absolute;
+      z-index: 4;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(242, 169, 206, .74);
+      box-shadow: 0 0 18px rgba(242, 169, 206, .5);
+      will-change: transform, opacity;
+    }
+
+    .particle.mint {
+      background: rgba(112, 211, 203, .62);
+      box-shadow: 0 0 18px rgba(112, 211, 203, .42);
+    }
+
+    .thread {
+      position: absolute;
+      z-index: 3;
+      height: 1px;
+      width: 240px;
+      background: linear-gradient(90deg, transparent, rgba(47, 88, 165, .2), transparent);
+      transform-origin: center;
+      opacity: .5;
+      will-change: transform, opacity;
+    }
+
+    .p1 { left: 294px; top: 230px; }
+    .p2 { left: 430px; top: 790px; }
+    .p3 { left: 1220px; top: 222px; }
+    .p4 { left: 1530px; top: 736px; }
+    .p5 { left: 980px; top: 820px; }
+    .p6 { left: 828px; top: 180px; }
+
+    .t1 { left: 318px; top: 282px; transform: rotate(12deg); }
+    .t2 { left: 1358px; top: 340px; transform: rotate(-16deg); }
+    .t3 { left: 880px; top: 784px; transform: rotate(4deg); }
+  </style>
+</head>
+<body>
+  <div data-composition-id="jellyfish-hero-loop" data-width="1920" data-height="1080">
+    <div class="hero-photo" aria-hidden="true"></div>
+    <div class="hero-wash" aria-hidden="true"></div>
+    <div class="soft-grid" aria-hidden="true"></div>
+    <div class="light-scan" aria-hidden="true"></div>
+
+    <span class="thread t1" aria-hidden="true"></span>
+    <span class="thread t2" aria-hidden="true"></span>
+    <span class="thread t3" aria-hidden="true"></span>
+
+    <div class="particle-field" aria-hidden="true">
+      <span class="particle p1"></span>
+      <span class="particle mint p2"></span>
+      <span class="particle p3"></span>
+      <span class="particle mint p4"></span>
+      <span class="particle p5"></span>
+      <span class="particle mint p6"></span>
+    </div>
+
+    <div class="scene-content">
+      <div class="side-stack left">
+        <section class="glass-card wide float-a">
+          <span class="card-kicker">Search</span>
+          <div class="card-line"></div>
+        </section>
+        <section class="glass-card small float-b">
+          <span class="card-kicker">Weather</span>
+          <div class="card-line"></div>
+        </section>
+        <section class="glass-card float-c">
+          <span class="card-kicker">Notes</span>
+          <div class="card-line"></div>
+        </section>
+      </div>
+
+      <div class="center-reserve" aria-hidden="true"></div>
+
+      <div class="side-stack right">
+        <section class="glass-card small float-d">
+          <span class="card-kicker">Quote</span>
+          <div class="card-line"></div>
+        </section>
+        <section class="glass-card wide float-e">
+          <span class="card-kicker">Guestbook</span>
+          <div class="card-line"></div>
+        </section>
+        <section class="glass-card float-f">
+          <span class="card-kicker">Explore</span>
+          <div class="card-line"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="hero-vignette" aria-hidden="true"></div>
+  </div>
+
+  <script src="./assets/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
+    const loopEase = "sine.inOut";
+
+    tl.fromTo(".hero-photo", { scale: 1.035, x: -10, y: -6 }, { scale: 1.052, x: 10, y: 6, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".soft-grid", { x: -16, y: -10, opacity: .24 }, { x: 16, y: 10, opacity: .34, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".light-scan", { x: "-120%" }, { x: "430%", duration: 10, ease: "sine.inOut" }, 0);
+
+    tl.fromTo(".float-a", { y: -8, rotation: -1.4, opacity: .76 }, { y: 8, rotation: 1.2, opacity: .92, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".float-b", { y: 10, rotation: 1.2, opacity: .74 }, { y: -9, rotation: -1, opacity: .9, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".float-c", { y: -6, rotation: .8, opacity: .72 }, { y: 11, rotation: -1.1, opacity: .9, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".float-d", { y: 9, rotation: -1, opacity: .74 }, { y: -8, rotation: 1, opacity: .9, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".float-e", { y: -10, rotation: 1.2, opacity: .76 }, { y: 7, rotation: -1.2, opacity: .92, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+    tl.fromTo(".float-f", { y: 8, rotation: .7, opacity: .72 }, { y: -10, rotation: -.9, opacity: .9, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+
+    tl.fromTo(".particle", { y: -8, scale: .82, opacity: .42 }, { y: 10, scale: 1.08, opacity: .82, duration: 5, yoyo: true, repeat: 1, stagger: { each: .24, from: "center" }, ease: loopEase }, 0);
+    tl.fromTo(".thread", { scaleX: .72, opacity: .22 }, { scaleX: 1.06, opacity: .5, duration: 5, yoyo: true, repeat: 1, stagger: .18, ease: loopEase }, 0);
+    tl.fromTo(".center-reserve", { scale: .996, opacity: .48 }, { scale: 1.006, opacity: .62, duration: 5, yoyo: true, repeat: 1, ease: loopEase }, 0);
+
+    window.__timelines["jellyfish-hero-loop"] = tl;
+  </script>
+</body>
+</html>

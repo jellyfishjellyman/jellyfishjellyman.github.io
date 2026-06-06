@@ -1,5 +1,11 @@
 /public/
+public_hyperframes_test/
 /resources/
 .hugo_build.lock
 .tools/
 .codegraph/
+_jellyfish_frames/
+_resource_tools_frames/
+_search_loop_frames/
+_post_loop_frames/
+hyperframes/**/tools/

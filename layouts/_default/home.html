@@ -7,6 +7,7 @@
 {{ range site.Data.tools }}{{ $toolCount = add $toolCount (len .items) }}{{ end }}
 
 <section id="hero" class="home-hero home-hero-window">
+  {{ partial "ambient-video.html" (dict "base" "jellyfish-hero-loop" "class" "ambient-bg-video home-hero-video" "autoplay" true) }}
   <div class="home-hero-inner">
     <aside class="home-side-stack home-side-left" aria-label="页面导航">
       <div class="home-side-card">
@@ -136,6 +137,7 @@
   <div class="home-grid">
     {{ range first 10 $posts }}
       <article class="post-card">
+        {{ partial "ambient-video.html" (dict "base" "post-loop" "class" "ambient-bg-video post-card-video" "preload" "none") }}
         <a class="post-card-hit" href="{{ .RelPermalink }}" aria-label="阅读：{{ .Title }}"></a>
         <span class="post-category">{{ .Params.category | default "其他" }}</span>
         <h2 class="f3">
