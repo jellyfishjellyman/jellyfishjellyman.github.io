@@ -4,6 +4,7 @@
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
   const prefersNight = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const cleanText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
   const themeToggle = document.querySelector("[data-theme-toggle]");
   const storedTheme = window.localStorage.getItem("site-theme");
