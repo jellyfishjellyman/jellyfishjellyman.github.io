@@ -577,6 +577,32 @@
       box.innerHTML = String(value || "");
       return cleanText(box.textContent || "");
     };
+    const hasEnglishText = (value) => /[A-Za-z][A-Za-z\s'’.,:;!?()/-]{2,}/.test(String(value || ""));
+    const collectTranslationText = (payload) => {
+      const pieces = [];
+      const seen = new Set();
+      const add = (value) => {
+        const text = shortText(cleanText(value), 220);
+        if (/^(en|english|zh|zh-cn|chinese)$/i.test(text)) return;
+        if (!text || !hasEnglishText(text) || seen.has(text)) return;
+        seen.add(text);
+        pieces.push(text);
+      };
+      add(payload.title);
+      add(payload.summary);
+      add(payload.note);
+      (payload.rows || []).forEach((row) => add(row?.value));
+      (payload.chips || []).forEach(add);
+      (payload.choices || []).forEach((choice) => add(choice?.label));
+      (payload.sections || []).forEach((section) => {
+        (section.items || []).forEach((item) => {
+          add(item?.label);
+          add(item?.value);
+          add(item?.meta);
+        });
+      });
+      return pieces.join("\n").slice(0, 1200);
+    };
     const formatHost = (value) => {
       try {
         return new URL(value).hostname.replace(/^www\./, "");
@@ -712,6 +738,15 @@
       const audio = payload.audio
         ? `<audio controls preload="none" src="${escapeHtml(payload.audio)}"></audio>`
         : "";
+      const translationText = collectTranslationText(payload);
+      const translateControl = translationText
+        ? `
+          <div class="api-translate" data-api-translate-shell>
+            <button class="api-translate-button" type="button" data-api-translate>翻译成中文</button>
+            <div class="api-translation" data-api-translation hidden></div>
+          </div>
+        `
+        : "";
       result.classList.remove("is-loading", "is-error");
       result.classList.add("is-success");
       result.innerHTML = `
@@ -727,7 +762,13 @@
         ${choices ? `<div class="api-choice-grid">${choices}</div><p class="api-choice-feedback" data-trivia-feedback>选择一个答案。</p>` : ""}
         ${note}
         ${audio}
+        ${translateControl}
       `;
+      if (translationText) {
+        result.dataset.translateText = translationText;
+      } else {
+        delete result.dataset.translateText;
+      }
     };
     const fetchJsonWithTimeout = async (url) => {
       const controller = new AbortController();
@@ -749,6 +790,34 @@
       } finally {
         window.clearTimeout(timeoutId);
       }
+    };
+    const translationCache = new Map();
+    const translateWithMyMemory = async (text) => {
+      const data = await fetchJsonWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en%7Czh-CN`);
+      const translated = stripHtml(data?.responseData?.translatedText);
+      if (!translated || data?.quotaFinished || Number(data?.responseStatus) >= 400) throw new Error("MyMemory 暂时不可用");
+      return { text: translated, provider: "MyMemory" };
+    };
+    const translateWithGoogle = async (text) => {
+      const data = await fetchJsonWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`);
+      const translated = Array.isArray(data?.[0])
+        ? data[0].map((part) => part?.[0] || "").join("")
+        : "";
+      if (!translated) throw new Error("翻译服务没有返回内容");
+      return { text: stripHtml(translated), provider: "Google translate gtx" };
+    };
+    const translateTextToChinese = async (text) => {
+      const source = cleanText(text).slice(0, 1200);
+      if (!source) throw new Error("没有可翻译内容");
+      if (translationCache.has(source)) return translationCache.get(source);
+      let result = null;
+      try {
+        result = await translateWithMyMemory(source);
+      } catch (_) {
+        result = await translateWithGoogle(source);
+      }
+      translationCache.set(source, result);
+      return result;
     };
     const runApiForm = async (form, runner) => {
       const name = form.dataset.apiForm;
@@ -1756,6 +1825,32 @@
       },
     };
     apiLab.addEventListener("click", (event) => {
+      const translateButton = event.target.closest("[data-api-translate]");
+      if (translateButton) {
+        const result = translateButton.closest(".api-result");
+        const output = result?.querySelector("[data-api-translation]");
+        const text = result?.dataset.translateText || "";
+        if (!result || !output || !text) return;
+        output.hidden = false;
+        output.classList.remove("is-error");
+        output.innerHTML = "<span>正在翻译</span><p>请稍等。</p>";
+        translateButton.disabled = true;
+        translateButton.textContent = "翻译中";
+        translateTextToChinese(text)
+          .then((translation) => {
+            output.innerHTML = `<span>${escapeHtml(translation.provider)} · 中文翻译</span><p>${escapeHtml(translation.text)}</p>`;
+            translateButton.textContent = "重新翻译";
+          })
+          .catch((error) => {
+            output.classList.add("is-error");
+            output.innerHTML = `<span>翻译失败</span><p>${escapeHtml(error?.message || "翻译服务暂时不可用")}</p>`;
+            translateButton.textContent = "重试翻译";
+          })
+          .finally(() => {
+            translateButton.disabled = false;
+          });
+        return;
+      }
       const choice = event.target.closest("[data-trivia-choice]");
       if (!choice) return;
       const result = choice.closest(".api-result");
