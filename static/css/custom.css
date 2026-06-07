@@ -3495,8 +3495,7 @@ body.home .site-nav {
   color: #29457f;
   background:
     linear-gradient(180deg, rgba(245, 250, 255, .06) 0%, rgba(245, 250, 255, .54) 70%, rgba(246, 250, 255, .98) 100%),
-    linear-gradient(90deg, rgba(255, 255, 255, .78) 0 13%, rgba(255, 255, 255, .2) 34%, rgba(255,255,255,.74) 100%),
-    url("/images/hero-optimized.jpg") center 38% / cover no-repeat;
+    linear-gradient(90deg, rgba(255, 255, 255, .78) 0 13%, rgba(255, 255, 255, .2) 34%, rgba(255,255,255,.74) 100%);
 }
 
 .home-hero-window::before {
