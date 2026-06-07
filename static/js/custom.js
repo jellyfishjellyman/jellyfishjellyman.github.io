@@ -545,7 +545,51 @@
         return String(value || "");
       }
     };
-    const formatNumber = (value) => new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 2 }).format(Number(value || 0));
+    const formatNumber = (value, digits = 2) => new Intl.NumberFormat("zh-CN", { maximumFractionDigits: digits }).format(Number(value || 0));
+    const compactJoin = (items, separator = "、") => items.filter(Boolean).join(separator);
+    const currencyLabels = {
+      CNY: "人民币",
+      USD: "美元",
+      EUR: "欧元",
+      JPY: "日元",
+      GBP: "英镑",
+      HKD: "港币",
+      SGD: "新加坡元",
+      AUD: "澳元",
+      CAD: "加元",
+      CHF: "瑞郎",
+    };
+    const commonCurrencies = ["USD", "CNY", "EUR", "JPY", "GBP", "HKD", "SGD", "AUD", "CAD", "CHF"];
+    const currencyLabel = (code) => currencyLabels[code] ? `${code} · ${currencyLabels[code]}` : code;
+    const formatDay = (value) => {
+      try {
+        return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", weekday: "short" }).format(new Date(`${value}T00:00:00`));
+      } catch (_) {
+        return value || "";
+      }
+    };
+    const shortText = (value, limit = 220) => {
+      const text = cleanText(value);
+      return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
+    };
+    const stripHtml = (value) => {
+      const box = document.createElement("span");
+      box.innerHTML = String(value || "");
+      return cleanText(box.textContent || "");
+    };
+    const formatHost = (value) => {
+      try {
+        return new URL(value).hostname.replace(/^www\./, "");
+      } catch (_) {
+        return "";
+      }
+    };
+    const formatRelativeTime = (seconds) => {
+      const diff = Math.max(0, Math.floor(Date.now() / 1000) - Number(seconds || 0));
+      if (diff < 3600) return `${Math.max(1, Math.floor(diff / 60))} 分钟前`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
+      return `${Math.floor(diff / 86400)} 天前`;
+    };
     const weatherNames = {
       0: "晴朗",
       1: "大体晴朗",
@@ -578,14 +622,46 @@
       const result = resultFor(name);
       if (!result) return;
       const rows = (payload.rows || [])
-        .filter((row) => row && row.value)
+        .filter((row) => row && row.value != null && row.value !== "")
         .map((row) => `
           <div class="api-result-item">
             <small>${escapeHtml(row.label)}</small>
             <strong>${escapeHtml(row.value)}</strong>
           </div>
         `).join("");
+      const chips = (payload.chips || [])
+        .filter(Boolean)
+        .map((chip) => `<span>${escapeHtml(chip)}</span>`)
+        .join("");
+      const sections = (payload.sections || [])
+        .map((section) => {
+          const items = (section.items || [])
+            .filter((item) => item && (item.label || item.value || item.meta))
+            .map((item) => `
+              <article class="api-result-list-item">
+                ${item.label ? `<small>${escapeHtml(item.label)}</small>` : ""}
+                ${item.value ? `<strong>${escapeHtml(item.value)}</strong>` : ""}
+                ${item.meta ? `<em>${escapeHtml(item.meta)}</em>` : ""}
+              </article>
+            `).join("");
+          if (!items) return "";
+          return `
+            <div class="api-result-section">
+              ${section.title ? `<h4>${escapeHtml(section.title)}</h4>` : ""}
+              <div class="api-result-list">${items}</div>
+            </div>
+          `;
+        })
+        .join("");
+      const choices = (payload.choices || [])
+        .map((choice, index) => `
+          <button class="api-choice" type="button" data-trivia-choice data-correct="${choice.correct ? "true" : "false"}">
+            <span>${String.fromCharCode(65 + index)}</span>
+            ${escapeHtml(choice.label)}
+          </button>
+        `).join("");
       const note = payload.note ? `<p>${escapeHtml(payload.note)}</p>` : "";
+      const summary = payload.summary ? `<p class="api-result-summary">${escapeHtml(payload.summary)}</p>` : "";
       const image = payload.image
         ? `<img class="api-result-image" src="${escapeHtml(payload.image.src)}" alt="${escapeHtml(payload.image.alt || "")}" loading="lazy">`
         : "";
@@ -597,8 +673,12 @@
       result.innerHTML = `
         <span>${escapeHtml(payload.meta || "公开 API 返回")}</span>
         <strong>${escapeHtml(payload.title)}</strong>
+        ${summary}
         ${image}
         ${rows ? `<div class="api-result-grid">${rows}</div>` : ""}
+        ${chips ? `<div class="api-result-chips">${chips}</div>` : ""}
+        ${sections}
+        ${choices ? `<div class="api-choice-grid">${choices}</div><p class="api-choice-feedback" data-trivia-feedback>选择一个答案。</p>` : ""}
         ${note}
         ${audio}
       `;
@@ -627,12 +707,12 @@
     const runApiForm = async (form, runner) => {
       const name = form.dataset.apiForm;
       const submit = form.querySelector('button[type="submit"]');
-      setApiState(name, "loading", "正在连接公开 API", "如果服务限流或 CORS 变化，会在这里提示");
+      setApiState(name, "loading", "正在查询", "如果服务限流或网络异常，会在这里提示");
       if (submit) submit.disabled = true;
       try {
         await runner(new FormData(form));
       } catch (error) {
-        const message = error?.name === "AbortError" ? "请求超时，稍后再试" : (error?.message || "公开 API 暂时不可用");
+        const message = error?.name === "AbortError" ? "请求超时，稍后再试" : (error?.message || "服务暂时不可用");
         setApiState(name, "error", "没有拿到可用结果", message);
       } finally {
         if (submit) submit.disabled = false;
@@ -644,18 +724,34 @@
         if (!word) throw new Error("请输入要查询的英文单词");
         const data = await fetchJsonWithTimeout(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
         const entry = Array.isArray(data) ? data[0] : null;
-        const meaning = entry?.meanings?.[0];
-        const definition = meaning?.definitions?.[0]?.definition;
-        if (!entry || !definition) throw new Error("没有找到释义");
+        const meanings = entry?.meanings || [];
+        const definitions = meanings
+          .flatMap((meaning) => (meaning.definitions || []).slice(0, 2).map((definition) => ({
+            label: meaning.partOfSpeech || "释义",
+            value: definition.definition,
+            meta: definition.example ? `例句：${definition.example}` : "",
+          })))
+          .filter((item) => item.value)
+          .slice(0, 6);
+        if (!entry || !definitions.length) throw new Error("没有找到释义");
         const audio = (entry.phonetics || []).find((item) => item.audio)?.audio;
+        const phonetics = Array.from(new Set((entry.phonetics || []).map((item) => item.text).filter(Boolean))).slice(0, 3);
+        const synonyms = Array.from(new Set(meanings.flatMap((meaning) => [
+          ...(meaning.synonyms || []),
+          ...(meaning.definitions || []).flatMap((definition) => definition.synonyms || []),
+        ]))).slice(0, 12);
+        const parts = Array.from(new Set(meanings.map((meaning) => meaning.partOfSpeech).filter(Boolean))).slice(0, 6);
         renderApiResult("dictionary", {
           title: entry.word || word,
-          meta: [meaning.partOfSpeech, entry.phonetic].filter(Boolean).join(" · ") || "Free Dictionary API",
+          meta: compactJoin([parts.join(" / "), phonetics.join(" / ") || entry.phonetic], " · ") || "Free Dictionary API",
+          summary: definitions[0]?.value,
           rows: [
-            { label: "释义", value: definition },
-            { label: "近义词", value: (meaning.synonyms || []).slice(0, 6).join("、") },
+            { label: "词性", value: parts.join("、") },
+            { label: "音标", value: phonetics.join(" / ") || entry.phonetic },
+            { label: "发音", value: audio ? "可播放" : "暂无音频" },
           ],
-          note: (entry.sourceUrls || [])[0] ? `来源：${entry.sourceUrls[0]}` : "",
+          chips: synonyms,
+          sections: [{ title: "更多释义", items: definitions }],
           audio,
         });
       },
@@ -663,66 +759,96 @@
         const amount = Number(formData.get("amount") || 0);
         const from = cleanText(formData.get("from")).toUpperCase();
         const to = cleanText(formData.get("to")).toUpperCase();
-        if (!amount || amount < 0) throw new Error("请输入大于 0 的金额");
+        if (!Number.isFinite(amount) || amount <= 0) throw new Error("请输入大于 0 的金额");
         if (!from || !to) throw new Error("请选择币种");
         if (from === to) {
           renderApiResult("exchange", {
             title: `${formatNumber(amount)} ${to}`,
             meta: "同币种无需换算",
-            rows: [{ label: "汇率", value: "1" }],
+            rows: [
+              { label: "汇率", value: "1" },
+              { label: "币种", value: currencyLabel(to) },
+            ],
           });
           return;
         }
+        const targetCodes = Array.from(new Set([to, ...commonCurrencies.filter((code) => code !== from && code !== to)])).slice(0, 6);
         let data = null;
         let value = null;
+        let rates = {};
         let source = "Frankfurter";
         try {
-          data = await fetchJsonWithTimeout(`https://api.frankfurter.app/latest?amount=${encodeURIComponent(amount)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
-          value = data?.rates?.[to];
+          data = await fetchJsonWithTimeout(`https://api.frankfurter.app/latest?amount=${encodeURIComponent(amount)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(targetCodes.join(","))}`);
+          rates = data?.rates || {};
+          value = rates[to];
         } catch (_) {
           const base = from.toLowerCase();
-          const target = to.toLowerCase();
-          data = await fetchJsonWithTimeout(`https://latest.currency-api.pages.dev/v1/currencies/${encodeURIComponent(base)}.json`);
-          const rate = data?.[base]?.[target];
-          if (typeof rate === "number") {
-            value = amount * rate;
-            source = "Currency-api";
-            data = { amount, base: from, date: data.date, rates: { [to]: value } };
-          }
+          const fallback = await fetchJsonWithTimeout(`https://latest.currency-api.pages.dev/v1/currencies/${encodeURIComponent(base)}.json`);
+          const sourceRates = fallback?.[base] || {};
+          rates = Object.fromEntries(targetCodes
+            .map((code) => [code, sourceRates[code.toLowerCase()]])
+            .filter(([, rate]) => typeof rate === "number")
+            .map(([code, rate]) => [code, amount * rate]));
+          value = rates[to];
+          source = "Currency-api";
+          data = { amount, base: from, date: fallback?.date, rates };
         }
         if (typeof value !== "number") throw new Error("汇率服务没有返回目标币种");
+        const rate = value / amount;
+        const watchItems = targetCodes
+          .filter((code) => typeof rates[code] === "number")
+          .map((code) => ({
+            label: currencyLabel(code),
+            value: `${formatNumber(rates[code])} ${code}`,
+            meta: `1 ${from} = ${formatNumber(rates[code] / amount, 6)} ${code}`,
+          }));
         renderApiResult("exchange", {
           title: `${formatNumber(amount)} ${from} ≈ ${formatNumber(value)} ${to}`,
           meta: `${source} · ${data.date || "最新可用日期"}`,
           rows: [
             { label: "基准金额", value: `${formatNumber(data.amount || amount)} ${data.base || from}` },
             { label: "折算结果", value: `${formatNumber(value)} ${to}` },
+            { label: "实时汇率", value: `1 ${from} = ${formatNumber(rate, 6)} ${to}` },
+            { label: "反向汇率", value: `1 ${to} = ${formatNumber(1 / rate, 6)} ${from}` },
           ],
-          note: "汇率日期取决于服务端最新可用交易日；Frankfurter 不可用时自动切换备用源。",
+          sections: [{ title: "常用币种对照", items: watchItems }],
+          note: "日期取决于服务端最新可用交易日；主源不可用时自动切换备用源。",
         });
       },
       country: async (formData) => {
         const query = cleanText(formData.get("country"));
         if (!query) throw new Error("请输入国家或地区名称");
-        const data = await fetchJsonWithTimeout(`https://restcountries.com/v3.1/name/${encodeURIComponent(query)}?fields=name,capital,region,subregion,population,currencies,languages,flags`);
+        const data = await fetchJsonWithTimeout(`https://restcountries.com/v3.1/name/${encodeURIComponent(query)}?fields=name,capital,region,subregion,population,currencies,languages,flags,timezones,area,continents,cca2,cca3,idd`);
         const entries = Array.isArray(data) ? data : [];
         const country = entries.find((item) => item.name?.common?.toLowerCase() === query.toLowerCase()) || entries[0];
         if (!country) throw new Error("没有找到国家资料");
-        const currencies = Object.entries(country.currencies || {})
-          .map(([code, value]) => `${code} ${value.name || ""}`.trim())
-          .join("、");
-        const languages = Object.values(country.languages || {}).join("、");
+        const currencies = Object.entries(country.currencies || {}).map(([code, value]) => compactJoin([code, value.name, value.symbol ? `(${value.symbol})` : ""], " "));
+        const languages = Object.values(country.languages || {});
+        const callingCodes = country.idd?.root && Array.isArray(country.idd?.suffixes)
+          ? country.idd.suffixes.slice(0, 4).map((suffix) => `${country.idd.root}${suffix}`).join("、")
+          : "";
         renderApiResult("country", {
           title: country.name?.common || query,
           meta: country.name?.official || "REST Countries",
           image: country.flags?.svg ? { src: country.flags.svg, alt: country.flags.alt || `${country.name?.common || query} flag` } : null,
           rows: [
             { label: "首都", value: (country.capital || []).join("、") || "未列出" },
-            { label: "地区", value: [country.region, country.subregion].filter(Boolean).join(" · ") },
+            { label: "地区", value: compactJoin([country.region, country.subregion], " · ") },
             { label: "人口", value: country.population ? `${formatNumber(country.population)} 人` : "" },
-            { label: "货币", value: currencies },
-            { label: "语言", value: languages },
+            { label: "面积", value: country.area ? `${formatNumber(country.area, 0)} km²` : "" },
+            { label: "区号", value: callingCodes },
           ],
+          chips: [...currencies, ...languages].slice(0, 12),
+          sections: [{
+            title: "补充资料",
+            items: [
+              { label: "洲", value: (country.continents || []).join("、") },
+              { label: "时区", value: (country.timezones || []).slice(0, 6).join("、") },
+              { label: "国家代码", value: compactJoin([country.cca2, country.cca3], " / ") },
+              { label: "货币", value: currencies.join("、") },
+              { label: "语言", value: languages.join("、") },
+            ],
+          }],
         });
       },
       weather: async (formData) => {
@@ -731,38 +857,278 @@
         const geo = await fetchJsonWithTimeout(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=zh&format=json`);
         const place = geo?.results?.[0];
         if (!place) throw new Error("没有找到城市坐标");
-        const weather = await fetchJsonWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(place.latitude)}&longitude=${encodeURIComponent(place.longitude)}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`);
+        const weather = await fetchJsonWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(place.latitude)}&longitude=${encodeURIComponent(place.longitude)}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=5&timezone=auto`);
         const current = weather?.current;
         if (!current) throw new Error("天气服务没有返回当前数据");
+        const currentUnits = weather.current_units || {};
+        const daily = weather.daily || {};
+        const forecastItems = (daily.time || []).map((day, index) => ({
+          label: formatDay(day),
+          value: `${weatherNames[daily.weather_code?.[index]] || `天气代码 ${daily.weather_code?.[index]}`} · ${daily.temperature_2m_min?.[index]}~${daily.temperature_2m_max?.[index]}°C`,
+          meta: daily.precipitation_probability_max?.[index] != null ? `最大降水概率 ${daily.precipitation_probability_max[index]}%` : "",
+        }));
         renderApiResult("weather", {
           title: `${place.name}${place.admin1 ? ` · ${place.admin1}` : ""}`,
           meta: `Open-Meteo · ${current.time || "当前天气"}`,
           rows: [
             { label: "天气", value: weatherNames[current.weather_code] || `天气代码 ${current.weather_code}` },
-            { label: "温度", value: `${current.temperature_2m}°C` },
-            { label: "湿度", value: `${current.relative_humidity_2m}%` },
-            { label: "风速", value: `${current.wind_speed_10m} km/h` },
+            { label: "温度", value: `${current.temperature_2m}${currentUnits.temperature_2m || "°C"}` },
+            { label: "湿度", value: `${current.relative_humidity_2m}${currentUnits.relative_humidity_2m || "%"}` },
+            { label: "风速", value: `${current.wind_speed_10m} ${currentUnits.wind_speed_10m || "km/h"}` },
           ],
+          sections: [{ title: "未来几天", items: forecastItems }],
           note: `${place.country || ""}${place.timezone ? ` · ${place.timezone}` : ""}`,
         });
       },
-      trivia: async () => {
-        const data = await fetchJsonWithTimeout("https://opentdb.com/api.php?amount=1&type=multiple&encode=url3986");
+      trivia: async (formData) => {
+        const category = cleanText(formData.get("category"));
+        const difficulty = cleanText(formData.get("difficulty"));
+        const params = new URLSearchParams({ amount: "1", type: "multiple", encode: "url3986" });
+        if (category) params.set("category", category);
+        if (difficulty) params.set("difficulty", difficulty);
+        const data = await fetchJsonWithTimeout(`https://opentdb.com/api.php?${params.toString()}`);
         const item = data?.results?.[0];
         if (!item) throw new Error("题库暂时没有返回题目");
-        const answers = [item.correct_answer, ...(item.incorrect_answers || [])]
-          .map(decodeApiText)
+        const correctAnswer = decodeApiText(item.correct_answer);
+        const answers = [correctAnswer, ...(item.incorrect_answers || []).map(decodeApiText)]
           .sort(() => Math.random() - 0.5);
+        const difficultyNames = { easy: "简单", medium: "中等", hard: "困难" };
         renderApiResult("trivia", {
           title: decodeApiText(item.question),
-          meta: [decodeApiText(item.category), decodeApiText(item.difficulty)].filter(Boolean).join(" · "),
+          meta: compactJoin([decodeApiText(item.category), difficultyNames[decodeApiText(item.difficulty)] || decodeApiText(item.difficulty)], " · "),
+          summary: "点选一个答案，结果会直接在卡片里标出来。",
           rows: [
-            { label: "选项", value: answers.join(" / ") },
-            { label: "答案", value: decodeApiText(item.correct_answer) },
+            { label: "题型", value: "单选题" },
+            { label: "选项数", value: `${answers.length} 个` },
           ],
+          choices: answers.map((answer) => ({ label: answer, correct: answer === correctAnswer })),
+        });
+      },
+      wiki: async (formData) => {
+        const topic = cleanText(formData.get("topic"));
+        if (!topic) throw new Error("请输入百科词条");
+        const search = await fetchJsonWithTimeout(`https://zh.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(topic)}&format=json&origin=*&srlimit=5`);
+        const matches = search?.query?.search || [];
+        const best = matches[0];
+        if (!best?.title) throw new Error("没有找到百科结果");
+        let summary = null;
+        try {
+          summary = await fetchJsonWithTimeout(`https://zh.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(best.title.replace(/\s+/g, "_"))}`);
+        } catch (_) {
+          summary = null;
+        }
+        renderApiResult("wiki", {
+          title: summary?.title || best.title,
+          meta: compactJoin(["Wikipedia", summary?.description], " · "),
+          summary: shortText(summary?.extract || stripHtml(best.snippet), 260),
+          image: summary?.thumbnail?.source ? { src: summary.thumbnail.source, alt: summary.title || best.title } : null,
+          rows: [
+            { label: "匹配词条", value: `${matches.length} 个` },
+            { label: "页面编号", value: best.pageid },
+            { label: "语言", value: "中文维基百科" },
+          ],
+          chips: matches.slice(0, 5).map((item) => item.title),
+          sections: [{
+            title: "相关结果",
+            items: matches.slice(1, 5).map((item) => ({
+              label: item.title,
+              value: shortText(stripHtml(item.snippet), 120),
+              meta: item.timestamp ? item.timestamp.slice(0, 10) : "",
+            })),
+          }],
+        });
+      },
+      books: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入书名或作者");
+        const data = await fetchJsonWithTimeout(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=6`);
+        const docs = data?.docs || [];
+        const book = docs[0];
+        if (!book) throw new Error("没有找到图书");
+        const authors = (book.author_name || []).slice(0, 3);
+        const cover = book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : "";
+        renderApiResult("books", {
+          title: book.title || query,
+          meta: compactJoin(["Open Library", authors.join("、")], " · "),
+          image: cover ? { src: cover, alt: book.title || query } : null,
+          rows: [
+            { label: "作者", value: authors.join("、") },
+            { label: "首版年份", value: book.first_publish_year },
+            { label: "版本数", value: book.edition_count ? `${formatNumber(book.edition_count, 0)} 个` : "" },
+            { label: "语言", value: (book.language || []).slice(0, 5).join("、") },
+          ],
+          chips: (book.subject || []).slice(0, 10),
+          sections: [{
+            title: "更多结果",
+            items: docs.slice(1, 6).map((item) => ({
+              label: (item.author_name || []).slice(0, 2).join("、") || "作者未列出",
+              value: item.title,
+              meta: compactJoin([item.first_publish_year, item.edition_count ? `${item.edition_count} 个版本` : ""], " · "),
+            })),
+          }],
+          note: data?.numFound ? `共找到约 ${formatNumber(data.numFound, 0)} 条记录。` : "",
+        });
+      },
+      art: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入艺术家或主题");
+        const data = await fetchJsonWithTimeout(`https://api.artic.edu/api/v1/artworks/search?q=${encodeURIComponent(query)}&limit=6&fields=id,title,artist_display,date_display,image_id,thumbnail,place_of_origin,medium_display`);
+        const works = data?.data || [];
+        const work = works.find((item) => item.image_id) || works[0];
+        if (!work) throw new Error("没有找到馆藏作品");
+        const image = work.image_id ? `${data.config?.iiif_url || "https://www.artic.edu/iiif/2"}/${work.image_id}/full/420,/0/default.jpg` : "";
+        renderApiResult("art", {
+          title: work.title || query,
+          meta: compactJoin(["Art Institute of Chicago", work.date_display], " · "),
+          summary: shortText(work.thumbnail?.alt_text || work.medium_display || "", 220),
+          image: image ? { src: image, alt: work.thumbnail?.alt_text || work.title || query } : null,
+          rows: [
+            { label: "作者", value: work.artist_display },
+            { label: "年代", value: work.date_display },
+            { label: "地区", value: work.place_of_origin },
+            { label: "材质", value: work.medium_display },
+          ],
+          sections: [{
+            title: "相关馆藏",
+            items: works.slice(0, 6).map((item) => ({
+              label: item.date_display || "年代未列出",
+              value: item.title,
+              meta: item.artist_display,
+            })),
+          }],
+        });
+      },
+      anime: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入动漫名");
+        const data = await fetchJsonWithTimeout(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=6&sfw=true`);
+        const items = data?.data || [];
+        const anime = items[0];
+        if (!anime) throw new Error("没有找到动漫资料");
+        renderApiResult("anime", {
+          title: anime.title || query,
+          meta: compactJoin(["Jikan", anime.title_japanese], " · "),
+          summary: shortText(anime.synopsis, 260),
+          image: anime.images?.jpg?.image_url ? { src: anime.images.jpg.image_url, alt: anime.title || query } : null,
+          rows: [
+            { label: "评分", value: anime.score ? `${anime.score} / 10` : "" },
+            { label: "集数", value: anime.episodes ? `${anime.episodes} 集` : "" },
+            { label: "年份", value: anime.year },
+            { label: "状态", value: anime.status },
+          ],
+          chips: (anime.genres || []).slice(0, 8).map((item) => item.name),
+          sections: [{
+            title: "相近条目",
+            items: items.slice(1, 6).map((item) => ({
+              label: compactJoin([item.type, item.year], " · "),
+              value: item.title,
+              meta: item.score ? `评分 ${item.score}` : item.status,
+            })),
+          }],
+        });
+      },
+      news: async () => {
+        const ids = await fetchJsonWithTimeout("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+        const topIds = Array.isArray(ids) ? ids.slice(0, 8) : [];
+        if (!topIds.length) throw new Error("热榜暂时没有返回内容");
+        const stories = (await Promise.all(topIds.map((id) => fetchJsonWithTimeout(`https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`).catch(() => null))))
+          .filter((item) => item && item.title)
+          .slice(0, 6);
+        if (!stories.length) throw new Error("热榜详情加载失败");
+        const top = stories[0];
+        renderApiResult("news", {
+          title: top.title,
+          meta: "Hacker News · Top Stories",
+          summary: top.url ? `来源域名：${formatHost(top.url)}` : "Ask HN / Show HN 讨论帖",
+          rows: [
+            { label: "热榜条目", value: `${stories.length} 条` },
+            { label: "最高分", value: `${formatNumber(top.score, 0)} 分` },
+            { label: "评论", value: `${formatNumber(top.descendants, 0)} 条` },
+            { label: "时间", value: formatRelativeTime(top.time) },
+          ],
+          sections: [{
+            title: "当前热榜",
+            items: stories.map((item) => ({
+              label: compactJoin([`${formatNumber(item.score, 0)} 分`, `${formatNumber(item.descendants, 0)} 评论`], " · "),
+              value: item.title,
+              meta: item.url ? formatHost(item.url) : "news.ycombinator.com",
+            })),
+          }],
+        });
+      },
+      poetry: async (formData) => {
+        const title = cleanText(formData.get("title"));
+        if (!title) throw new Error("请输入英文诗题");
+        const data = await fetchJsonWithTimeout(`https://poetrydb.org/title/${encodeURIComponent(title)}/title,author,lines,linecount`);
+        const poems = Array.isArray(data) ? data : [];
+        const poem = poems[0];
+        if (!poem) throw new Error("没有找到诗歌");
+        const lines = (poem.lines || []).filter(Boolean);
+        renderApiResult("poetry", {
+          title: poem.title || title,
+          meta: compactJoin(["PoetryDB", poem.author], " · "),
+          summary: lines.slice(0, 2).join(" / "),
+          rows: [
+            { label: "作者", value: poem.author },
+            { label: "行数", value: poem.linecount ? `${poem.linecount} 行` : `${lines.length} 行` },
+            { label: "匹配", value: `${poems.length} 首` },
+          ],
+          sections: [{
+            title: "诗句摘录",
+            items: lines.slice(0, 8).map((line, index) => ({
+              label: `第 ${index + 1} 行`,
+              value: line,
+            })),
+          }],
+        });
+      },
+      words: async (formData) => {
+        const term = cleanText(formData.get("term")).toLowerCase();
+        const mode = cleanText(formData.get("mode")) || "ml";
+        if (!term) throw new Error("请输入英文词");
+        const modeNames = {
+          ml: "语义联想",
+          rel_rhy: "押韵",
+          sl: "近似发音",
+          sp: "拼写建议",
+        };
+        const data = await fetchJsonWithTimeout(`https://api.datamuse.com/words?${encodeURIComponent(mode)}=${encodeURIComponent(term)}&max=12&md=psf`);
+        const words = Array.isArray(data) ? data : [];
+        if (!words.length) throw new Error("没有找到词语结果");
+        renderApiResult("words", {
+          title: `${term} · ${modeNames[mode] || "词语结果"}`,
+          meta: "Datamuse",
+          rows: [
+            { label: "结果数", value: `${words.length} 个` },
+            { label: "最高分", value: words[0]?.score ? formatNumber(words[0].score, 0) : "" },
+            { label: "模式", value: modeNames[mode] || mode },
+          ],
+          chips: words.slice(0, 10).map((item) => item.word),
+          sections: [{
+            title: "候选词",
+            items: words.map((item) => ({
+              label: (item.tags || []).slice(0, 3).join(" · ") || "word",
+              value: item.word,
+              meta: item.score ? `score ${formatNumber(item.score, 0)}` : "",
+            })),
+          }],
         });
       },
     };
+    apiLab.addEventListener("click", (event) => {
+      const choice = event.target.closest("[data-trivia-choice]");
+      if (!choice) return;
+      const result = choice.closest(".api-result");
+      const group = choice.closest(".api-choice-grid");
+      const feedback = result?.querySelector("[data-trivia-feedback]");
+      const isCorrect = choice.dataset.correct === "true";
+      group?.querySelectorAll("[data-trivia-choice]").forEach((button) => {
+        button.disabled = true;
+        button.classList.toggle("is-correct", button.dataset.correct === "true");
+      });
+      if (!isCorrect) choice.classList.add("is-wrong");
+      if (feedback) feedback.textContent = isCorrect ? "答对了。" : "答错了，正确答案已标出。";
+    });
     tabs.forEach((tab) => tab.addEventListener("click", () => activateApiTab(tab.dataset.apiTab)));
     forms.forEach((form) => {
       form.addEventListener("submit", (event) => {
@@ -996,7 +1362,7 @@
     loadGuestMessages();
   }
 
-  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item, .api-source-card, .api-directory-item");
+  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
   if (finePointer) {
     selectableItems.forEach((item) => {
       item.addEventListener(
@@ -1103,7 +1469,7 @@
     setAmbientState("off", "开启氛围声音", "默认关闭");
   }
 
-  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item, .api-source-card, .api-directory-item");
+  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item");
   if ("IntersectionObserver" in window && !reduceMotion) {
     const observer = new IntersectionObserver(
       (entries) => {

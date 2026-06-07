@@ -7,18 +7,18 @@
     <div class="module-copy">{{ .Content }}</div>
     {{ $total := 0 }}
     {{ range site.Data.tools }}{{ $total = add $total (len .items) }}{{ end }}
-    {{ $apiTotal := len site.Data.public_apis }}
+    {{ $apiToolTotal := 12 }}
     <div class="module-stats" aria-label="工具概览">
       <span><strong>{{ len site.Data.tools }}</strong> 个工具组</span>
       <span><strong>{{ $total }}</strong> 个入口</span>
-      <span><strong>{{ $apiTotal }}</strong> 个公开 API</span>
+      <span><strong>{{ $apiToolTotal }}</strong> 个实时工具</span>
     </div>
   </div>
 
   <div class="tools-workbench reveal-on-scroll" aria-label="工具页说明">
     <div>
       <p class="eyebrow">Workbench</p>
-      <h2>把常用入口和公开数据源收在一张工具台里</h2>
+      <h2>把常用入口和实时小工具收在一张工具台里</h2>
     </div>
     <div class="tools-workbench-steps">
       <span>收藏</span>
@@ -29,26 +29,17 @@
   </div>
 
   {{ with site.Data.public_apis }}
-    {{ $featuredApis := where . "featured" true }}
-    {{ $candidateApis := where . "featured" "ne" true }}
     <section class="public-api-lab reveal-on-scroll" data-public-api-lab>
       <div class="public-api-lab-head">
         <div>
-          <p class="eyebrow">Public APIs</p>
-          <h2>公开 API 实验室</h2>
+          <p class="eyebrow">Live Tools</p>
+          <h2>十二个实时小工具</h2>
         </div>
-        <a class="ghost-button" href="https://github.com/public-apis/public-apis" target="_blank" rel="noopener noreferrer">索引来源</a>
-      </div>
-
-      <div class="api-source-strip" aria-label="已接入实验 API">
-        {{ range $featuredApis }}
-          <a class="api-source-card" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
-            <span>{{ .category }}</span>
-            <strong>{{ .name }}</strong>
-            <em>{{ .description }}</em>
-            <small>{{ .auth }} · {{ .cors }}</small>
-          </a>
-        {{ end }}
+        <div class="api-lab-badges" aria-label="实时工具状态">
+          <span>免密</span>
+          <span>前端直连</span>
+          <span>即时结果</span>
+        </div>
       </div>
 
       <div class="api-lab-shell">
@@ -58,6 +49,13 @@
           <button type="button" role="tab" aria-selected="false" data-api-tab="country">国家资料</button>
           <button type="button" role="tab" aria-selected="false" data-api-tab="weather">天气</button>
           <button type="button" role="tab" aria-selected="false" data-api-tab="trivia">问答</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="wiki">百科</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="books">图书</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="art">艺术</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="anime">动漫</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="news">热榜</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="poetry">诗歌</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="words">词联想</button>
         </div>
 
         <div class="api-lab-panels">
@@ -90,6 +88,10 @@
                   <option>JPY</option>
                   <option>GBP</option>
                   <option>HKD</option>
+                  <option>SGD</option>
+                  <option>AUD</option>
+                  <option>CAD</option>
+                  <option>CHF</option>
                 </select>
               </label>
               <label>
@@ -101,6 +103,10 @@
                   <option>JPY</option>
                   <option>GBP</option>
                   <option>HKD</option>
+                  <option>SGD</option>
+                  <option>AUD</option>
+                  <option>CAD</option>
+                  <option>CHF</option>
                 </select>
               </label>
               <button class="primary-button" type="submit">换算</button>
@@ -140,7 +146,29 @@
           </section>
 
           <section class="api-lab-panel" data-api-panel="trivia">
-            <form class="api-lab-form api-lab-form-compact" data-api-form="trivia">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="trivia">
+              <label>
+                <span>题目类型</span>
+                <select name="category">
+                  <option value="" selected>随机</option>
+                  <option value="9">综合知识</option>
+                  <option value="17">科学自然</option>
+                  <option value="18">电脑知识</option>
+                  <option value="21">体育</option>
+                  <option value="22">地理</option>
+                  <option value="23">历史</option>
+                  <option value="31">动漫</option>
+                </select>
+              </label>
+              <label>
+                <span>难度</span>
+                <select name="difficulty">
+                  <option value="" selected>随机</option>
+                  <option value="easy">简单</option>
+                  <option value="medium">中等</option>
+                  <option value="hard">困难</option>
+                </select>
+              </label>
               <button class="primary-button" type="submit">抽一题</button>
             </form>
             <div class="api-result" data-api-result="trivia" aria-live="polite">
@@ -148,30 +176,111 @@
               <strong>Open Trivia DB</strong>
             </div>
           </section>
+
+          <section class="api-lab-panel" data-api-panel="wiki">
+            <form class="api-lab-form" data-api-form="wiki">
+              <label>
+                <span>百科词条</span>
+                <input name="topic" type="search" value="上海" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">查百科</button>
+            </form>
+            <div class="api-result" data-api-result="wiki" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Wikipedia</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="books">
+            <form class="api-lab-form" data-api-form="books">
+              <label>
+                <span>书名或作者</span>
+                <input name="query" type="search" value="three body problem" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜图书</button>
+            </form>
+            <div class="api-result" data-api-result="books" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Open Library</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="art">
+            <form class="api-lab-form" data-api-form="art">
+              <label>
+                <span>艺术家或主题</span>
+                <input name="query" type="search" value="monet" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找作品</button>
+            </form>
+            <div class="api-result" data-api-result="art" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Art Institute of Chicago</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="anime">
+            <form class="api-lab-form" data-api-form="anime">
+              <label>
+                <span>动漫名</span>
+                <input name="query" type="search" value="naruto" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜动漫</button>
+            </form>
+            <div class="api-result" data-api-result="anime" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Jikan</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="news">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="news">
+              <button class="primary-button" type="submit">刷新热榜</button>
+            </form>
+            <div class="api-result" data-api-result="news" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Hacker News</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="poetry">
+            <form class="api-lab-form" data-api-form="poetry">
+              <label>
+                <span>英文诗题</span>
+                <input name="title" type="search" value="Ozymandias" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找诗</button>
+            </form>
+            <div class="api-result" data-api-result="poetry" aria-live="polite">
+              <span>等待查询</span>
+              <strong>PoetryDB</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="words">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="words">
+              <label>
+                <span>英文词</span>
+                <input name="term" type="search" value="ocean" autocomplete="off" spellcheck="false">
+              </label>
+              <label>
+                <span>模式</span>
+                <select name="mode">
+                  <option value="ml" selected>语义联想</option>
+                  <option value="rel_rhy">押韵</option>
+                  <option value="sl">近似发音</option>
+                  <option value="sp">拼写建议</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">找词</button>
+            </form>
+            <div class="api-result" data-api-result="words" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Datamuse</strong>
+            </div>
+          </section>
         </div>
       </div>
-
-      {{ if $candidateApis }}
-        <div class="api-directory">
-          <div class="api-directory-head">
-            <div>
-              <p class="eyebrow">Candidate Pool</p>
-              <h3>更多公开 API 候选池</h3>
-            </div>
-            <span>{{ len $candidateApis }} 个候选</span>
-          </div>
-          <div class="api-directory-grid">
-            {{ range $candidateApis }}
-              <a class="api-directory-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
-                <span>{{ .category }}</span>
-                <strong>{{ .name }}</strong>
-                <em>{{ .description }}</em>
-                <small>{{ .auth }} · {{ .cors }}</small>
-              </a>
-            {{ end }}
-          </div>
-        </div>
-      {{ end }}
     </section>
   {{ end }}
 

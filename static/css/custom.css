@@ -2374,57 +2374,24 @@ body.home .site-header {
   font-size: clamp(24px, 3vw, 36px);
 }
 
-.api-source-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 10px;
-  margin-bottom: 18px;
+.api-lab-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
-.api-source-card {
-  min-height: 152px;
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 14px;
-  border: 1px solid var(--panel-border-soft);
+.api-lab-badges span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--chip-border);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--panel-strong) 78%, transparent);
-  color: var(--text);
-  box-shadow: 0 10px 28px rgba(44, 42, 35, .08);
-}
-
-.api-source-card:hover,
-.api-source-card:focus-visible {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--vapor-cyan) 42%, var(--panel-border));
-  background: var(--panel-hover);
-  box-shadow: var(--shadow-soft), var(--glow);
-}
-
-.api-source-card span,
-.api-source-card small {
-  color: var(--accent-2);
+  background: var(--field-bg);
+  color: var(--accent);
   font-size: 12px;
   font-weight: 900;
-}
-
-.api-source-card strong {
-  color: var(--text);
-  font-size: 16px;
-  line-height: 1.25;
-}
-
-.api-source-card em {
-  color: var(--muted);
-  font-size: 13px;
-  font-style: normal;
-  line-height: 1.55;
-}
-
-.api-source-card small {
-  align-self: end;
-  color: var(--accent);
 }
 
 .api-lab-shell {
@@ -2549,6 +2516,12 @@ body.home .site-header {
   font-size: 13px;
 }
 
+.api-result-summary {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 .api-result.is-loading {
   border-style: dashed;
 }
@@ -2588,8 +2561,8 @@ body.home .site-header {
 }
 
 .api-result-image {
-  width: min(130px, 100%);
-  max-height: 86px;
+  width: min(180px, 100%);
+  max-height: 210px;
   object-fit: contain;
   padding: 8px;
   border: 1px solid var(--chip-border);
@@ -2601,85 +2574,128 @@ body.home .site-header {
   width: min(100%, 340px);
 }
 
-.api-directory {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--panel-border-soft);
-}
-
-.api-directory-head {
+.api-result-chips {
   display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.api-directory-head h3 {
-  margin: 0;
-  font-size: clamp(19px, 2.2vw, 26px);
-}
-
-.api-directory-head > span {
-  flex: 0 0 auto;
-  padding: 6px 10px;
+.api-result-chips span {
+  padding: 5px 8px;
   border: 1px solid var(--chip-border);
   border-radius: var(--radius);
-  background: var(--field-bg);
+  background: color-mix(in srgb, var(--field-bg) 82%, transparent);
   color: var(--accent);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
-.api-directory-grid {
+.api-result-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 8px;
 }
 
-.api-directory-item {
-  min-height: 118px;
+.api-result-section h4 {
+  margin: 0;
+  color: var(--accent-2);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.api-result-list {
   display: grid;
-  align-content: start;
+  gap: 8px;
+}
+
+.api-result-list-item {
+  display: grid;
   gap: 4px;
-  padding: 12px;
+  padding: 10px;
   border: 1px solid var(--panel-border-soft);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--field-bg) 86%, transparent);
-  color: var(--text);
+  background: color-mix(in srgb, var(--field-bg) 76%, transparent);
 }
 
-.api-directory-item:hover,
-.api-directory-item:focus-visible {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--vapor-cyan) 38%, var(--panel-border));
-  background: var(--panel-hover);
-  box-shadow: var(--shadow-soft);
-}
-
-.api-directory-item span,
-.api-directory-item small {
+.api-result-list-item small {
   color: var(--accent-2);
   font-size: 11px;
   font-weight: 900;
 }
 
-.api-directory-item strong {
+.api-result-list-item strong {
   color: var(--text);
-  font-size: 15px;
-  line-height: 1.25;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.api-directory-item em {
+.api-result-list-item em {
   color: var(--muted);
   font-size: 12px;
   font-style: normal;
   line-height: 1.45;
 }
 
-.api-directory-item small {
-  align-self: end;
+.api-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.api-choice {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid var(--chip-border);
+  border-radius: var(--radius);
+  background: var(--field-bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: var(--paw-cursor);
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.api-choice:hover,
+.api-choice:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--vapor-cyan) 46%, var(--chip-border));
+  background: var(--panel-hover);
+}
+
+.api-choice span {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
+  font-size: 12px;
+}
+
+.api-choice[disabled] {
+  cursor: default;
+  opacity: .78;
+}
+
+.api-choice.is-correct {
+  border-color: color-mix(in srgb, var(--accent) 58%, var(--chip-border));
+  background: color-mix(in srgb, var(--dream-mint) 38%, var(--field-bg));
+}
+
+.api-choice.is-wrong {
+  border-color: color-mix(in srgb, var(--accent-2) 58%, var(--chip-border));
+  background: color-mix(in srgb, var(--accent-2) 10%, var(--field-bg));
+}
+
+.api-choice-feedback {
+  color: var(--accent);
+  font-weight: 900;
 }
 
 .tools-grid {
@@ -5412,8 +5428,8 @@ blockquote,
     display: grid;
   }
 
-  .public-api-lab-head .ghost-button {
-    justify-self: start;
+  .api-lab-badges {
+    justify-content: flex-start;
   }
 
   .api-lab-shell {
@@ -5435,15 +5451,6 @@ blockquote,
 
   .api-result {
     min-height: 150px;
-  }
-
-  .api-directory-head {
-    display: grid;
-    align-items: start;
-  }
-
-  .api-directory-head > span {
-    justify-self: start;
   }
 
   .tools-grid {
