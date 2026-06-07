@@ -2570,6 +2570,38 @@ body.home .site-header {
   background: rgba(255,255,255,.52);
 }
 
+.api-color-swatch {
+  width: min(100%, 220px);
+  min-height: 92px;
+  border: 1px solid var(--chip-border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--api-swatch) 86%, white), var(--api-swatch)),
+    var(--api-swatch);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.34);
+}
+
+.api-result-link {
+  width: fit-content;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--chip-border);
+  border-radius: var(--radius);
+  background: var(--field-bg);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.api-result-link:hover,
+.api-result-link:focus-visible {
+  border-color: color-mix(in srgb, var(--vapor-cyan) 46%, var(--chip-border));
+  background: var(--panel-hover);
+}
+
 .api-result audio {
   width: min(100%, 340px);
 }

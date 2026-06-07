@@ -590,6 +590,37 @@
       if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
       return `${Math.floor(diff / 86400)} 天前`;
     };
+    const formatDateTime = (value) => {
+      if (!value) return "";
+      try {
+        return new Intl.DateTimeFormat("zh-CN", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(new Date(value));
+      } catch (_) {
+        return String(value).slice(0, 16);
+      }
+    };
+    const titleCase = (value) => cleanText(value)
+      .split(/[\s_-]+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+    const boolText = (value) => value ? "是" : "否";
+    const normalizeDomain = (value) => cleanText(value)
+      .replace(/^mailto:/i, "")
+      .replace(/^https?:\/\//i, "")
+      .split(/[/?#]/)[0]
+      .split("@")
+      .pop()
+      .toLowerCase();
+    const parseTraceText = (text) => Object.fromEntries(String(text || "")
+      .split(/\n+/)
+      .map((line) => line.split("="))
+      .filter((parts) => parts.length >= 2)
+      .map(([key, ...rest]) => [key, rest.join("=")]));
     const weatherNames = {
       0: "晴朗",
       1: "大体晴朗",
@@ -665,6 +696,12 @@
       const image = payload.image
         ? `<img class="api-result-image" src="${escapeHtml(payload.image.src)}" alt="${escapeHtml(payload.image.alt || "")}" loading="lazy">`
         : "";
+      const swatch = payload.swatch
+        ? `<span class="api-color-swatch" style="--api-swatch:${escapeHtml(payload.swatch)}"></span>`
+        : "";
+      const link = payload.link?.href
+        ? `<a class="api-result-link" href="${escapeHtml(payload.link.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(payload.link.label || "打开链接")}</a>`
+        : "";
       const audio = payload.audio
         ? `<audio controls preload="none" src="${escapeHtml(payload.audio)}"></audio>`
         : "";
@@ -674,7 +711,9 @@
         <span>${escapeHtml(payload.meta || "公开 API 返回")}</span>
         <strong>${escapeHtml(payload.title)}</strong>
         ${summary}
+        ${swatch}
         ${image}
+        ${link}
         ${rows ? `<div class="api-result-grid">${rows}</div>` : ""}
         ${chips ? `<div class="api-result-chips">${chips}</div>` : ""}
         ${sections}
@@ -1112,6 +1151,443 @@
               meta: item.score ? `score ${formatNumber(item.score, 0)}` : "",
             })),
           }],
+        });
+      },
+      holidays: async (formData) => {
+        const year = Number(formData.get("year") || new Date().getFullYear());
+        const country = cleanText(formData.get("country")).toUpperCase();
+        if (!Number.isInteger(year) || year < 2000 || year > 2100) throw new Error("请输入 2000 到 2100 之间的年份");
+        if (!/^[A-Z]{2}$/.test(country)) throw new Error("请选择两位国家代码");
+        const data = await fetchJsonWithTimeout(`https://date.nager.at/api/v3/PublicHolidays/${encodeURIComponent(year)}/${encodeURIComponent(country)}`);
+        const holidays = Array.isArray(data) ? data : [];
+        if (!holidays.length) throw new Error("没有找到该国家/年份的公共假日");
+        const next = holidays.find((item) => new Date(`${item.date}T23:59:59`) >= new Date()) || holidays[0];
+        renderApiResult("holidays", {
+          title: `${country} · ${year} 公共假日`,
+          meta: "Nager.Date",
+          rows: [
+            { label: "假日数量", value: `${holidays.length} 天` },
+            { label: "下一个/首个", value: next ? `${next.date} · ${next.name}` : "" },
+            { label: "全国性", value: `${holidays.filter((item) => item.global).length} 天` },
+          ],
+          sections: [{
+            title: "假日列表",
+            items: holidays.slice(0, 10).map((item) => ({
+              label: compactJoin([item.date, item.global ? "全国" : "地区"], " · "),
+              value: item.localName || item.name,
+              meta: item.name,
+            })),
+          }],
+        });
+      },
+      network: async () => {
+        const [geo, traceText] = await Promise.all([
+          fetchJsonWithTimeout("https://get.geojs.io/v1/ip/geo.json"),
+          fetchJsonWithTimeout("https://one.one.one.one/cdn-cgi/trace"),
+        ]);
+        const trace = typeof traceText === "string" ? parseTraceText(traceText) : {};
+        renderApiResult("network", {
+          title: geo?.ip || trace.ip || "当前网络",
+          meta: compactJoin(["GeoJS", "Cloudflare Trace"], " · "),
+          rows: [
+            { label: "城市", value: compactJoin([geo?.city, geo?.region], " · ") },
+            { label: "国家/地区", value: compactJoin([geo?.country, geo?.country_code], " · ") },
+            { label: "ASN", value: geo?.asn ? `AS${geo.asn}` : "" },
+            { label: "组织", value: geo?.organization_name },
+            { label: "HTTP 协议", value: trace.http },
+            { label: "TLS", value: trace.tls },
+          ],
+          chips: [trace.colo ? `Cloudflare ${trace.colo}` : "", trace.loc, trace.visit_scheme, trace.warp ? `WARP ${trace.warp}` : ""],
+          note: "这是浏览器当前出口网络信息，可能受代理、CDN 或运营商出口影响。",
+        });
+      },
+      emailcheck: async (formData) => {
+        const domain = normalizeDomain(formData.get("email"));
+        if (!domain || !domain.includes(".")) throw new Error("请输入邮箱地址或域名");
+        const data = await fetchJsonWithTimeout(`https://open.kickbox.com/v1/disposable/${encodeURIComponent(domain)}`);
+        renderApiResult("emailcheck", {
+          title: domain,
+          meta: "Kickbox Open",
+          rows: [
+            { label: "临时邮箱域名", value: boolText(data?.disposable) },
+            { label: "检测结论", value: data?.disposable ? "不建议用于注册或联系" : "未命中临时邮箱库" },
+          ],
+          note: "此接口只判断域名是否出现在临时邮箱数据库，不验证邮箱账号是否真实存在。",
+        });
+      },
+      colors: async () => {
+        const data = await fetchJsonWithTimeout("https://x-colors.yurace.pro/api/random");
+        if (!data?.hex) throw new Error("配色服务没有返回颜色");
+        renderApiResult("colors", {
+          title: data.hex,
+          meta: "xColors",
+          swatch: data.hex,
+          rows: [
+            { label: "HEX", value: data.hex },
+            { label: "RGB", value: data.rgb },
+            { label: "HSL", value: data.hsl },
+          ],
+        });
+      },
+      emoji: async () => {
+        const data = await fetchJsonWithTimeout("https://emojihub.yurace.pro/api/random");
+        const symbol = Array.isArray(data?.htmlCode) && data.htmlCode.length
+          ? data.htmlCode.map((code) => {
+              const span = document.createElement("span");
+              span.innerHTML = code;
+              return span.textContent || "";
+            }).join("")
+          : (data?.unicode || []).join(" ");
+        if (!symbol) throw new Error("表情服务没有返回结果");
+        renderApiResult("emoji", {
+          title: `${symbol} ${data.name || "emoji"}`,
+          meta: "EmojiHub",
+          rows: [
+            { label: "分类", value: data.category },
+            { label: "分组", value: data.group },
+            { label: "Unicode", value: (data.unicode || []).join(" / ") },
+          ],
+        });
+      },
+      qrcode: async (formData) => {
+        const text = cleanText(formData.get("text"));
+        if (!text) throw new Error("请输入要编码的文本或链接");
+        if (text.length > 800) throw new Error("文本太长，建议控制在 800 字符以内");
+        const src = `https://quickchart.io/qr?size=220&margin=2&text=${encodeURIComponent(text)}`;
+        renderApiResult("qrcode", {
+          title: "二维码已生成",
+          meta: "QuickChart QR",
+          summary: shortText(text, 180),
+          image: { src, alt: "QR code" },
+          link: { href: src, label: "打开二维码图片" },
+          rows: [
+            { label: "字符数", value: `${text.length} 个` },
+            { label: "图片尺寸", value: "220 x 220" },
+          ],
+        });
+      },
+      jokes: async (formData) => {
+        const category = cleanText(formData.get("category")) || "Programming";
+        const type = cleanText(formData.get("type")) || "single";
+        const params = new URLSearchParams({
+          blacklistFlags: "nsfw,religious,political,racist,sexist,explicit",
+          type,
+        });
+        const data = await fetchJsonWithTimeout(`https://v2.jokeapi.dev/joke/${encodeURIComponent(category)}?${params.toString()}`);
+        if (data?.error) throw new Error(data.message || "笑话接口返回错误");
+        const text = data.type === "twopart" ? `${data.setup}\n${data.delivery}` : data.joke;
+        if (!text) throw new Error("没有拿到笑话文本");
+        renderApiResult("jokes", {
+          title: data.category || category,
+          meta: "JokeAPI",
+          summary: text,
+          rows: [
+            { label: "类型", value: data.type === "twopart" ? "问答" : "单句" },
+            { label: "安全过滤", value: "已过滤敏感 flags" },
+            { label: "语言", value: data.lang || "en" },
+          ],
+        });
+      },
+      randomuser: async (formData) => {
+        const nat = cleanText(formData.get("nat")).toLowerCase() || "us";
+        const data = await fetchJsonWithTimeout(`https://randomuser.me/api/?nat=${encodeURIComponent(nat)}&results=1&noinfo`);
+        const user = data?.results?.[0];
+        if (!user) throw new Error("没有生成用户资料");
+        const fullName = [user.name?.title, user.name?.first, user.name?.last].filter(Boolean).join(" ");
+        renderApiResult("randomuser", {
+          title: fullName,
+          meta: "RandomUser",
+          image: user.picture?.large ? { src: user.picture.large, alt: fullName } : null,
+          rows: [
+            { label: "性别", value: user.gender },
+            { label: "邮箱", value: user.email },
+            { label: "城市", value: compactJoin([user.location?.city, user.location?.country], " · ") },
+            { label: "用户名", value: user.login?.username },
+          ],
+          note: "生成的是测试资料，不代表真实身份。",
+        });
+      },
+      nameprofile: async (formData) => {
+        const name = cleanText(formData.get("name")).toLowerCase();
+        if (!/^[a-z][a-z -]{0,40}$/i.test(name)) throw new Error("请输入英文名");
+        const [age, gender, nation] = await Promise.all([
+          fetchJsonWithTimeout(`https://api.agify.io?name=${encodeURIComponent(name)}`),
+          fetchJsonWithTimeout(`https://api.genderize.io?name=${encodeURIComponent(name)}`),
+          fetchJsonWithTimeout(`https://api.nationalize.io?name=${encodeURIComponent(name)}`),
+        ]);
+        const countries = (nation?.country || []).slice(0, 5);
+        renderApiResult("nameprofile", {
+          title: titleCase(name),
+          meta: "Agify · Genderize · Nationalize",
+          rows: [
+            { label: "估计年龄", value: age?.age ? `${age.age} 岁` : "未返回" },
+            { label: "年龄样本", value: age?.count ? `${formatNumber(age.count, 0)} 条` : "" },
+            { label: "性别倾向", value: gender?.gender ? `${gender.gender} · ${formatNumber((gender.probability || 0) * 100, 1)}%` : "未返回" },
+            { label: "国籍候选", value: countries[0]?.country_id ? `${countries[0].country_id} · ${formatNumber(countries[0].probability * 100, 1)}%` : "未返回" },
+          ],
+          sections: [{
+            title: "国籍概率",
+            items: countries.map((item) => ({
+              label: item.country_id,
+              value: `${formatNumber(item.probability * 100, 1)}%`,
+            })),
+          }],
+          note: "这是按公开姓名统计做出的概率估计，不适合用于身份判断。",
+        });
+      },
+      gamedeals: async (formData) => {
+        const title = cleanText(formData.get("title"));
+        const price = Number(formData.get("price") || 15);
+        if (!title) throw new Error("请输入游戏名");
+        if (!Number.isFinite(price) || price < 0) throw new Error("请输入有效价格");
+        const data = await fetchJsonWithTimeout(`https://www.cheapshark.com/api/1.0/deals?storeID=1&title=${encodeURIComponent(title)}&upperPrice=${encodeURIComponent(price)}&pageSize=5`);
+        const deals = Array.isArray(data) ? data : [];
+        if (!deals.length) throw new Error("没有找到符合条件的折扣");
+        const top = deals[0];
+        renderApiResult("gamedeals", {
+          title: top.title,
+          meta: "CheapShark · Steam deals",
+          image: top.thumb ? { src: top.thumb, alt: top.title } : null,
+          rows: [
+            { label: "现价", value: `$${top.salePrice}` },
+            { label: "原价", value: `$${top.normalPrice}` },
+            { label: "折扣", value: top.savings ? `${formatNumber(top.savings, 0)}%` : "" },
+            { label: "评分", value: top.steamRatingPercent ? `${top.steamRatingPercent}%` : "" },
+          ],
+          sections: [{
+            title: "候选折扣",
+            items: deals.map((item) => ({
+              label: `$${item.salePrice} / $${item.normalPrice}`,
+              value: item.title,
+              meta: item.savings ? `节省 ${formatNumber(item.savings, 0)}%` : "",
+            })),
+          }],
+        });
+      },
+      freegames: async (formData) => {
+        const platform = cleanText(formData.get("platform")) || "browser";
+        const category = cleanText(formData.get("category")) || "shooter";
+        const data = await fetchJsonWithTimeout(`https://www.freetogame.com/api/games?platform=${encodeURIComponent(platform)}&category=${encodeURIComponent(category)}`);
+        const games = Array.isArray(data) ? data.slice(0, 6) : [];
+        if (!games.length) throw new Error("没有找到免费游戏");
+        const first = games[0];
+        renderApiResult("freegames", {
+          title: first.title,
+          meta: `FreeToGame · ${titleCase(platform)} · ${titleCase(category)}`,
+          summary: shortText(first.short_description, 180),
+          image: first.thumbnail ? { src: first.thumbnail, alt: first.title } : null,
+          link: first.game_url ? { href: first.game_url, label: "打开游戏页面" } : null,
+          rows: [
+            { label: "平台", value: first.platform },
+            { label: "类型", value: first.genre },
+            { label: "发行商", value: first.publisher },
+            { label: "发布日期", value: first.release_date },
+          ],
+          sections: [{
+            title: "更多免费游戏",
+            items: games.map((item) => ({
+              label: compactJoin([item.genre, item.platform], " · "),
+              value: item.title,
+              meta: shortText(item.short_description, 90),
+            })),
+          }],
+        });
+      },
+      giveaways: async (formData) => {
+        const platform = cleanText(formData.get("platform")) || "pc";
+        const data = await fetchJsonWithTimeout(`https://www.gamerpower.com/api/giveaways?platform=${encodeURIComponent(platform)}&type=game`);
+        const items = Array.isArray(data) ? data.slice(0, 6) : [];
+        if (!items.length) throw new Error("没有找到当前限免赠品");
+        const first = items[0];
+        renderApiResult("giveaways", {
+          title: first.title,
+          meta: `GamerPower · ${platform}`,
+          summary: shortText(first.description, 200),
+          image: first.thumbnail ? { src: first.thumbnail, alt: first.title } : null,
+          link: first.open_giveaway_url ? { href: first.open_giveaway_url, label: "打开领取页" } : null,
+          rows: [
+            { label: "价值", value: first.worth },
+            { label: "平台", value: first.platforms },
+            { label: "结束时间", value: first.end_date },
+            { label: "状态", value: first.status },
+          ],
+          sections: [{
+            title: "更多限免",
+            items: items.map((item) => ({
+              label: compactJoin([item.worth, item.platforms], " · "),
+              value: item.title,
+              meta: item.end_date ? `结束：${item.end_date}` : item.status,
+            })),
+          }],
+        });
+      },
+      spaceNews: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入航天新闻关键词");
+        const data = await fetchJsonWithTimeout(`https://api.spaceflightnewsapi.net/v4/articles/?limit=5&search=${encodeURIComponent(query)}`);
+        const articles = data?.results || [];
+        if (!articles.length) throw new Error("没有找到航天新闻");
+        const top = articles[0];
+        renderApiResult("spaceNews", {
+          title: top.title,
+          meta: "Spaceflight News",
+          summary: shortText(top.summary, 240),
+          image: top.image_url ? { src: top.image_url, alt: top.title } : null,
+          link: top.url ? { href: top.url, label: "打开原文" } : null,
+          rows: [
+            { label: "来源", value: top.news_site },
+            { label: "发布时间", value: formatDateTime(top.published_at) },
+            { label: "匹配数量", value: data?.count ? `${formatNumber(data.count, 0)} 条` : "" },
+          ],
+          sections: [{
+            title: "相关新闻",
+            items: articles.map((item) => ({
+              label: compactJoin([item.news_site, formatDateTime(item.published_at)], " · "),
+              value: item.title,
+              meta: shortText(item.summary, 110),
+            })),
+          }],
+        });
+      },
+      launches: async () => {
+        const data = await fetchJsonWithTimeout("https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=5&mode=list");
+        const launches = data?.results || [];
+        if (!launches.length) throw new Error("没有找到近期发射任务");
+        const next = launches[0];
+        renderApiResult("launches", {
+          title: next.name,
+          meta: "Launch Library 2",
+          summary: next.mission?.description ? shortText(next.mission.description, 220) : "",
+          rows: [
+            { label: "窗口时间", value: formatDateTime(next.window_start || next.net) },
+            { label: "状态", value: next.status?.name },
+            { label: "发射服务商", value: next.launch_service_provider?.name },
+            { label: "发射场", value: next.pad?.name },
+          ],
+          sections: [{
+            title: "近期任务",
+            items: launches.map((item) => ({
+              label: compactJoin([formatDateTime(item.window_start || item.net), item.status?.name], " · "),
+              value: item.name,
+              meta: item.pad?.location?.name || item.launch_service_provider?.name,
+            })),
+          }],
+        });
+      },
+      nobel: async (formData) => {
+        const year = Number(formData.get("year") || 2024);
+        const category = cleanText(formData.get("category"));
+        if (!Number.isInteger(year) || year < 1901 || year > 2026) throw new Error("请输入 1901 到 2026 之间的年份");
+        const params = new URLSearchParams({ nobelPrizeYear: String(year) });
+        if (category) params.set("nobelPrizeCategory", category);
+        const data = await fetchJsonWithTimeout(`https://api.nobelprize.org/2.1/nobelPrizes?${params.toString()}`);
+        const prizes = data?.nobelPrizes || [];
+        if (!prizes.length) throw new Error("没有找到该年份/奖项的诺贝尔奖记录");
+        const first = prizes[0];
+        const laureates = prizes.flatMap((prize) => prize.laureates || []);
+        renderApiResult("nobel", {
+          title: `${year} · ${first.categoryFullName?.en || first.category?.en}`,
+          meta: "Nobel Prize API",
+          rows: [
+            { label: "奖项数", value: `${prizes.length} 项` },
+            { label: "获奖者数", value: `${laureates.length} 位/组` },
+            { label: "奖金", value: first.prizeAmount ? `${formatNumber(first.prizeAmount, 0)} SEK` : "" },
+          ],
+          sections: [{
+            title: "获奖记录",
+            items: prizes.map((prize) => ({
+              label: prize.category?.en,
+              value: (prize.laureates || []).map((item) => item.knownName?.en || item.orgName?.en || item.fullName?.en).filter(Boolean).join("、") || "未列出",
+              meta: shortText((prize.laureates || []).map((item) => item.motivation?.en).filter(Boolean).join(" / "), 160),
+            })),
+          }],
+        });
+      },
+      openalex: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入学术关键词");
+        const data = await fetchJsonWithTimeout(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=5&select=id,display_name,publication_year,cited_by_count,authorships,primary_location`);
+        const works = data?.results || [];
+        if (!works.length) throw new Error("没有找到学术记录");
+        const first = works[0];
+        const authors = (first.authorships || []).map((item) => item.author?.display_name).filter(Boolean).slice(0, 3);
+        renderApiResult("openalex", {
+          title: first.display_name,
+          meta: "OpenAlex",
+          link: first.id ? { href: first.id, label: "打开 OpenAlex 记录" } : null,
+          rows: [
+            { label: "年份", value: first.publication_year },
+            { label: "引用数", value: formatNumber(first.cited_by_count, 0) },
+            { label: "作者", value: authors.join("、") },
+            { label: "来源", value: first.primary_location?.source?.display_name },
+          ],
+          sections: [{
+            title: "相关论文",
+            items: works.map((item) => ({
+              label: compactJoin([item.publication_year, item.cited_by_count ? `${formatNumber(item.cited_by_count, 0)} 引用` : ""], " · "),
+              value: item.display_name,
+              meta: (item.authorships || []).map((entry) => entry.author?.display_name).filter(Boolean).slice(0, 3).join("、"),
+            })),
+          }],
+        });
+      },
+      species: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入物种关键词");
+        const data = await fetchJsonWithTimeout(`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(query)}&limit=6`);
+        const items = data?.results || [];
+        if (!items.length) throw new Error("没有找到物种记录");
+        const first = items[0];
+        renderApiResult("species", {
+          title: first.scientificName || first.canonicalName || query,
+          meta: "GBIF",
+          rows: [
+            { label: "分类等级", value: first.rank },
+            { label: "界", value: first.kingdom },
+            { label: "科", value: first.family },
+            { label: "状态", value: first.taxonomicStatus },
+            { label: "匹配数量", value: data.count ? `${formatNumber(data.count, 0)} 条` : "" },
+          ],
+          chips: [first.phylum, first.class, first.order, first.genus, first.species].filter(Boolean),
+          sections: [{
+            title: "候选物种",
+            items: items.map((item) => ({
+              label: compactJoin([item.rank, item.taxonomicStatus], " · "),
+              value: item.scientificName || item.canonicalName,
+              meta: compactJoin([item.kingdom, item.family], " · "),
+            })),
+          }],
+        });
+      },
+      radio: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入电台关键词");
+        const data = await fetchJsonWithTimeout(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=10&hidebroken=true&order=clickcount&reverse=true`);
+        const stations = Array.isArray(data) ? data : [];
+        const playable = stations.find((item) => cleanText(item.url_resolved || item.url).startsWith("https://")) || stations[0];
+        if (!playable) throw new Error("没有找到电台");
+        const audioUrl = cleanText(playable.url_resolved || playable.url);
+        renderApiResult("radio", {
+          title: playable.name,
+          meta: "Radio Browser",
+          rows: [
+            { label: "国家", value: compactJoin([playable.country, playable.countrycode], " · ") },
+            { label: "语言", value: playable.language },
+            { label: "码率", value: playable.bitrate ? `${playable.bitrate} kbps` : "" },
+            { label: "点击量", value: formatNumber(playable.clickcount, 0) },
+          ],
+          chips: cleanText(playable.tags).split(",").slice(0, 10),
+          audio: audioUrl.startsWith("https://") ? audioUrl : "",
+          link: playable.homepage ? { href: playable.homepage, label: "打开电台主页" } : null,
+          sections: [{
+            title: "候选电台",
+            items: stations.slice(0, 6).map((item) => ({
+              label: compactJoin([item.countrycode, item.bitrate ? `${item.bitrate} kbps` : ""], " · "),
+              value: item.name,
+              meta: cleanText(item.tags).split(",").slice(0, 4).join("、"),
+            })),
+          }],
+          note: audioUrl.startsWith("https://") ? "音频不会自动播放，需要手动点击播放。" : "该电台只返回非 HTTPS 音频流，当前页面不直接播放以避免混合内容。",
         });
       },
     };

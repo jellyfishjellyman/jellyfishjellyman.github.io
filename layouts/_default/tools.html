@@ -7,7 +7,7 @@
     <div class="module-copy">{{ .Content }}</div>
     {{ $total := 0 }}
     {{ range site.Data.tools }}{{ $total = add $total (len .items) }}{{ end }}
-    {{ $apiToolTotal := 12 }}
+    {{ $apiToolTotal := 30 }}
     <div class="module-stats" aria-label="工具概览">
       <span><strong>{{ len site.Data.tools }}</strong> 个工具组</span>
       <span><strong>{{ $total }}</strong> 个入口</span>
@@ -33,7 +33,7 @@
       <div class="public-api-lab-head">
         <div>
           <p class="eyebrow">Live Tools</p>
-          <h2>十二个实时小工具</h2>
+          <h2>三十个实时小工具</h2>
         </div>
         <div class="api-lab-badges" aria-label="实时工具状态">
           <span>免密</span>
@@ -56,6 +56,24 @@
           <button type="button" role="tab" aria-selected="false" data-api-tab="news">热榜</button>
           <button type="button" role="tab" aria-selected="false" data-api-tab="poetry">诗歌</button>
           <button type="button" role="tab" aria-selected="false" data-api-tab="words">词联想</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="holidays">节假日</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="network">网络诊断</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="emailcheck">邮箱检测</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="colors">配色生成</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="emoji">表情查询</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="qrcode">二维码</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="jokes">编程笑话</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="randomuser">随机用户</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="nameprofile">姓名画像</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="gamedeals">游戏折扣</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="freegames">免费游戏</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="giveaways">限免赠品</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="spaceNews">航天新闻</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="launches">发射日程</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="nobel">诺贝尔奖</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="openalex">学术搜索</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="species">物种搜索</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="radio">网络电台</button>
         </div>
 
         <div class="api-lab-panels">
@@ -277,6 +295,309 @@
             <div class="api-result" data-api-result="words" aria-live="polite">
               <span>等待查询</span>
               <strong>Datamuse</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="holidays">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="holidays">
+              <label>
+                <span>年份</span>
+                <input name="year" type="number" min="2000" max="2100" step="1" value="2026">
+              </label>
+              <label>
+                <span>国家代码</span>
+                <select name="country">
+                  <option value="US" selected>US</option>
+                  <option value="CN">CN</option>
+                  <option value="JP">JP</option>
+                  <option value="GB">GB</option>
+                  <option value="DE">DE</option>
+                  <option value="FR">FR</option>
+                  <option value="CA">CA</option>
+                  <option value="AU">AU</option>
+                  <option value="SG">SG</option>
+                  <option value="KR">KR</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">查假日</button>
+            </form>
+            <div class="api-result" data-api-result="holidays" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Nager.Date</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="network">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="network">
+              <button class="primary-button" type="submit">检测网络</button>
+            </form>
+            <div class="api-result" data-api-result="network" aria-live="polite">
+              <span>等待查询</span>
+              <strong>GeoJS + Cloudflare Trace</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="emailcheck">
+            <form class="api-lab-form" data-api-form="emailcheck">
+              <label>
+                <span>邮箱或域名</span>
+                <input name="email" type="search" value="test@example.com" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">检测</button>
+            </form>
+            <div class="api-result" data-api-result="emailcheck" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Kickbox Open</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="colors">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="colors">
+              <button class="primary-button" type="submit">生成配色</button>
+            </form>
+            <div class="api-result" data-api-result="colors" aria-live="polite">
+              <span>等待查询</span>
+              <strong>xColors</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="emoji">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="emoji">
+              <button class="primary-button" type="submit">随机表情</button>
+            </form>
+            <div class="api-result" data-api-result="emoji" aria-live="polite">
+              <span>等待查询</span>
+              <strong>EmojiHub</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="qrcode">
+            <form class="api-lab-form" data-api-form="qrcode">
+              <label>
+                <span>文本或链接</span>
+                <input name="text" type="search" value="https://gwbblog.top/" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">生成</button>
+            </form>
+            <div class="api-result" data-api-result="qrcode" aria-live="polite">
+              <span>等待查询</span>
+              <strong>QuickChart QR</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="jokes">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="jokes">
+              <label>
+                <span>类型</span>
+                <select name="category">
+                  <option value="Programming" selected>Programming</option>
+                  <option value="Misc">Misc</option>
+                  <option value="Pun">Pun</option>
+                </select>
+              </label>
+              <label>
+                <span>格式</span>
+                <select name="type">
+                  <option value="single" selected>单句</option>
+                  <option value="twopart">问答</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">来一条</button>
+            </form>
+            <div class="api-result" data-api-result="jokes" aria-live="polite">
+              <span>等待查询</span>
+              <strong>JokeAPI</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="randomuser">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="randomuser">
+              <label>
+                <span>地区</span>
+                <select name="nat">
+                  <option value="us" selected>US</option>
+                  <option value="gb">GB</option>
+                  <option value="ca">CA</option>
+                  <option value="au">AU</option>
+                  <option value="fr">FR</option>
+                  <option value="de">DE</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">生成用户</button>
+            </form>
+            <div class="api-result" data-api-result="randomuser" aria-live="polite">
+              <span>等待查询</span>
+              <strong>RandomUser</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="nameprofile">
+            <form class="api-lab-form" data-api-form="nameprofile">
+              <label>
+                <span>英文名</span>
+                <input name="name" type="search" value="michael" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">分析</button>
+            </form>
+            <div class="api-result" data-api-result="nameprofile" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Agify / Genderize / Nationalize</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="gamedeals">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="gamedeals">
+              <label>
+                <span>游戏名</span>
+                <input name="title" type="search" value="portal" autocomplete="off">
+              </label>
+              <label>
+                <span>最高价 USD</span>
+                <input name="price" type="number" min="0" max="100" step="1" value="15">
+              </label>
+              <button class="primary-button" type="submit">找折扣</button>
+            </form>
+            <div class="api-result" data-api-result="gamedeals" aria-live="polite">
+              <span>等待查询</span>
+              <strong>CheapShark</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="freegames">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="freegames">
+              <label>
+                <span>平台</span>
+                <select name="platform">
+                  <option value="browser" selected>Browser</option>
+                  <option value="pc">PC</option>
+                </select>
+              </label>
+              <label>
+                <span>类型</span>
+                <select name="category">
+                  <option value="shooter" selected>Shooter</option>
+                  <option value="mmorpg">MMORPG</option>
+                  <option value="strategy">Strategy</option>
+                  <option value="card">Card</option>
+                  <option value="racing">Racing</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">筛游戏</button>
+            </form>
+            <div class="api-result" data-api-result="freegames" aria-live="polite">
+              <span>等待查询</span>
+              <strong>FreeToGame</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="giveaways">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="giveaways">
+              <label>
+                <span>平台</span>
+                <select name="platform">
+                  <option value="pc" selected>PC</option>
+                  <option value="steam">Steam</option>
+                  <option value="epic-games-store">Epic</option>
+                  <option value="itchio">itch.io</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">看限免</button>
+            </form>
+            <div class="api-result" data-api-result="giveaways" aria-live="polite">
+              <span>等待查询</span>
+              <strong>GamerPower</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="spaceNews">
+            <form class="api-lab-form" data-api-form="spaceNews">
+              <label>
+                <span>关键词</span>
+                <input name="query" type="search" value="moon" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜新闻</button>
+            </form>
+            <div class="api-result" data-api-result="spaceNews" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Spaceflight News</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="launches">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="launches">
+              <button class="primary-button" type="submit">近期发射</button>
+            </form>
+            <div class="api-result" data-api-result="launches" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Launch Library 2</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="nobel">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="nobel">
+              <label>
+                <span>年份</span>
+                <input name="year" type="number" min="1901" max="2026" step="1" value="2024">
+              </label>
+              <label>
+                <span>奖项</span>
+                <select name="category">
+                  <option value="" selected>全部</option>
+                  <option value="phy">物理</option>
+                  <option value="che">化学</option>
+                  <option value="med">医学</option>
+                  <option value="lit">文学</option>
+                  <option value="pea">和平</option>
+                  <option value="eco">经济</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">查获奖</button>
+            </form>
+            <div class="api-result" data-api-result="nobel" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Nobel Prize</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="openalex">
+            <form class="api-lab-form" data-api-form="openalex">
+              <label>
+                <span>学术关键词</span>
+                <input name="query" type="search" value="machine learning" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜论文</button>
+            </form>
+            <div class="api-result" data-api-result="openalex" aria-live="polite">
+              <span>等待查询</span>
+              <strong>OpenAlex</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="species">
+            <form class="api-lab-form" data-api-form="species">
+              <label>
+                <span>物种关键词</span>
+                <input name="query" type="search" value="panda" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜物种</button>
+            </form>
+            <div class="api-result" data-api-result="species" aria-live="polite">
+              <span>等待查询</span>
+              <strong>GBIF</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="radio">
+            <form class="api-lab-form" data-api-form="radio">
+              <label>
+                <span>电台关键词</span>
+                <input name="query" type="search" value="lofi" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找电台</button>
+            </form>
+            <div class="api-result" data-api-result="radio" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Radio Browser</strong>
             </div>
           </section>
         </div>

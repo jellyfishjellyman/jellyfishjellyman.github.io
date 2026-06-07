@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1323&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>工具 | Jellyfish 的博客</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="一些常用在线工具和以后准备本地集成的小工具。">
+    <meta name="generator" content="Hugo 0.155.2">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+    <script src="/js/custom.js" defer></script>
+
+    
+      
+
+    
+
+    
+    
+      <link href="/tools/index.xml" rel="alternate" type="application/rss+xml" title="Jellyfish 的博客" />
+      <link href="/tools/index.xml" rel="feed" type="application/rss+xml" title="Jellyfish 的博客" />
+      
+    
+
+    
+      <link rel="canonical" href="http://localhost:1323/tools/">
+    <meta property="og:url" content="http://localhost:1323/tools/">
+  <meta property="og:site_name" content="Jellyfish 的博客">
+  <meta property="og:title" content="工具">
+  <meta property="og:description" content="一些常用在线工具和以后准备本地集成的小工具。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="工具">
+  <meta itemprop="description" content="一些常用在线工具和以后准备本地集成的小工具。">
+  <meta itemprop="wordCount" content="36">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="工具">
+  <meta name="twitter:description" content="一些常用在线工具和以后准备本地集成的小工具。">
+
+    <script>
+  (function () {
+    try {
+      var storedTheme = window.localStorage.getItem("site-theme");
+      var prefersNight = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = storedTheme || (prefersNight ? "night" : "day");
+    } catch (_) {
+      document.documentElement.dataset.theme = "day";
+    }
+  })();
+</script>
+<meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101412" media="(prefers-color-scheme: dark)">
+<meta name="random-quote-proxy" content="https://gwbblogsuijiyiyan.demon1jellyfish.workers.dev/">
+<link rel="stylesheet" href="/css/custom.css">
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"9aa2629b8e154193868191843ee3313c"}'></script>
+
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+    <header class="site-header">
+  <nav class="site-nav" role="navigation" aria-label="主导航">
+  <a class="site-brand" href="/" aria-label="Jellyfish 的博客">
+    
+      <img src="/images/avatar.jpg" alt="" />
+    
+    <span>Jellyfish 的博客</span>
+  </a>
+
+  
+    <ul class="site-menu">
+      
+      
+        
+        <li>
+          <a class="" href="/">首页</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/posts/">文章</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/links/">资源</a>
+        </li>
+      
+        
+        <li>
+          <a class="is-active" href="/tools/">工具</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/games/">游戏</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/search/">搜索</a>
+        </li>
+      
+        
+        <li>
+          <a class="" href="/about/">关于</a>
+        </li>
+      
+    </ul>
+  
+
+  <button class="theme-toggle" type="button" aria-label="切换主题" aria-pressed="false" data-theme-toggle>
+    <span aria-hidden="true"></span>
+  </button>
+</nav>
+
+  
+  
+</header>
+
+    <main class="pb7" role="main">
+      
+<section class="module-page tools-page">
+  <div class="module-intro reveal-on-scroll">
+    <video
+  class="ambient-bg-video module-intro-video"
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="metadata"
+  poster="/videos/resource-tools-loop-poster.jpg"
+  aria-hidden="true"
+>
+  <source src="/videos/resource-tools-loop.webm" type="video/webm">
+  <source src="/videos/resource-tools-loop.mp4" type="video/mp4">
+</video>
+    <p class="eyebrow">Tools</p>
+    <h1>工具</h1>
+    <div class="module-copy"><p>先从入口页开始，后续可以把图片编辑、格式转换、文本处理等工具逐步接进来。</p>
+</div>
+    
+    
+    
+    <div class="module-stats" aria-label="工具概览">
+      <span><strong>8</strong> 个工具组</span>
+      <span><strong>30</strong> 个入口</span>
+      <span><strong>30</strong> 个实时工具</span>
+    </div>
+  </div>
+
+  <div class="tools-workbench reveal-on-scroll" aria-label="工具页说明">
+    <div>
+      <p class="eyebrow">Workbench</p>
+      <h2>把常用入口和实时小工具收在一张工具台里</h2>
+    </div>
+    <div class="tools-workbench-steps">
+      <span>收藏</span>
+      <span>发现</span>
+      <span>处理</span>
+      <span>集成</span>
+    </div>
+  </div>
+
+  
+    <section class="public-api-lab reveal-on-scroll" data-public-api-lab>
+      <div class="public-api-lab-head">
+        <div>
+          <p class="eyebrow">Live Tools</p>
+          <h2>三十个实时小工具</h2>
+        </div>
+        <div class="api-lab-badges" aria-label="实时工具状态">
+          <span>免密</span>
+          <span>前端直连</span>
+          <span>即时结果</span>
+        </div>
+      </div>
+
+      <div class="api-lab-shell">
+        <div class="api-lab-tabs" role="tablist" aria-label="公开 API 工具">
+          <button class="is-active" type="button" role="tab" aria-selected="true" data-api-tab="dictionary">词典</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="exchange">汇率</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="country">国家资料</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="weather">天气</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="trivia">问答</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="wiki">百科</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="books">图书</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="art">艺术</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="anime">动漫</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="news">热榜</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="poetry">诗歌</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="words">词联想</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="holidays">节假日</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="network">网络诊断</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="emailcheck">邮箱检测</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="colors">配色生成</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="emoji">表情查询</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="qrcode">二维码</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="jokes">编程笑话</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="randomuser">随机用户</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="nameprofile">姓名画像</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="gamedeals">游戏折扣</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="freegames">免费游戏</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="giveaways">限免赠品</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="spaceNews">航天新闻</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="launches">发射日程</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="nobel">诺贝尔奖</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="openalex">学术搜索</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="species">物种搜索</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="radio">网络电台</button>
+        </div>
+
+        <div class="api-lab-panels">
+          <section class="api-lab-panel is-active" data-api-panel="dictionary">
+            <form class="api-lab-form" data-api-form="dictionary">
+              <label>
+                <span>英文单词</span>
+                <input name="word" type="search" value="serendipity" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">查词</button>
+            </form>
+            <div class="api-result" data-api-result="dictionary" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Free Dictionary API</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="exchange">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="exchange">
+              <label>
+                <span>金额</span>
+                <input name="amount" type="number" min="0" step="0.01" value="100">
+              </label>
+              <label>
+                <span>从</span>
+                <select name="from">
+                  <option selected>CNY</option>
+                  <option>USD</option>
+                  <option>EUR</option>
+                  <option>JPY</option>
+                  <option>GBP</option>
+                  <option>HKD</option>
+                  <option>SGD</option>
+                  <option>AUD</option>
+                  <option>CAD</option>
+                  <option>CHF</option>
+                </select>
+              </label>
+              <label>
+                <span>到</span>
+                <select name="to">
+                  <option selected>USD</option>
+                  <option>CNY</option>
+                  <option>EUR</option>
+                  <option>JPY</option>
+                  <option>GBP</option>
+                  <option>HKD</option>
+                  <option>SGD</option>
+                  <option>AUD</option>
+                  <option>CAD</option>
+                  <option>CHF</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">换算</button>
+            </form>
+            <div class="api-result" data-api-result="exchange" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Frankfurter</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="country">
+            <form class="api-lab-form" data-api-form="country">
+              <label>
+                <span>国家或地区</span>
+                <input name="country" type="search" value="China" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">查询</button>
+            </form>
+            <div class="api-result" data-api-result="country" aria-live="polite">
+              <span>等待查询</span>
+              <strong>REST Countries</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="weather">
+            <form class="api-lab-form" data-api-form="weather">
+              <label>
+                <span>城市</span>
+                <input name="city" type="search" value="Shanghai" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">看天气</button>
+            </form>
+            <div class="api-result" data-api-result="weather" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Open-Meteo</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="trivia">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="trivia">
+              <label>
+                <span>题目类型</span>
+                <select name="category">
+                  <option value="" selected>随机</option>
+                  <option value="9">综合知识</option>
+                  <option value="17">科学自然</option>
+                  <option value="18">电脑知识</option>
+                  <option value="21">体育</option>
+                  <option value="22">地理</option>
+                  <option value="23">历史</option>
+                  <option value="31">动漫</option>
+                </select>
+              </label>
+              <label>
+                <span>难度</span>
+                <select name="difficulty">
+                  <option value="" selected>随机</option>
+                  <option value="easy">简单</option>
+                  <option value="medium">中等</option>
+                  <option value="hard">困难</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">抽一题</button>
+            </form>
+            <div class="api-result" data-api-result="trivia" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Open Trivia DB</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="wiki">
+            <form class="api-lab-form" data-api-form="wiki">
+              <label>
+                <span>百科词条</span>
+                <input name="topic" type="search" value="上海" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">查百科</button>
+            </form>
+            <div class="api-result" data-api-result="wiki" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Wikipedia</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="books">
+            <form class="api-lab-form" data-api-form="books">
+              <label>
+                <span>书名或作者</span>
+                <input name="query" type="search" value="three body problem" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜图书</button>
+            </form>
+            <div class="api-result" data-api-result="books" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Open Library</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="art">
+            <form class="api-lab-form" data-api-form="art">
+              <label>
+                <span>艺术家或主题</span>
+                <input name="query" type="search" value="monet" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找作品</button>
+            </form>
+            <div class="api-result" data-api-result="art" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Art Institute of Chicago</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="anime">
+            <form class="api-lab-form" data-api-form="anime">
+              <label>
+                <span>动漫名</span>
+                <input name="query" type="search" value="naruto" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜动漫</button>
+            </form>
+            <div class="api-result" data-api-result="anime" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Jikan</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="news">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="news">
+              <button class="primary-button" type="submit">刷新热榜</button>
+            </form>
+            <div class="api-result" data-api-result="news" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Hacker News</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="poetry">
+            <form class="api-lab-form" data-api-form="poetry">
+              <label>
+                <span>英文诗题</span>
+                <input name="title" type="search" value="Ozymandias" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找诗</button>
+            </form>
+            <div class="api-result" data-api-result="poetry" aria-live="polite">
+              <span>等待查询</span>
+              <strong>PoetryDB</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="words">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="words">
+              <label>
+                <span>英文词</span>
+                <input name="term" type="search" value="ocean" autocomplete="off" spellcheck="false">
+              </label>
+              <label>
+                <span>模式</span>
+                <select name="mode">
+                  <option value="ml" selected>语义联想</option>
+                  <option value="rel_rhy">押韵</option>
+                  <option value="sl">近似发音</option>
+                  <option value="sp">拼写建议</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">找词</button>
+            </form>
+            <div class="api-result" data-api-result="words" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Datamuse</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="holidays">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="holidays">
+              <label>
+                <span>年份</span>
+                <input name="year" type="number" min="2000" max="2100" step="1" value="2026">
+              </label>
+              <label>
+                <span>国家代码</span>
+                <select name="country">
+                  <option value="US" selected>US</option>
+                  <option value="CN">CN</option>
+                  <option value="JP">JP</option>
+                  <option value="GB">GB</option>
+                  <option value="DE">DE</option>
+                  <option value="FR">FR</option>
+                  <option value="CA">CA</option>
+                  <option value="AU">AU</option>
+                  <option value="SG">SG</option>
+                  <option value="KR">KR</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">查假日</button>
+            </form>
+            <div class="api-result" data-api-result="holidays" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Nager.Date</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="network">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="network">
+              <button class="primary-button" type="submit">检测网络</button>
+            </form>
+            <div class="api-result" data-api-result="network" aria-live="polite">
+              <span>等待查询</span>
+              <strong>GeoJS + Cloudflare Trace</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="emailcheck">
+            <form class="api-lab-form" data-api-form="emailcheck">
+              <label>
+                <span>邮箱或域名</span>
+                <input name="email" type="search" value="test@example.com" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">检测</button>
+            </form>
+            <div class="api-result" data-api-result="emailcheck" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Kickbox Open</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="colors">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="colors">
+              <button class="primary-button" type="submit">生成配色</button>
+            </form>
+            <div class="api-result" data-api-result="colors" aria-live="polite">
+              <span>等待查询</span>
+              <strong>xColors</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="emoji">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="emoji">
+              <button class="primary-button" type="submit">随机表情</button>
+            </form>
+            <div class="api-result" data-api-result="emoji" aria-live="polite">
+              <span>等待查询</span>
+              <strong>EmojiHub</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="qrcode">
+            <form class="api-lab-form" data-api-form="qrcode">
+              <label>
+                <span>文本或链接</span>
+                <input name="text" type="search" value="https://gwbblog.top/" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">生成</button>
+            </form>
+            <div class="api-result" data-api-result="qrcode" aria-live="polite">
+              <span>等待查询</span>
+              <strong>QuickChart QR</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="jokes">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="jokes">
+              <label>
+                <span>类型</span>
+                <select name="category">
+                  <option value="Programming" selected>Programming</option>
+                  <option value="Misc">Misc</option>
+                  <option value="Pun">Pun</option>
+                </select>
+              </label>
+              <label>
+                <span>格式</span>
+                <select name="type">
+                  <option value="single" selected>单句</option>
+                  <option value="twopart">问答</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">来一条</button>
+            </form>
+            <div class="api-result" data-api-result="jokes" aria-live="polite">
+              <span>等待查询</span>
+              <strong>JokeAPI</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="randomuser">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="randomuser">
+              <label>
+                <span>地区</span>
+                <select name="nat">
+                  <option value="us" selected>US</option>
+                  <option value="gb">GB</option>
+                  <option value="ca">CA</option>
+                  <option value="au">AU</option>
+                  <option value="fr">FR</option>
+                  <option value="de">DE</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">生成用户</button>
+            </form>
+            <div class="api-result" data-api-result="randomuser" aria-live="polite">
+              <span>等待查询</span>
+              <strong>RandomUser</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="nameprofile">
+            <form class="api-lab-form" data-api-form="nameprofile">
+              <label>
+                <span>英文名</span>
+                <input name="name" type="search" value="michael" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">分析</button>
+            </form>
+            <div class="api-result" data-api-result="nameprofile" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Agify / Genderize / Nationalize</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="gamedeals">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="gamedeals">
+              <label>
+                <span>游戏名</span>
+                <input name="title" type="search" value="portal" autocomplete="off">
+              </label>
+              <label>
+                <span>最高价 USD</span>
+                <input name="price" type="number" min="0" max="100" step="1" value="15">
+              </label>
+              <button class="primary-button" type="submit">找折扣</button>
+            </form>
+            <div class="api-result" data-api-result="gamedeals" aria-live="polite">
+              <span>等待查询</span>
+              <strong>CheapShark</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="freegames">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="freegames">
+              <label>
+                <span>平台</span>
+                <select name="platform">
+                  <option value="browser" selected>Browser</option>
+                  <option value="pc">PC</option>
+                </select>
+              </label>
+              <label>
+                <span>类型</span>
+                <select name="category">
+                  <option value="shooter" selected>Shooter</option>
+                  <option value="mmorpg">MMORPG</option>
+                  <option value="strategy">Strategy</option>
+                  <option value="card">Card</option>
+                  <option value="racing">Racing</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">筛游戏</button>
+            </form>
+            <div class="api-result" data-api-result="freegames" aria-live="polite">
+              <span>等待查询</span>
+              <strong>FreeToGame</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="giveaways">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="giveaways">
+              <label>
+                <span>平台</span>
+                <select name="platform">
+                  <option value="pc" selected>PC</option>
+                  <option value="steam">Steam</option>
+                  <option value="epic-games-store">Epic</option>
+                  <option value="itchio">itch.io</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">看限免</button>
+            </form>
+            <div class="api-result" data-api-result="giveaways" aria-live="polite">
+              <span>等待查询</span>
+              <strong>GamerPower</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="spaceNews">
+            <form class="api-lab-form" data-api-form="spaceNews">
+              <label>
+                <span>关键词</span>
+                <input name="query" type="search" value="moon" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜新闻</button>
+            </form>
+            <div class="api-result" data-api-result="spaceNews" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Spaceflight News</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="launches">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="launches">
+              <button class="primary-button" type="submit">近期发射</button>
+            </form>
+            <div class="api-result" data-api-result="launches" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Launch Library 2</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="nobel">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="nobel">
+              <label>
+                <span>年份</span>
+                <input name="year" type="number" min="1901" max="2026" step="1" value="2024">
+              </label>
+              <label>
+                <span>奖项</span>
+                <select name="category">
+                  <option value="" selected>全部</option>
+                  <option value="phy">物理</option>
+                  <option value="che">化学</option>
+                  <option value="med">医学</option>
+                  <option value="lit">文学</option>
+                  <option value="pea">和平</option>
+                  <option value="eco">经济</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">查获奖</button>
+            </form>
+            <div class="api-result" data-api-result="nobel" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Nobel Prize</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="openalex">
+            <form class="api-lab-form" data-api-form="openalex">
+              <label>
+                <span>学术关键词</span>
+                <input name="query" type="search" value="machine learning" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜论文</button>
+            </form>
+            <div class="api-result" data-api-result="openalex" aria-live="polite">
+              <span>等待查询</span>
+              <strong>OpenAlex</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="species">
+            <form class="api-lab-form" data-api-form="species">
+              <label>
+                <span>物种关键词</span>
+                <input name="query" type="search" value="panda" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜物种</button>
+            </form>
+            <div class="api-result" data-api-result="species" aria-live="polite">
+              <span>等待查询</span>
+              <strong>GBIF</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="radio">
+            <form class="api-lab-form" data-api-form="radio">
+              <label>
+                <span>电台关键词</span>
+                <input name="query" type="search" value="lofi" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找电台</button>
+            </form>
+            <div class="api-result" data-api-result="radio" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Radio Browser</strong>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  
+
+  <div class="module-grid tools-grid">
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="0">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">写</span>
+          <div>
+            <p class="tool-count">4 个入口</p>
+            <h2>写作与文本</h2>
+            <p>写作、Markdown、文本整理和内容差异检查。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://www.tablesgenerator.com/markdown_tables" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Markdown 表格生成器</strong>
+                <em>把表格内容整理成 Markdown 表格。</em>
+              </span>
+              <small>写作工具</small>
+            </a>
+          
+            <a class="link-item" href="https://www.diffchecker.com/text-compare/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>文本差异对比器</strong>
+                <em>对比两段文本，找出新增、删除和修改的地方。</em>
+              </span>
+              <small>文本处理</small>
+            </a>
+          
+            <a class="link-item" href="https://www.sojson.com/removeDuplicate.html" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>在线文本去重</strong>
+                <em>整理列表、去除重复行，适合轻量文本清理。</em>
+              </span>
+              <small>文本处理</small>
+            </a>
+          
+            <a class="link-item" href="https://youglish.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>YouGlish</strong>
+                <em>用 YouTube 例句练习英语发音。</em>
+              </span>
+              <small>语言学习</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="1">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">图</span>
+          <div>
+            <p class="tool-count">6 个入口</p>
+            <h2>图片与视觉</h2>
+            <p>图片编辑、压缩、格式转换、识图和视觉创作。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://www.photopea.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Photopea</strong>
+                <em>浏览器里的图像编辑工具。</em>
+              </span>
+              <small>图片编辑</small>
+            </a>
+          
+            <a class="link-item" href="https://github.com/mtsee/image-editor" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>在线图片编辑器</strong>
+                <em>先作为项目入口，后续可评估本地部署。</em>
+              </span>
+              <small>待集成</small>
+            </a>
+          
+            <a class="link-item" href="https://www.gaitubao.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>改图宝</strong>
+                <em>在线修改图片尺寸、格式、压缩和基础处理。</em>
+              </span>
+              <small>图片处理</small>
+            </a>
+          
+            <a class="link-item" href="https://graph.baidu.com/pcpage/index?tpl_from=pc" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>百度识图</strong>
+                <em>图片反查和相似图片搜索。</em>
+              </span>
+              <small>识图搜索</small>
+            </a>
+          
+            <a class="link-item" href="https://smallseotools.com/zh/reverse-image-search/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>SmallSEOTools 以图搜图</strong>
+                <em>聚合式反向图片搜索工具。</em>
+              </span>
+              <small>识图搜索</small>
+            </a>
+          
+            <a class="link-item" href="https://nsfwjs.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>NSFW JS</strong>
+                <em>浏览器端图像内容安全分类库，适合技术参考。</em>
+              </span>
+              <small>技术参考</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="2">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">文</span>
+          <div>
+            <p class="tool-count">4 个入口</p>
+            <h2>文件与 PDF</h2>
+            <p>文件格式转换、PDF 处理和轻量办公。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://convertio.co/zh/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Convertio</strong>
+                <em>在线文件格式转换。</em>
+              </span>
+              <small>格式转换</small>
+            </a>
+          
+            <a class="link-item" href="https://www.ilovepdf.com/zh-cn" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>iLovePDF</strong>
+                <em>PDF 合并、压缩、转换和常见处理。</em>
+              </span>
+              <small>PDF 工具</small>
+            </a>
+          
+            <a class="link-item" href="https://smallpdf.com/cn" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Smallpdf</strong>
+                <em>PDF 在线处理工具，适合压缩、转换、合并和解锁等轻量任务。</em>
+              </span>
+              <small>PDF 工具</small>
+            </a>
+          
+            <a class="link-item" href="https://support.microsoft.com/zh-cn/office/excel-%E8%A7%86%E9%A2%91%E5%9F%B9%E8%AE%AD-9bc05390-e94c-46af-a5b3-d7c22f6990bb" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>微软 Excel 视频培训</strong>
+                <em>微软官方 Excel 入门培训。</em>
+              </span>
+              <small>办公学习</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="3">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">开</span>
+          <div>
+            <p class="tool-count">4 个入口</p>
+            <h2>开发与数据</h2>
+            <p>编码、格式化、校验、数学可视化和开发辅助。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://www.jyshare.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>菜鸟工具</strong>
+                <em>编码、格式化、转换和开发辅助工具集合。</em>
+              </span>
+              <small>开发工具</small>
+            </a>
+          
+            <a class="link-item" href="https://jsonformatter.org/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>JSON Formatter</strong>
+                <em>JSON 格式化和校验。</em>
+              </span>
+              <small>数据格式</small>
+            </a>
+          
+            <a class="link-item" href="https://www.somd5.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>SOMD5</strong>
+                <em>MD5 在线查询和解密工具。</em>
+              </span>
+              <small>哈希工具</small>
+            </a>
+          
+            <a class="link-item" href="https://www.geogebra.org/classic?lang=zh_CN" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>GeoGebra</strong>
+                <em>几何、函数、代数和数学可视化工具。</em>
+              </span>
+              <small>数学工具</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="4">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">音</span>
+          <div>
+            <p class="tool-count">4 个入口</p>
+            <h2>音乐与媒体</h2>
+            <p>音乐识别、音频格式处理和趣味媒体工具。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://www.aha-music.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>AHA Music</strong>
+                <em>浏览器里识别正在播放的音乐。</em>
+              </span>
+              <small>音乐识别</small>
+            </a>
+          
+            <a class="link-item" href="https://www.yinyue.tw/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>音悦范</strong>
+                <em>音乐格式转换工具。</em>
+              </span>
+              <small>音频转换</small>
+            </a>
+          
+            <a class="link-item" href="https://demo.unlock-music.dev/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>音乐解锁</strong>
+                <em>本地浏览器端音乐格式解锁工具。</em>
+              </span>
+              <small>本地处理</small>
+            </a>
+          
+            <a class="link-item" href="https://genshin.pro-ivan.com/#/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>原神字体转换</strong>
+                <em>把文字转换成原神风格字体的趣味工具。</em>
+              </span>
+              <small>趣味工具</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="5">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">查</span>
+          <div>
+            <p class="tool-count">3 个入口</p>
+            <h2>查询与设备</h2>
+            <p>时间查询、设备支持和常用信息入口。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://time.is/zh/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Time.is</strong>
+                <em>准确时间、时区和时间差查询。</em>
+              </span>
+              <small>时间查询</small>
+            </a>
+          
+            <a class="link-item" href="https://support.lenovo.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Lenovo Support</strong>
+                <em>联想设备驱动、保修和支持入口。</em>
+              </span>
+              <small>设备支持</small>
+            </a>
+          
+            <a class="link-item" href="https://www.lenovo.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Lenovo</strong>
+                <em>联想官网入口。</em>
+              </span>
+              <small>官网入口</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="6">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">综</span>
+          <div>
+            <p class="tool-count">4 个入口</p>
+            <h2>综合工具箱</h2>
+            <p>综合导航和工具集合，适合不知道去哪找时先打开。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="https://cli.im/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>二维码生成器</strong>
+                <em>把文字、链接等内容快速生成二维码。</em>
+              </span>
+              <small>生成工具</small>
+            </a>
+          
+            <a class="link-item" href="http://tool.liumingye.cn/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>刘明野的工具箱</strong>
+                <em>常用在线小工具集合。</em>
+              </span>
+              <small>工具集合</small>
+            </a>
+          
+            <a class="link-item" href="https://c.runoob.com/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>菜鸟工具</strong>
+                <em>工具集合站，偏编码、格式化和转换。</em>
+              </span>
+              <small>工具集合</small>
+            </a>
+          
+            <a class="link-item" href="https://axutongxue.net/" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>阿虚同学的储物间</strong>
+                <em>互联网工具、资源和软件导航。</em>
+              </span>
+              <small>综合导航</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+      
+      
+      
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="7">
+        <div class="module-card-head">
+          <span class="module-icon" aria-hidden="true">博</span>
+          <div>
+            <p class="tool-count">1 个入口</p>
+            <h2>博客维护</h2>
+            <p>本站维护相关的本地入口。</p>
+          </div>
+        </div>
+        <div class="link-list">
+          
+            <a class="link-item" href="/about/" >
+              <span>
+                <strong>本地预览命令</strong>
+                <em>.\.tools\hugo\hugo.exe server -D --bind 127.0.0.1 --baseURL http://localhost:1313/ --port 1313</em>
+              </span>
+              <small>本地</small>
+            </a>
+          
+          
+        </div>
+      </article>
+    
+  </div>
+</section>
+
+    </main>
+    <footer class="site-footer" role="contentinfo">
+  <div class="site-footer-inner">
+    <div>
+      <p class="footer-kicker">Jellyfish Lab</p>
+      <a class="footer-brand" href="http://localhost:1323/">Jellyfish 的博客</a>
+      <p class="footer-copy">记录学习、技术和生活</p>
+    </div>
+
+    <div class="footer-meta">
+      <span>&copy; 2026</span>
+      <span>Built with Hugo 0.155.2</span>
+      <span>Updated 2026-06-07 22:29</span>
+    </div>
+  </div>
+</footer>
+
+<div class="music-panel ambient-player" data-ambient-player data-state="off" data-audio-src="">
+  <button id="musicToggle" type="button" data-ambient-toggle aria-label="开启氛围声音" aria-pressed="false">
+    <span class="ambient-player-icon" aria-hidden="true"></span>
+  </button>
+  <span class="music-copy">
+    <span class="music-title">Ambient</span>
+    <span class="music-status" data-ambient-status>默认关闭</span>
+  </span>
+  <span class="music-bars" aria-hidden="true">
+    <span style="--bar-index: 1"></span><span style="--bar-index: 2"></span><span style="--bar-index: 3"></span><span style="--bar-index: 4"></span><span style="--bar-index: 5"></span><span style="--bar-index: 6"></span><span style="--bar-index: 7"></span><span style="--bar-index: 8"></span><span style="--bar-index: 9"></span><span style="--bar-index: 10"></span><span style="--bar-index: 11"></span><span style="--bar-index: 12"></span>
+  </span>
+</div>
+
+  </body>
+</html>

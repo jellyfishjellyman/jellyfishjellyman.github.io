@@ -89,3 +89,150 @@
   auth: 免密
   cors: CORS 可用
   description: 英文词语联想、押韵、近音和拼写建议。
+- name: Nager.Date
+  tool: holidays
+  category: Calendar
+  url: https://date.nager.at
+  auth: 免密
+  cors: CORS 可用
+  description: 按年份和国家代码查询公共假日。
+- name: GeoJS
+  tool: network
+  category: Geocoding
+  url: https://www.geojs.io/
+  auth: 免密
+  cors: CORS 可用
+  description: 当前出口 IP、城市、国家、ASN 和组织信息。
+- name: Cloudflare Trace
+  tool: network
+  category: Development
+  url: https://github.com/fawazahmed0/cloudflare-trace-api
+  auth: 免密
+  cors: CORS 可用
+  description: 当前浏览器连接的 HTTP、TLS、CDN 节点和网络诊断信息。
+- name: Kickbox Open
+  tool: emailcheck
+  category: Email
+  url: https://open.kickbox.com/
+  auth: 免密
+  cors: CORS 可用
+  description: 检测邮箱域名是否属于临时邮箱服务。
+- name: xColors
+  tool: colors
+  category: Art & Design
+  url: https://x-colors.yurace.pro/
+  auth: 免密
+  cors: CORS 可用
+  description: 随机生成 HEX、RGB 和 HSL 配色。
+- name: EmojiHub
+  tool: emoji
+  category: Art & Design
+  url: https://github.com/cheatsnake/emojihub
+  auth: 免密
+  cors: CORS 可用
+  description: 随机 emoji、分类、分组和 Unicode 信息。
+- name: QuickChart QR
+  tool: qrcode
+  category: Development
+  url: https://quickchart.io/
+  auth: 免密
+  cors: CORS 可用
+  description: 输入文本或链接生成二维码图片。
+- name: JokeAPI
+  tool: jokes
+  category: Entertainment
+  url: https://v2.jokeapi.dev/
+  auth: 免密
+  cors: CORS 可用
+  description: 可过滤敏感内容的编程笑话和短笑话。
+- name: RandomUser
+  tool: randomuser
+  category: Test Data
+  url: https://randomuser.me/
+  auth: 免密
+  cors: CORS 可用
+  description: 生成前端测试用随机用户资料。
+- name: Agify
+  tool: nameprofile
+  category: Development
+  url: https://agify.io/
+  auth: 免密
+  cors: CORS 可用
+  description: 根据英文名估计年龄。
+- name: Genderize
+  tool: nameprofile
+  category: Development
+  url: https://genderize.io/
+  auth: 免密
+  cors: CORS 可用
+  description: 根据英文名估计性别概率。
+- name: Nationalize
+  tool: nameprofile
+  category: Development
+  url: https://nationalize.io/
+  auth: 免密
+  cors: CORS 可用
+  description: 根据英文名估计国籍概率。
+- name: CheapShark
+  tool: gamedeals
+  category: Games & Comics
+  url: https://www.cheapshark.com/api
+  auth: 免密
+  cors: CORS 可用
+  description: 搜索 PC 游戏折扣、现价、原价和折扣比例。
+- name: FreeToGame
+  tool: freegames
+  category: Games & Comics
+  url: https://www.freetogame.com/api-doc
+  auth: 免密
+  cors: CORS 可用
+  description: 按平台和类型筛选免费游戏。
+- name: GamerPower
+  tool: giveaways
+  category: Games & Comics
+  url: https://www.gamerpower.com/api-read
+  auth: 免密
+  cors: CORS 可用
+  description: 查询当前游戏限免、赠品和领取入口。
+- name: Spaceflight News
+  tool: spaceNews
+  category: News
+  url: https://spaceflightnewsapi.net
+  auth: 免密
+  cors: CORS 可用
+  description: 按关键词搜索航天新闻。
+- name: Launch Library 2
+  tool: launches
+  category: Science & Math
+  url: https://thespacedevs.com/llapi
+  auth: 免密
+  cors: CORS 可用
+  description: 查询近期航天发射任务、窗口时间和发射场。
+- name: Nobel Prize
+  tool: nobel
+  category: Open Data
+  url: https://www.nobelprize.org/about/developer-zone-2/
+  auth: 免密
+  cors: CORS 可用
+  description: 按年份和奖项查询诺贝尔奖获奖记录。
+- name: OpenAlex
+  tool: openalex
+  category: Science & Math
+  url: https://docs.openalex.org/
+  auth: 免密
+  cors: CORS 可用
+  description: 学术作品搜索、年份、引用数和作者信息。
+- name: GBIF
+  tool: species
+  category: Science & Math
+  url: https://www.gbif.org/developer/summary
+  auth: 免密
+  cors: CORS 可用
+  description: 物种名称、分类等级和候选分类搜索。
+- name: Radio Browser
+  tool: radio
+  category: Music
+  url: https://api.radio-browser.info/
+  auth: 免密
+  cors: CORS 可用
+  description: 搜索网络电台并播放 HTTPS 音频流。
