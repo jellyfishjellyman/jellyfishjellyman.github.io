@@ -3078,6 +3078,12 @@ body.arcade-lock-scroll {
   font-size: clamp(24px, 4vw, 40px);
 }
 
+.quiz-card p:not(.eyebrow):not(.quiz-credit) {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
 .quiz-option {
   width: 100%;
   min-height: 52px;
@@ -3098,6 +3104,12 @@ body.arcade-lock-scroll {
   transform: translateX(4px);
   border-color: rgba(1,205,253,.42);
   background: rgba(255,255,255,.88);
+}
+
+.quiz-credit {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .piano-board {

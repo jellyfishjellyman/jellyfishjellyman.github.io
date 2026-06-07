@@ -12,6 +12,8 @@
 
   const game = root.dataset.arcadeGame;
   const bestKey = `jellyfish-arcade-best-${game}`;
+  const quizSourceKey = "jellyfish-quiz-source";
+  let quizSource = localStorage.getItem(quizSourceKey) || "local";
   let cleanup = () => {};
 
   const setText = (score, stat, hint) => {
@@ -473,41 +475,90 @@
     render("开局已检查，若无解会自动洗牌。");
   };
 
-  const startQuiz = () => {
+  const decodeHtml = (value) => {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = value || "";
+    return textarea.value;
+  };
+
+  const createText = (tag, text, className) => {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    element.textContent = text;
+    return element;
+  };
+
+  const startQuiz = async () => {
     resetBoard("quiz-board");
-    const questions = [
-      { q: "什么东西越洗越脏？", a: ["水", "毛巾", "肥皂"], ok: 0 },
-      { q: "一只船最多能坐十个人，上来九个后又来一个，船为什么没沉？", a: ["因为船在岸上", "因为是潜水艇", "因为第十个是船长"], ok: 0 },
-      { q: "哪一种书买不到？", a: ["秘书", "旧书", "电子书"], ok: 0 },
-      { q: "什么门永远关不上？", a: ["球门", "木门", "校门"], ok: 0 },
-      { q: "什么东西越分享越多？", a: ["秘密", "知识", "冰块"], ok: 1 },
-      { q: "什么东西越用越少，但越少越亮？", a: ["蜡烛", "影子", "镜子"], ok: 0 },
-      { q: "什么路最窄？", a: ["冤家路", "山路", "小路"], ok: 0 },
-      { q: "什么东西有脚却不会走？", a: ["桌子", "地图", "钟表"], ok: 0 },
-      { q: "什么东西越剪越长？", a: ["队伍", "头发", "布"], ok: 0 },
-      { q: "什么人每天靠运气吃饭？", a: ["气象员", "司机", "厨师"], ok: 0 },
-      { q: "什么字人人都会念错？", a: ["错", "难", "谜"], ok: 0 },
-      { q: "什么东西看得见却摸不着？", a: ["影子", "玻璃", "水"], ok: 0 },
-      { q: "哪种动物最安静？", a: ["睡着的动物", "乌龟", "鱼"], ok: 0 },
-      { q: "什么东西不怕水，却怕太阳？", a: ["雪人", "雨伞", "船"], ok: 0 },
-      { q: "什么东西越走越远却不会动？", a: ["时间", "钟", "路灯"], ok: 0 },
-      { q: "什么东西能装下世界，却放不进抽屉？", a: ["地图", "箱子", "书包"], ok: 0 },
-      { q: "什么东西白天看不见，晚上常出现？", a: ["星星", "云", "太阳"], ok: 0 },
-      { q: "什么东西人人都需要，但没人想失去？", a: ["时间", "钱包", "作业"], ok: 0 },
-      { q: "什么东西越擦越小？", a: ["橡皮", "桌子", "玻璃"], ok: 0 },
-      { q: "什么东西没有嘴却会告诉你时间？", a: ["钟表", "书", "镜子"], ok: 0 },
-      { q: "什么东西可以穿过玻璃却不会打碎它？", a: ["光", "石头", "雨"], ok: 0 },
-      { q: "什么东西总在前面，却永远到不了？", a: ["未来", "影子", "终点"], ok: 0 },
-      { q: "什么东西写出来是黑的，读起来是亮的？", a: ["知识", "墨水", "铅笔"], ok: 0 },
-      { q: "什么东西一说出来就打破了？", a: ["沉默", "玻璃", "谜底"], ok: 0 },
-      { q: "什么东西越冷越爱出来？", a: ["白气", "汗", "影子"], ok: 0 },
-      { q: "什么东西你给别人后，自己仍然拥有？", a: ["建议", "钱", "钥匙"], ok: 0 },
-      { q: "什么东西有城市、河流和山，却没有人？", a: ["地图", "照片", "游戏"], ok: 0 },
-      { q: "什么东西越等越短？", a: ["倒计时", "路", "影子"], ok: 0 },
-      { q: "什么东西没有翅膀却能飞？", a: ["时间", "纸飞机", "鸟"], ok: 0 },
-      { q: "什么东西每天都在变，却从不说话？", a: ["天气", "石头", "尺子"], ok: 0 },
+    const localUrl = "/data/quiz/ceval-lite.json";
+    const onlineUrl = "https://opentdb.com/api.php?amount=10&type=multiple&encode=html";
+    const fallbackQuestions = [
+      { q: "下列成语中，最适合形容事先做好充分准备的是？", a: ["未雨绸缪", "亡羊补牢", "画蛇添足", "刻舟求剑"], ok: 0, meta: "语文 · easy", explanation: "未雨绸缪比喻事先做好准备。" },
+      { q: "一个三角形的内角和是多少度？", a: ["180°", "90°", "270°", "360°"], ok: 0, meta: "数学 · easy", explanation: "欧几里得平面几何中，三角形内角和为 180°。" },
+      { q: "HTML 主要用于描述网页的什么？", a: ["结构", "电压", "温度", "音量"], ok: 0, meta: "计算机 · easy", explanation: "HTML 用于描述网页结构和内容。" },
     ];
-    const roundSize = 10;
+    let activeSource = quizSource;
+
+    modeBtn.textContent = quizSource === "local" ? "离线中文" : "在线英文";
+    setText("-", "加载中", quizSource === "local" ? "正在加载离线中文题库。" : "正在连接 OpenTDB 在线题库。");
+    board.appendChild(createText("p", "正在准备题目...", "game-message"));
+
+    async function loadLocal() {
+      const response = await fetch(localUrl);
+      if (!response.ok) throw new Error(`Local quiz failed: ${response.status}`);
+      const data = await response.json();
+      return (data.items || []).map((item) => ({
+        q: item.question,
+        a: item.answers,
+        ok: item.correct,
+        meta: `${item.category || "综合"} · ${item.difficulty || "normal"}`,
+        explanation: item.explanation || "",
+      }));
+    }
+
+    async function loadOnline() {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 6000);
+      let response;
+      try {
+        response = await fetch(onlineUrl, { signal: controller.signal });
+      } finally {
+        window.clearTimeout(timeout);
+      }
+      if (!response.ok) throw new Error(`OpenTDB failed: ${response.status}`);
+      const data = await response.json();
+      if (data.response_code !== 0 || !Array.isArray(data.results)) throw new Error("OpenTDB returned no questions");
+      return data.results.map((item) => {
+        const correct = decodeHtml(item.correct_answer);
+        const answers = shuffle([...item.incorrect_answers.map(decodeHtml), correct]);
+        return {
+          q: decodeHtml(item.question),
+          a: answers,
+          ok: answers.indexOf(correct),
+          meta: `${decodeHtml(item.category)} · ${decodeHtml(item.difficulty)}`,
+          explanation: "Open Trivia DB / CC BY-SA 4.0",
+        };
+      });
+    }
+
+    let questions = [];
+    try {
+      questions = quizSource === "online" ? await loadOnline() : await loadLocal();
+    } catch (error) {
+      activeSource = "local";
+      quizSource = "local";
+      localStorage.setItem(quizSourceKey, quizSource);
+      modeBtn.textContent = "离线中文";
+      try {
+        questions = await loadLocal();
+        setText("-", "已回退", "在线题库暂时不可用，已切回离线中文题库。");
+      } catch (localError) {
+        questions = fallbackQuestions;
+        setText("-", "备用题库", "离线文件暂时不可用，已启用内置备用题。");
+      }
+    }
+
+    const roundSize = Math.min(10, questions.length);
     let order = shuffle(questions.map((_, i) => i)).slice(0, roundSize);
     let cursor = 0;
     let score = 0;
@@ -517,7 +568,8 @@
       board.innerHTML = "";
       const card = document.createElement("div");
       card.className = "quiz-card";
-      card.innerHTML = `<p class="eyebrow">Question ${cursor + 1}/${roundSize}</p><h2>${item.q}</h2>`;
+      card.appendChild(createText("p", `${activeSource === "local" ? "离线中文" : "Online"} · ${cursor + 1}/${roundSize}${item.meta ? ` · ${item.meta}` : ""}`, "eyebrow"));
+      card.appendChild(createText("h2", item.q));
       item.a.forEach((answer, index) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -526,6 +578,12 @@
         button.addEventListener("click", () => choose(index));
         card.appendChild(button);
       });
+      const credit = createText(
+        "p",
+        activeSource === "local" ? "题库结构参考 CEval，CEval: CC BY-NC-SA 4.0。当前为站内离线精选题。" : "Online questions from Open Trivia DB, CC BY-SA 4.0.",
+        "quiz-credit"
+      );
+      card.appendChild(credit);
       board.appendChild(card);
       setText(score, `${cursor + 1}/${roundSize}`, hint || "选择一个答案。");
     }
@@ -537,14 +595,28 @@
       cursor += 1;
       if (cursor >= roundSize) {
         saveBest(score);
-        board.innerHTML = `<div class="quiz-card"><p class="eyebrow">Result</p><h2>答对 ${score} / ${roundSize}</h2><p>题库已扩展，每轮随机抽 10 题。</p></div>`;
-        setText(score, "完成", score >= 8 ? "不错，脑子醒了。" : "再来一轮会更顺。");
+        board.innerHTML = "";
+        const card = document.createElement("div");
+        card.className = "quiz-card";
+        card.appendChild(createText("p", "Result", "eyebrow"));
+        card.appendChild(createText("h2", `答对 ${score} / ${roundSize}`));
+        card.appendChild(createText("p", activeSource === "local" ? "离线中文题库会随机抽题，后续可继续扩充到上千题。" : "在线英文挑战来自 OpenTDB，网络不可用时会回退离线题库。"));
+        card.appendChild(createText("p", activeSource === "local" ? "题库结构参考 CEval，CEval: CC BY-NC-SA 4.0。" : "Online questions from Open Trivia DB, CC BY-SA 4.0.", "quiz-credit"));
+        board.appendChild(card);
+        setText(score, "完成", score >= 8 ? "答得不错，可以切换模式再来一轮。" : "再来一轮会更顺。");
       } else {
-        render(correct ? "答对了。" : `答案是：${item.a[item.ok]}`);
+        render(correct ? (item.explanation || "答对了。") : `答案是：${item.a[item.ok]}。${item.explanation || ""}`);
       }
     }
 
-    render("题库已扩展，每轮随机抽 10 题。");
+    if (roundSize < 1) {
+      board.innerHTML = "";
+      board.appendChild(createText("p", "题库加载失败，请稍后再试。", "game-message"));
+      setText(0, "失败", "没有可用题目。");
+      return;
+    }
+
+    render(activeSource === "local" ? "离线中文题库已加载，每轮随机抽 10 题。" : "在线英文挑战已加载。");
   };
 
   const startPianoTiles = () => {
@@ -1068,6 +1140,13 @@
 
   startBtn.addEventListener("click", () => starters[game]?.());
   modeBtn.addEventListener("click", () => {
+    if (game === "quiz") {
+      quizSource = quizSource === "local" ? "online" : "local";
+      localStorage.setItem(quizSourceKey, quizSource);
+      modeBtn.textContent = quizSource === "local" ? "离线中文" : "在线英文";
+      starters[game]?.();
+      return;
+    }
     hintEl.textContent = "这个小游戏暂时只有普通模式。";
   });
   starters[game]?.();

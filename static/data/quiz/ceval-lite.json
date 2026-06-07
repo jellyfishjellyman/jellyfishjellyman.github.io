@@ -1,0 +1,166 @@
+{
+  "source": "Inspired by CEval subject-style multiple choice questions. CEval is licensed under CC BY-NC-SA 4.0.",
+  "license": "CC BY-NC-SA 4.0",
+  "items": [
+    {
+      "category": "语文",
+      "difficulty": "easy",
+      "question": "下列成语中，最适合形容“事先做好充分准备”的是？",
+      "answers": ["未雨绸缪", "亡羊补牢", "画蛇添足", "刻舟求剑"],
+      "correct": 0,
+      "explanation": "“未雨绸缪”比喻事先做好准备。"
+    },
+    {
+      "category": "语文",
+      "difficulty": "easy",
+      "question": "“春眠不觉晓，处处闻啼鸟”出自哪位诗人？",
+      "answers": ["孟浩然", "李白", "杜甫", "王维"],
+      "correct": 0,
+      "explanation": "该诗句出自孟浩然《春晓》。"
+    },
+    {
+      "category": "历史",
+      "difficulty": "easy",
+      "question": "秦朝统一六国后，统一使用的文字是？",
+      "answers": ["小篆", "隶书", "楷书", "甲骨文"],
+      "correct": 0,
+      "explanation": "秦统一后推行“书同文”，以小篆作为标准文字。"
+    },
+    {
+      "category": "历史",
+      "difficulty": "medium",
+      "question": "“贞观之治”主要发生在下列哪位皇帝统治时期？",
+      "answers": ["唐太宗", "唐玄宗", "汉武帝", "宋太祖"],
+      "correct": 0,
+      "explanation": "贞观是唐太宗李世民的年号。"
+    },
+    {
+      "category": "地理",
+      "difficulty": "easy",
+      "question": "我国最长的河流是？",
+      "answers": ["长江", "黄河", "珠江", "黑龙江"],
+      "correct": 0,
+      "explanation": "长江是中国长度最长、水量最大的河流。"
+    },
+    {
+      "category": "地理",
+      "difficulty": "medium",
+      "question": "下列哪一项属于可再生能源？",
+      "answers": ["太阳能", "煤炭", "石油", "天然气"],
+      "correct": 0,
+      "explanation": "太阳能可以持续获得，属于可再生能源。"
+    },
+    {
+      "category": "数学",
+      "difficulty": "easy",
+      "question": "若 x + 5 = 12，则 x 等于？",
+      "answers": ["7", "5", "12", "17"],
+      "correct": 0,
+      "explanation": "x = 12 - 5 = 7。"
+    },
+    {
+      "category": "数学",
+      "difficulty": "medium",
+      "question": "一个三角形内角和为多少度？",
+      "answers": ["180°", "90°", "270°", "360°"],
+      "correct": 0,
+      "explanation": "欧几里得平面几何中，三角形内角和为 180°。"
+    },
+    {
+      "category": "物理",
+      "difficulty": "easy",
+      "question": "声音在真空中能否传播？",
+      "answers": ["不能", "能", "只在夜晚能", "只在低温下能"],
+      "correct": 0,
+      "explanation": "声音传播需要介质，真空中不能传播。"
+    },
+    {
+      "category": "物理",
+      "difficulty": "medium",
+      "question": "下列哪个单位是电流的国际单位？",
+      "answers": ["安培", "伏特", "欧姆", "瓦特"],
+      "correct": 0,
+      "explanation": "电流的国际单位是安培。"
+    },
+    {
+      "category": "化学",
+      "difficulty": "easy",
+      "question": "水的化学式是？",
+      "answers": ["H2O", "CO2", "O2", "NaCl"],
+      "correct": 0,
+      "explanation": "水由两个氢原子和一个氧原子组成，化学式为 H2O。"
+    },
+    {
+      "category": "化学",
+      "difficulty": "medium",
+      "question": "食盐的主要成分是？",
+      "answers": ["氯化钠", "碳酸钙", "硫酸铜", "氢氧化钠"],
+      "correct": 0,
+      "explanation": "食盐的主要成分是氯化钠。"
+    },
+    {
+      "category": "生物",
+      "difficulty": "easy",
+      "question": "植物进行光合作用主要需要哪种气体？",
+      "answers": ["二氧化碳", "氧气", "氮气", "氢气"],
+      "correct": 0,
+      "explanation": "植物光合作用吸收二氧化碳并释放氧气。"
+    },
+    {
+      "category": "生物",
+      "difficulty": "medium",
+      "question": "遗传信息主要储存在细胞中的哪种物质里？",
+      "answers": ["DNA", "淀粉", "脂肪", "水"],
+      "correct": 0,
+      "explanation": "DNA 是主要遗传物质。"
+    },
+    {
+      "category": "计算机",
+      "difficulty": "easy",
+      "question": "HTML 主要用于描述网页的什么？",
+      "answers": ["结构", "电压", "温度", "音量"],
+      "correct": 0,
+      "explanation": "HTML 用于描述网页结构和内容。"
+    },
+    {
+      "category": "计算机",
+      "difficulty": "medium",
+      "question": "在程序设计中，数组通常用于存储什么？",
+      "answers": ["一组有序数据", "单个像素", "网络地址", "显示器亮度"],
+      "correct": 0,
+      "explanation": "数组用于存储一组按索引访问的数据。"
+    },
+    {
+      "category": "常识",
+      "difficulty": "easy",
+      "question": "人体正常体温通常接近多少摄氏度？",
+      "answers": ["37℃", "25℃", "50℃", "100℃"],
+      "correct": 0,
+      "explanation": "人体正常体温通常约为 37℃。"
+    },
+    {
+      "category": "常识",
+      "difficulty": "medium",
+      "question": "下列哪种行为更有助于保护个人账号安全？",
+      "answers": ["使用强密码并开启双重验证", "所有网站使用同一密码", "把密码写在公开主页", "随意点击陌生链接"],
+      "correct": 0,
+      "explanation": "强密码和双重验证能显著降低账号被盗风险。"
+    },
+    {
+      "category": "逻辑",
+      "difficulty": "medium",
+      "question": "如果所有 A 都是 B，且所有 B 都是 C，那么可以推出？",
+      "answers": ["所有 A 都是 C", "所有 C 都是 A", "没有 A 是 C", "只有 B 是 C"],
+      "correct": 0,
+      "explanation": "这是三段论的基本传递关系。"
+    },
+    {
+      "category": "逻辑",
+      "difficulty": "medium",
+      "question": "一个命题与其否定命题不可能同时为真，这体现了？",
+      "answers": ["矛盾律", "排中律", "同一律", "充足理由律"],
+      "correct": 0,
+      "explanation": "矛盾律说明一个命题和它的否定不能同时为真。"
+    }
+  ]
+}
