@@ -548,100 +548,175 @@
   };
 
   const startPianoTiles = () => {
-    resetBoard("piano-board");
+    resetBoard("piano-board piano-canvas-board");
+    const made = makeCanvas();
+    const canvas = made.canvas;
+    const ctx = made.ctx;
     const cols = 4;
-    const rows = 6;
-    let grid = [];
+    const visibleRows = 5;
     let score = 0;
-    let speed = 900;
     let running = true;
-    let timer = 0;
+    let raf = 0;
+    let lastTime = 0;
+    let speed = 86;
+    let offset = 0;
+    let rows = [];
 
-    const makeRow = () => {
-      const row = Array.from({ length: cols }, () => false);
-      row[Math.floor(Math.random() * cols)] = true;
-      return row;
-    };
+    const makeRow = (y) => ({ y, hit: false, col: Math.floor(Math.random() * cols) });
 
-    const tick = () => {
-      if (!running) return;
-      const missed = grid[rows - 1]?.some(Boolean);
-      if (missed) {
-        running = false;
-        saveBest(score);
-        setText(score, "结束", "黑块滑到底了，点击开始重来。");
-        render();
-        return;
-      }
-      grid.pop();
-      grid.unshift(makeRow());
-      render();
-    };
-
-    const hit = (r, c) => {
-      if (!running) return;
-      if (!grid[r][c]) {
-        running = false;
-        saveBest(score);
-        setText(score, "结束", "踩到白块了。");
-        render();
-        return;
-      }
-      grid[r][c] = false;
-      score += 1;
-      if (score % 8 === 0) {
-        speed = Math.max(420, speed - 70);
-        window.clearInterval(timer);
-        timer = window.setInterval(tick, speed);
-      }
-      saveBest(score);
-      setText(score, `${Math.round(1000 / speed * 10) / 10}x`, "保持节奏，只点深色块。");
-      render();
-    };
-
-    function render() {
-      board.innerHTML = "";
-      board.style.setProperty("--piano-cols", cols);
-      board.style.setProperty("--piano-rows", rows);
-      grid.forEach((row, r) => {
-        row.forEach((black, c) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "piano-tile";
-          button.dataset.black = black ? "true" : "false";
-          button.addEventListener("click", () => hit(r, c));
-          board.appendChild(button);
-        });
+    const resetRows = () => {
+      rows = [];
+      for (let i = -2; i < visibleRows + 1; i += 1) rows.push(makeRow(i));
+      rows.forEach((row) => {
+        if (row.y >= visibleRows - 1) row.hit = true;
       });
-    }
+      offset = 0;
+    };
 
-    grid = Array.from({ length: rows }, (_, index) => (index < 3 ? makeRow() : Array.from({ length: cols }, () => false)));
-    timer = window.setInterval(tick, speed);
-    cleanup = () => window.clearInterval(timer);
-    setText(0, "1x", "只点击深色块。");
-    render();
+    const endGame = (message) => {
+      running = false;
+      cancelAnimationFrame(raf);
+      saveBest(score);
+      setText(score, "结束", message);
+      draw();
+    };
+
+    const draw = () => {
+      const w = canvas.width / cols;
+      const h = canvas.height / visibleRows;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      bg.addColorStop(0, "#fbfffd");
+      bg.addColorStop(1, "#fff8fb");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "rgba(40,120,107,.18)";
+      ctx.lineWidth = 2;
+      for (let c = 1; c < cols; c += 1) {
+        ctx.beginPath(); ctx.moveTo(c * w, 0); ctx.lineTo(c * w, canvas.height); ctx.stroke();
+      }
+      rows.forEach((row) => {
+        const y = (row.y * h) + offset;
+        if (y < -h || y > canvas.height) return;
+        ctx.fillStyle = row.hit ? "rgba(40,120,107,.18)" : "#14201c";
+        ctx.fillRect(row.col * w + 6, y + 6, w - 12, h - 12);
+        if (!row.hit) {
+          const shine = ctx.createLinearGradient(row.col * w, y, row.col * w + w, y + h);
+          shine.addColorStop(0, "rgba(255,255,255,.2)");
+          shine.addColorStop(.45, "rgba(255,255,255,0)");
+          shine.addColorStop(1, "rgba(1,205,253,.16)");
+          ctx.fillStyle = shine;
+          ctx.fillRect(row.col * w + 6, y + 6, w - 12, h - 12);
+        }
+      });
+      ctx.fillStyle = "rgba(40,120,107,.82)";
+      ctx.font = "700 18px system-ui";
+      ctx.fillText("连续下落，只点深色块", 22, 34);
+    };
+
+    const step = (now) => {
+      if (!running) return;
+      if (!lastTime) lastTime = now;
+      const dt = Math.min(48, now - lastTime);
+      lastTime = now;
+      offset += (speed * dt) / 1000;
+      const h = canvas.height / visibleRows;
+      if (offset >= h) {
+        offset -= h;
+        rows.forEach((row) => { row.y += 1; });
+        const missed = rows.find((row) => row.y >= visibleRows && !row.hit);
+        if (missed) {
+          endGame("黑块滑到底了，点击开始重来。");
+          return;
+        }
+        rows = rows.filter((row) => row.y < visibleRows + 1);
+        while (rows.length < visibleRows + 3) rows.unshift(makeRow(rows[0].y - 1));
+      }
+      draw();
+      raf = requestAnimationFrame(step);
+    };
+
+    const tap = (event) => {
+      event.preventDefault();
+      if (!running) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = event.clientX || (event.touches && event.touches[0] && event.touches[0].clientX);
+      const clientY = event.clientY || (event.touches && event.touches[0] && event.touches[0].clientY);
+      const x = ((clientX - rect.left) / rect.width) * canvas.width;
+      const y = ((clientY - rect.top) / rect.height) * canvas.height;
+      const w = canvas.width / cols;
+      const h = canvas.height / visibleRows;
+      const col = Math.floor(x / w);
+      const row = rows.find((item) => {
+        const top = item.y * h + offset;
+        return !item.hit && item.col === col && y >= top && y <= top + h;
+      });
+      if (!row) {
+        endGame("点到白块了。");
+        return;
+      }
+      row.hit = true;
+      score += 1;
+      speed = Math.min(260, 86 + score * 5);
+      saveBest(score);
+      setText(score, String(Math.round((speed / 86) * 10) / 10) + "x", "节奏不错，继续。");
+      draw();
+    };
+
+    canvas.addEventListener("pointerdown", tap);
+    canvas.addEventListener("touchstart", tap, { passive: false });
+    cleanup = () => {
+      cancelAnimationFrame(raf);
+      canvas.removeEventListener("pointerdown", tap);
+    };
+    resetRows();
+    setText(0, "1x", "黑块已加深，速度已放慢。");
+    draw();
+    raf = requestAnimationFrame(step);
   };
 
   const startTileStack = () => {
-    resetBoard("stack-board");
-    const symbols = ["月", "星", "海", "云", "花", "灯", "书"];
-    let deck = [];
+    resetBoard("stack-board layered-stack-board");
+    const symbols = ["月", "星", "海", "云", "花", "灯", "书", "叶"];
+    let cards = [];
     let tray = [];
     let cleared = 0;
     let locked = false;
 
-    const buildDeck = () => {
-      const cards = [];
-      symbols.forEach((symbol) => {
-        cards.push(symbol, symbol, symbol);
-        if (Math.random() > .35) cards.push(symbol, symbol, symbol);
-      });
-      return shuffle(cards).slice(0, 30);
+    const layout = [
+      { x: 1, y: 0, layer: 0 }, { x: 3, y: 0, layer: 0 }, { x: 5, y: 0, layer: 0 },
+      { x: 0, y: 1, layer: 0 }, { x: 2, y: 1, layer: 0 }, { x: 4, y: 1, layer: 0 }, { x: 6, y: 1, layer: 0 },
+      { x: 1, y: 2, layer: 0 }, { x: 3, y: 2, layer: 0 }, { x: 5, y: 2, layer: 0 },
+      { x: 2, y: .65, layer: 1 }, { x: 4, y: .65, layer: 1 },
+      { x: 1, y: 1.65, layer: 1 }, { x: 3, y: 1.65, layer: 1 }, { x: 5, y: 1.65, layer: 1 },
+      { x: 2, y: 2.65, layer: 1 }, { x: 4, y: 2.65, layer: 1 },
+      { x: 3, y: 1.25, layer: 2 }, { x: 2, y: 2.25, layer: 2 }, { x: 4, y: 2.25, layer: 2 },
+      { x: 3, y: 2.05, layer: 3 },
+    ];
+
+    const buildCards = () => {
+      const values = [];
+      while (values.length < layout.length) {
+        const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+        values.push(symbol, symbol, symbol);
+      }
+      const picked = shuffle(values).slice(0, layout.length);
+      cards = layout.map((pos, index) => ({ id: index, symbol: picked[index], x: pos.x, y: pos.y, layer: pos.layer, removed: false }));
+      tray = [];
+      cleared = 0;
+      locked = false;
     };
 
+    const overlaps = (top, bottom) => {
+      if (top.layer <= bottom.layer || top.removed || bottom.removed) return false;
+      return Math.abs(top.x - bottom.x) < .95 && Math.abs(top.y - bottom.y) < .95;
+    };
+
+    const isBlocked = (card) => cards.some((other) => overlaps(other, card));
+
     const compactTray = () => {
-      const counts = tray.reduce((map, symbol) => {
-        map.set(symbol, (map.get(symbol) || 0) + 1);
+      const counts = tray.reduce((map, item) => {
+        map.set(item.symbol, (map.get(item.symbol) || 0) + 1);
         return map;
       }, new Map());
       let removed = false;
@@ -649,7 +724,7 @@
         if (count >= 3) {
           let left = 3;
           tray = tray.filter((item) => {
-            if (item === symbol && left > 0) {
+            if (item.symbol === symbol && left > 0) {
               left -= 1;
               return false;
             }
@@ -662,12 +737,18 @@
       return removed;
     };
 
-    const pick = (index) => {
-      if (locked || !deck[index]) return;
-      tray.push(deck[index]);
-      deck.splice(index, 1);
+    const pick = (id) => {
+      if (locked) return;
+      const card = cards.find((item) => item.id === id);
+      if (!card || card.removed) return;
+      if (isBlocked(card)) {
+        render("这张被上层压住了，先拿上面的牌。");
+        return;
+      }
+      card.removed = true;
+      tray.push({ id: card.id, symbol: card.symbol });
       const removed = compactTray();
-      if (deck.length === 0 && tray.length === 0) {
+      if (cards.every((item) => item.removed) && tray.length === 0) {
         locked = true;
         saveBest(cleared);
         render("全部清空了。");
@@ -680,39 +761,40 @@
         return;
       }
       saveBest(cleared);
-      render(removed ? "三张相同已消除。" : "继续凑三张相同。");
+      render(removed ? "三张相同已消除。" : "只能点没有被压住的亮牌。");
     };
 
     function render(hint) {
       board.innerHTML = "";
       const pile = document.createElement("div");
-      pile.className = "stack-pile";
-      deck.forEach((symbol, index) => {
+      pile.className = "stack-pile layered-stack-pile";
+      cards.forEach((card) => {
+        if (card.removed) return;
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "stack-card";
-        button.textContent = symbol;
-        button.style.setProperty("--stack-x", `${(index % 6) * 12}px`);
-        button.style.setProperty("--stack-y", `${Math.floor(index / 6) * 18}px`);
-        button.addEventListener("click", () => pick(index));
+        button.className = "stack-card layered-stack-card";
+        button.textContent = card.symbol;
+        button.dataset.blocked = isBlocked(card) ? "true" : "false";
+        button.style.setProperty("--stack-x", String(card.x));
+        button.style.setProperty("--stack-y", String(card.y));
+        button.style.setProperty("--stack-layer", String(card.layer));
+        button.addEventListener("click", () => pick(card.id));
         pile.appendChild(button);
       });
       const trayEl = document.createElement("div");
       trayEl.className = "stack-tray";
       Array.from({ length: 7 }).forEach((_, index) => {
         const slot = document.createElement("span");
-        slot.textContent = tray[index] || "";
+        slot.textContent = (tray[index] && tray[index].symbol) || "";
         slot.dataset.empty = tray[index] ? "false" : "true";
         trayEl.appendChild(slot);
       });
       board.append(pile, trayEl);
-      setText(cleared, `${tray.length}/7`, hint || "从牌堆取牌，槽位凑三消。");
+      setText(cleared, String(tray.length) + "/7", hint || "亮牌可点，暗牌被上层压住。");
     }
 
-    deck = buildDeck();
-    tray = [];
-    cleared = 0;
-    setText(0, "0/7", "从牌堆取牌，槽位凑三消。");
+    buildCards();
+    setText(0, "0/7", "新增层级遮挡，不能无脑点底牌。");
     render();
   };
 
