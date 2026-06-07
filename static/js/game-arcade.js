@@ -381,11 +381,191 @@
     render("选择一个答案。");
   };
 
+  const startPianoTiles = () => {
+    resetBoard("piano-board");
+    const cols = 4;
+    const rows = 6;
+    let grid = [];
+    let score = 0;
+    let speed = 900;
+    let running = true;
+    let timer = 0;
+
+    const makeRow = () => {
+      const row = Array.from({ length: cols }, () => false);
+      row[Math.floor(Math.random() * cols)] = true;
+      return row;
+    };
+
+    const tick = () => {
+      if (!running) return;
+      const missed = grid[rows - 1]?.some(Boolean);
+      if (missed) {
+        running = false;
+        saveBest(score);
+        setText(score, "结束", "黑块滑到底了，点击开始重来。");
+        render();
+        return;
+      }
+      grid.pop();
+      grid.unshift(makeRow());
+      render();
+    };
+
+    const hit = (r, c) => {
+      if (!running) return;
+      if (!grid[r][c]) {
+        running = false;
+        saveBest(score);
+        setText(score, "结束", "踩到白块了。");
+        render();
+        return;
+      }
+      grid[r][c] = false;
+      score += 1;
+      if (score % 8 === 0) {
+        speed = Math.max(420, speed - 70);
+        window.clearInterval(timer);
+        timer = window.setInterval(tick, speed);
+      }
+      saveBest(score);
+      setText(score, `${Math.round(1000 / speed * 10) / 10}x`, "保持节奏，只点深色块。");
+      render();
+    };
+
+    function render() {
+      board.innerHTML = "";
+      board.style.setProperty("--piano-cols", cols);
+      board.style.setProperty("--piano-rows", rows);
+      grid.forEach((row, r) => {
+        row.forEach((black, c) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "piano-tile";
+          button.dataset.black = black ? "true" : "false";
+          button.addEventListener("click", () => hit(r, c));
+          board.appendChild(button);
+        });
+      });
+    }
+
+    grid = Array.from({ length: rows }, (_, index) => (index < 3 ? makeRow() : Array.from({ length: cols }, () => false)));
+    timer = window.setInterval(tick, speed);
+    cleanup = () => window.clearInterval(timer);
+    setText(0, "1x", "只点击深色块。");
+    render();
+  };
+
+  const startTileStack = () => {
+    resetBoard("stack-board");
+    const symbols = ["月", "星", "海", "云", "花", "灯", "书"];
+    let deck = [];
+    let tray = [];
+    let cleared = 0;
+    let locked = false;
+
+    const shuffle = (items) => {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    };
+
+    const buildDeck = () => {
+      const cards = [];
+      symbols.forEach((symbol) => {
+        cards.push(symbol, symbol, symbol);
+        if (Math.random() > .35) cards.push(symbol, symbol, symbol);
+      });
+      return shuffle(cards).slice(0, 30);
+    };
+
+    const compactTray = () => {
+      const counts = tray.reduce((map, symbol) => {
+        map.set(symbol, (map.get(symbol) || 0) + 1);
+        return map;
+      }, new Map());
+      let removed = false;
+      counts.forEach((count, symbol) => {
+        if (count >= 3) {
+          let left = 3;
+          tray = tray.filter((item) => {
+            if (item === symbol && left > 0) {
+              left -= 1;
+              return false;
+            }
+            return true;
+          });
+          cleared += 1;
+          removed = true;
+        }
+      });
+      return removed;
+    };
+
+    const pick = (index) => {
+      if (locked || !deck[index]) return;
+      tray.push(deck[index]);
+      deck.splice(index, 1);
+      const removed = compactTray();
+      if (deck.length === 0 && tray.length === 0) {
+        locked = true;
+        saveBest(cleared);
+        render("全部清空了。");
+        return;
+      }
+      if (tray.length >= 7) {
+        locked = true;
+        saveBest(cleared);
+        render("槽位满了，点击开始重来。");
+        return;
+      }
+      saveBest(cleared);
+      render(removed ? "三张相同已消除。" : "继续凑三张相同。");
+    };
+
+    function render(hint) {
+      board.innerHTML = "";
+      const pile = document.createElement("div");
+      pile.className = "stack-pile";
+      deck.forEach((symbol, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "stack-card";
+        button.textContent = symbol;
+        button.style.setProperty("--stack-x", `${(index % 6) * 12}px`);
+        button.style.setProperty("--stack-y", `${Math.floor(index / 6) * 18}px`);
+        button.addEventListener("click", () => pick(index));
+        pile.appendChild(button);
+      });
+      const trayEl = document.createElement("div");
+      trayEl.className = "stack-tray";
+      Array.from({ length: 7 }).forEach((_, index) => {
+        const slot = document.createElement("span");
+        slot.textContent = tray[index] || "";
+        slot.dataset.empty = tray[index] ? "false" : "true";
+        trayEl.appendChild(slot);
+      });
+      board.append(pile, trayEl);
+      setText(cleared, `${tray.length}/7`, hint || "从牌堆取牌，槽位凑三消。");
+    }
+
+    deck = buildDeck();
+    tray = [];
+    cleared = 0;
+    setText(0, "0/7", "从牌堆取牌，槽位凑三消。");
+    render();
+  };
+
   const starters = {
     jump: startJump,
     snake: startSnake,
     "link-match": startLinkMatch,
     quiz: startQuiz,
+    "piano-tiles": startPianoTiles,
+    "tile-stack": startTileStack,
   };
 
   startBtn.addEventListener("click", () => starters[game]?.());

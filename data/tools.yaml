@@ -1,132 +1,140 @@
-- title: 外部工具
-  description: 从收藏夹整理出的常用在线工具。
+- title: 写作与文本
+  description: 写作、Markdown、文本整理和内容差异检查。
   items:
-  - name: 二维码生成器
-    url: https://cli.im/
-    note: 把文字、链接等内容快速生成二维码。
-    status: 在线工具
   - name: Markdown 表格生成器
     url: https://www.tablesgenerator.com/markdown_tables
     note: 把表格内容整理成 Markdown 表格。
-    status: 在线工具
+    status: 写作工具
   - name: 文本差异对比器
     url: https://www.diffchecker.com/text-compare/
     note: 对比两段文本，找出新增、删除和修改的地方。
-    status: 在线工具
+    status: 文本处理
   - name: 在线文本去重
     url: https://www.sojson.com/removeDuplicate.html
     note: 整理列表、去除重复行，适合轻量文本清理。
-    status: 在线工具
-  - name: Convertio
-    url: https://convertio.co/zh/
-    note: 在线文件格式转换。
-    status: 外部工具
-  - name: iLovePDF
-    url: https://www.ilovepdf.com/zh-cn
-    note: PDF 合并、压缩、转换和常见处理。
-    status: 外部工具
-  - name: Smallpdf
-    url: https://smallpdf.com/cn
-    note: PDF 在线工具集合。
-    status: 外部工具
-  - name: Time.is
-    url: https://time.is/zh/
-    note: 准确时间、时区和时间差查询。
-    status: 外部工具
-  - name: 百度识图
-    url: https://graph.baidu.com/pcpage/index?tpl_from=pc
-    note: 图片反查和相似图片搜索。
-    status: 外部工具
-  - name: 刘明野的工具箱
-    url: http://tool.liumingye.cn/
-    note: 常用在线小工具集合。
-    status: 外部工具
-  - name: 菜鸟工具
-    url: https://c.runoob.com/
-    note: 编码、格式化、转换和开发辅助工具。
-    status: 外部工具
-  - name: AHA Music
-    url: https://www.aha-music.com/
-    note: 浏览器里识别正在播放的音乐。
-    status: 外部工具
-  - name: GeoGebra
-    url: https://www.geogebra.org/classic?lang=zh_CN
-    note: 几何、函数、代数和数学可视化工具。
-    status: 外部工具
-  - name: NSFW JS
-    url: https://nsfwjs.com/
-    note: 浏览器端图像内容安全分类库，适合技术参考。
-    status: 外部工具
+    status: 文本处理
   - name: YouGlish
     url: https://youglish.com/
     note: 用 YouTube 例句练习英语发音。
-    status: 外部工具
-  - name: 微软 Excel 视频培训
-    url: https://support.microsoft.com/zh-cn/office/excel-%E8%A7%86%E9%A2%91%E5%9F%B9%E8%AE%AD-9bc05390-e94c-46af-a5b3-d7c22f6990bb
-    note: 微软官方 Excel 入门培训。
-    status: 外部工具
-  - name: Lenovo Support
-    url: https://support.lenovo.com/
-    note: 联想设备驱动、保修和支持入口。
-    status: 外部工具
-  - name: Lenovo
-    url: https://www.lenovo.com/
-    note: 联想官网入口。
-    status: 外部工具
-  - name: Smallpdf
-    url: https://smallpdf.com/cn#r=app
-    note: PDF 在线处理工具，适合压缩、转换、合并和解锁等轻量任务。
-    status: 外部工具
-  - name: SOMD5
-    url: https://www.somd5.com/
-    note: MD5 在线查询和解密工具。
-    status: 外部工具
-  - name: 改图宝
-    url: https://www.gaitubao.com/
-    note: 在线修改图片尺寸、格式、压缩和基础处理。
-    status: 外部工具
-  - name: 原神字体转换
-    url: https://genshin.pro-ivan.com/#/
-    note: 把文字转换成原神风格字体的趣味工具。
-    status: 外部工具
-  - name: SmallSEOTools 以图搜图
-    url: https://smallseotools.com/zh/reverse-image-search/
-    note: 聚合式反向图片搜索工具。
-    status: 外部工具
-  - name: 音悦范
-    url: https://www.yinyue.tw/
-    note: 音乐格式转换工具。
-    status: 外部工具
-  - name: 音乐解锁
-    url: https://demo.unlock-music.dev/
-    note: 本地浏览器端音乐格式解锁工具。
-    status: 外部工具
-  - name: 阿虚同学的储物间
-    url: https://axutongxue.net/
-    note: 互联网工具、资源和软件导航。
-    status: 外部工具
-- title: 图片处理
-  description: 图片编辑、压缩、格式转换和辅助创作。
+    status: 语言学习
+- title: 图片与视觉
+  description: 图片编辑、压缩、格式转换、识图和视觉创作。
   items:
+  - name: Photopea
+    url: https://www.photopea.com/
+    note: 浏览器里的图像编辑工具。
+    status: 图片编辑
   - name: 在线图片编辑器
     url: https://github.com/mtsee/image-editor
     note: 先作为项目入口，后续可评估本地部署。
     status: 待集成
-  - name: Photopea
-    url: https://www.photopea.com/
-    note: 浏览器里的图像编辑工具。
-    status: 外部工具
-- title: 开发与文本
-  description: 写作、格式化、转换和开发辅助。
+  - name: 改图宝
+    url: https://www.gaitubao.com/
+    note: 在线修改图片尺寸、格式、压缩和基础处理。
+    status: 图片处理
+  - name: 百度识图
+    url: https://graph.baidu.com/pcpage/index?tpl_from=pc
+    note: 图片反查和相似图片搜索。
+    status: 识图搜索
+  - name: SmallSEOTools 以图搜图
+    url: https://smallseotools.com/zh/reverse-image-search/
+    note: 聚合式反向图片搜索工具。
+    status: 识图搜索
+  - name: NSFW JS
+    url: https://nsfwjs.com/
+    note: 浏览器端图像内容安全分类库，适合技术参考。
+    status: 技术参考
+- title: 文件与 PDF
+  description: 文件格式转换、PDF 处理和轻量办公。
+  items:
+  - name: Convertio
+    url: https://convertio.co/zh/
+    note: 在线文件格式转换。
+    status: 格式转换
+  - name: iLovePDF
+    url: https://www.ilovepdf.com/zh-cn
+    note: PDF 合并、压缩、转换和常见处理。
+    status: PDF 工具
+  - name: Smallpdf
+    url: https://smallpdf.com/cn
+    note: PDF 在线处理工具，适合压缩、转换、合并和解锁等轻量任务。
+    status: PDF 工具
+  - name: 微软 Excel 视频培训
+    url: https://support.microsoft.com/zh-cn/office/excel-%E8%A7%86%E9%A2%91%E5%9F%B9%E8%AE%AD-9bc05390-e94c-46af-a5b3-d7c22f6990bb
+    note: 微软官方 Excel 入门培训。
+    status: 办公学习
+- title: 开发与数据
+  description: 编码、格式化、校验、数学可视化和开发辅助。
   items:
   - name: 菜鸟工具
     url: https://www.jyshare.com/
-    note: 工具集合站。
-    status: 参考/外链
+    note: 编码、格式化、转换和开发辅助工具集合。
+    status: 开发工具
   - name: JSON Formatter
     url: https://jsonformatter.org/
     note: JSON 格式化和校验。
-    status: 外部工具
+    status: 数据格式
+  - name: SOMD5
+    url: https://www.somd5.com/
+    note: MD5 在线查询和解密工具。
+    status: 哈希工具
+  - name: GeoGebra
+    url: https://www.geogebra.org/classic?lang=zh_CN
+    note: 几何、函数、代数和数学可视化工具。
+    status: 数学工具
+- title: 音乐与媒体
+  description: 音乐识别、音频格式处理和趣味媒体工具。
+  items:
+  - name: AHA Music
+    url: https://www.aha-music.com/
+    note: 浏览器里识别正在播放的音乐。
+    status: 音乐识别
+  - name: 音悦范
+    url: https://www.yinyue.tw/
+    note: 音乐格式转换工具。
+    status: 音频转换
+  - name: 音乐解锁
+    url: https://demo.unlock-music.dev/
+    note: 本地浏览器端音乐格式解锁工具。
+    status: 本地处理
+  - name: 原神字体转换
+    url: https://genshin.pro-ivan.com/#/
+    note: 把文字转换成原神风格字体的趣味工具。
+    status: 趣味工具
+- title: 查询与设备
+  description: 时间查询、设备支持和常用信息入口。
+  items:
+  - name: Time.is
+    url: https://time.is/zh/
+    note: 准确时间、时区和时间差查询。
+    status: 时间查询
+  - name: Lenovo Support
+    url: https://support.lenovo.com/
+    note: 联想设备驱动、保修和支持入口。
+    status: 设备支持
+  - name: Lenovo
+    url: https://www.lenovo.com/
+    note: 联想官网入口。
+    status: 官网入口
+- title: 综合工具箱
+  description: 综合导航和工具集合，适合不知道去哪找时先打开。
+  items:
+  - name: 二维码生成器
+    url: https://cli.im/
+    note: 把文字、链接等内容快速生成二维码。
+    status: 生成工具
+  - name: 刘明野的工具箱
+    url: http://tool.liumingye.cn/
+    note: 常用在线小工具集合。
+    status: 工具集合
+  - name: 菜鸟工具
+    url: https://c.runoob.com/
+    note: 工具集合站，偏编码、格式化和转换。
+    status: 工具集合
+  - name: 阿虚同学的储物间
+    url: https://axutongxue.net/
+    note: 互联网工具、资源和软件导航。
+    status: 综合导航
 - title: 博客维护
   description: 本站维护相关的本地入口。
   items:
