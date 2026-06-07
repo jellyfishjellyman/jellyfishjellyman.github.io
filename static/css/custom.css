@@ -2978,6 +2978,11 @@ body.home .site-header {
   min-height: calc(100svh - 170px);
 }
 
+html.arcade-lock-scroll,
+body.arcade-lock-scroll {
+  overflow: hidden;
+}
+
 .arcade-board {
   width: min(100%, 900px);
   min-height: 520px;
@@ -3022,6 +3027,7 @@ body.home .site-header {
   font-weight: 950;
   line-height: 1;
   box-shadow: 0 10px 22px rgba(44,42,35,.08);
+  transition: transform .18s ease, opacity .18s ease, background .18s ease, box-shadow .18s ease;
 }
 
 .link-tile[data-empty="true"] {
@@ -3033,6 +3039,12 @@ body.home .site-header {
   color: #fffaf2;
   background: linear-gradient(135deg, rgba(40,120,107,.92), rgba(1,205,253,.58));
   transform: translateY(-2px);
+}
+
+.link-tile[data-clearing="true"] {
+  opacity: 0;
+  transform: scale(.72) rotate(-4deg);
+  box-shadow: 0 0 0 3px rgba(1,205,253,.18), 0 14px 28px rgba(44,42,35,.08);
 }
 
 .quiz-board {

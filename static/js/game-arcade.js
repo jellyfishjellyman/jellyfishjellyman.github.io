@@ -29,6 +29,8 @@
 
   const resetBoard = (className) => {
     cleanup();
+    document.body.classList.remove("arcade-lock-scroll");
+    document.documentElement.classList.remove("arcade-lock-scroll");
     board.className = `arcade-board ${className}`;
     board.innerHTML = "";
     cleanup = () => {};
@@ -43,25 +45,49 @@
     return { canvas, ctx: canvas.getContext("2d") };
   };
 
+  const shuffle = (items) => {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+
   const startJump = () => {
     resetBoard("jump-board");
     const { canvas, ctx } = makeCanvas();
     let score = 0;
     let power = 0;
     let charging = false;
-    let player = { x: 170, y: 382 };
-    let target = nextPlatform();
+    let animating = false;
     let raf = 0;
+    const base = { x: 170, y: 400, r: 58 };
+    let player = { x: base.x, y: base.y - 20 };
+    let target = nextPlatform();
 
     function nextPlatform() {
       return {
-        x: 440 + Math.random() * 270,
-        y: 300 + Math.random() * 140,
-        r: 42 + Math.random() * 20,
+        x: 350 + Math.random() * 250,
+        y: 320 + Math.random() * 96,
+        r: 50 + Math.random() * 22,
       };
     }
 
-    function draw() {
+    function drawPlatform(x, y, r, color) {
+      ctx.fillStyle = "rgba(44,42,35,.12)";
+      ctx.beginPath();
+      ctx.ellipse(x + 5, y + 14, r * 1.16, r * .42, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(x, y, r, r * .37, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(40,120,107,.28)";
+      ctx.stroke();
+    }
+
+    function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
       bg.addColorStop(0, "#f8fffb");
@@ -69,80 +95,131 @@
       bg.addColorStop(1, "#fff5fb");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "rgba(40,120,107,.12)";
+      ctx.strokeStyle = "rgba(40,120,107,.1)";
       for (let x = 0; x < canvas.width; x += 40) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
       }
-      drawPlatform(170, 400, 52, "#c7f5dc");
+      drawPlatform(base.x, base.y, base.r, "#c7f5dc");
       drawPlatform(target.x, target.y, target.r, "#fff2fb");
-      ctx.fillStyle = "rgba(40,120,107,.85)";
+      ctx.strokeStyle = "rgba(189,93,54,.38)";
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(player.x, player.y - (charging ? power * .16 : 0), 22, 0, Math.PI * 2);
+      ctx.ellipse(target.x, target.y, target.r * .52, target.r * .18, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.fillStyle = "rgba(40,120,107,.88)";
+      ctx.beginPath();
+      ctx.arc(player.x, player.y - (charging ? power * .12 : 0), 22, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = "rgba(189,93,54,.86)";
       ctx.fillRect(46, 486, Math.min(power, 100) * 3, 12);
       ctx.fillStyle = "rgba(23,32,27,.62)";
       ctx.font = "700 18px system-ui";
       ctx.fillText("按住蓄力，松开起跳", 46, 462);
-      if (charging) {
-        power = Math.min(100, power + 1.35);
-        raf = requestAnimationFrame(draw);
-      }
     }
 
-    function drawPlatform(x, y, r, color) {
-      ctx.fillStyle = "rgba(44,42,35,.12)";
-      ctx.beginPath();
-      ctx.ellipse(x + 4, y + 12, r * 1.15, r * .4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.ellipse(x, y, r, r * .36, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(40,120,107,.28)";
-      ctx.stroke();
+    function drawCharge() {
+      if (!charging) return;
+      power += 1.05;
+      if (power > 100) power = 100;
+      setText(score, Math.round(power), "蓄力中，松开起跳。");
+      drawScene();
+      raf = requestAnimationFrame(drawCharge);
+    }
+
+    function animateJump(success, landing) {
+      animating = true;
+      const start = { ...player };
+      const end = success ? { x: target.x, y: target.y - 20 } : landing;
+      const startTime = performance.now();
+      const duration = 520;
+      const frame = (now) => {
+        const t = Math.min(1, (now - startTime) / duration);
+        const ease = 1 - Math.pow(1 - t, 2);
+        player.x = start.x + (end.x - start.x) * ease;
+        player.y = start.y + (end.y - start.y) * ease - Math.sin(t * Math.PI) * 120;
+        drawScene();
+        if (t < 1) {
+          raf = requestAnimationFrame(frame);
+          return;
+        }
+        animating = false;
+        if (success) {
+          window.setTimeout(() => {
+            player = { x: base.x, y: base.y - 20 };
+            target = nextPlatform();
+            power = 0;
+            drawScene();
+          }, 260);
+        } else {
+          power = 0;
+          score = 0;
+          window.setTimeout(() => {
+            player = { x: base.x, y: base.y - 20 };
+            drawScene();
+          }, 420);
+        }
+      };
+      raf = requestAnimationFrame(frame);
     }
 
     function release() {
-      if (!charging) return;
+      if (!charging || animating) return;
       charging = false;
+      canvas.dataset.charging = "false";
       cancelAnimationFrame(raf);
-      const dx = target.x - 170;
-      const dy = target.y - 400;
-      const need = Math.sqrt(dx * dx + dy * dy) / 6.8;
+      const dx = target.x - base.x;
+      const dy = target.y - base.y;
+      const need = Math.sqrt(dx * dx + dy * dy) / 7.6;
       const diff = Math.abs(power - need);
-      if (diff < 13) {
-        score += diff < 5 ? 2 : 1;
+      const tolerance = 22;
+      const angle = Math.atan2(dy, dx);
+      const travel = power * 7.6;
+      const landing = {
+        x: base.x + Math.cos(angle) * travel,
+        y: base.y + Math.sin(angle) * travel - 20,
+      };
+      if (diff <= tolerance) {
+        score += diff < 8 ? 2 : 1;
         saveBest(score);
-        player = { x: target.x, y: target.y - 18 };
-        setText(score, Math.round(power), diff < 5 ? "漂亮，落在中心附近。" : "成功落地。");
-        window.setTimeout(() => {
-          player = { x: 170, y: 382 };
-          target = nextPlatform();
-          power = 0;
-          draw();
-        }, 360);
+        setText(score, `${Math.round(power)}/${Math.round(need)}`, diff < 8 ? "漂亮，落点很稳。" : "成功落地。");
+        animateJump(true, landing);
       } else {
-        setText(score, Math.round(power), "力度偏了，重新开始。");
-        score = 0;
-        power = 0;
-        window.setTimeout(draw, 360);
+        setText(score, `${Math.round(power)}/${Math.round(need)}`, diff > tolerance + 18 ? "差得有点多，试试短按一点。" : "差一点点，再来。");
+        animateJump(false, landing);
       }
     }
 
-    const press = () => { if (!charging) { charging = true; power = 0; draw(); } };
+    const press = (event) => {
+      event?.preventDefault?.();
+      if (charging || animating) return;
+      charging = true;
+      canvas.dataset.charging = "true";
+      power = 0;
+      setText(score, 0, "蓄力中，松开起跳。");
+      drawCharge();
+    };
     canvas.addEventListener("pointerdown", press);
+    canvas.addEventListener("mousedown", press);
+    canvas.addEventListener("touchstart", press, { passive: false });
+    canvas.addEventListener("pointercancel", release);
     window.addEventListener("pointerup", release);
+    window.addEventListener("mouseup", release);
+    window.addEventListener("touchend", release);
     cleanup = () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointerup", release);
+      window.removeEventListener("mouseup", release);
+      window.removeEventListener("touchend", release);
     };
-    setText(0, 0, "按住画面蓄力，松开跳跃。");
-    draw();
+    setText(0, 0, "判定已放宽。按住越久跳得越远。");
+    drawScene();
   };
 
   const startSnake = () => {
     resetBoard("snake-board");
+    document.body.classList.add("arcade-lock-scroll");
+    document.documentElement.classList.add("arcade-lock-scroll");
     const { canvas, ctx } = makeCanvas();
     const cols = 24;
     const rows = 15;
@@ -154,6 +231,7 @@
     let running = true;
     let timer = 0;
     let startTouch = null;
+    const lockedScrollY = window.scrollY;
 
     function spawnFood() {
       let p;
@@ -209,6 +287,10 @@
     }
 
     const key = (event) => {
+      if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      requestAnimationFrame(() => window.scrollTo(0, lockedScrollY));
       if (event.key === "ArrowUp") setDir(0, -1);
       if (event.key === "ArrowDown") setDir(0, 1);
       if (event.key === "ArrowLeft") setDir(-1, 0);
@@ -224,15 +306,20 @@
       else setDir(0, dy > 0 ? 1 : -1);
     };
 
-    window.addEventListener("keydown", key);
+    window.addEventListener("keydown", key, { capture: true, passive: false });
+    document.addEventListener("keydown", key, { capture: true, passive: false });
     canvas.addEventListener("touchstart", touchStart, { passive: true });
     canvas.addEventListener("touchend", touchEnd, { passive: true });
+    canvas.focus();
     timer = window.setInterval(tick, 150);
     cleanup = () => {
+      document.body.classList.remove("arcade-lock-scroll");
+      document.documentElement.classList.remove("arcade-lock-scroll");
       window.clearInterval(timer);
-      window.removeEventListener("keydown", key);
+      window.removeEventListener("keydown", key, { capture: true });
+      document.removeEventListener("keydown", key, { capture: true });
     };
-    setText(score, "普通", "方向键或滑动控制。");
+    setText(score, "普通", "方向键不会再滚动页面。");
     draw();
   };
 
@@ -240,23 +327,16 @@
     resetBoard("link-board");
     const size = 8;
     const symbols = ["月", "星", "海", "云", "花", "书", "灯", "雨", "糖", "叶", "风", "梦"];
-    const inner = [];
-    symbols.forEach((s) => inner.push(s, s));
-    while (inner.length < 36) inner.push(...symbols.slice(0, 6));
-    inner.length = 36;
-    inner.sort(() => Math.random() - .5);
-    let cells = Array.from({ length: size * size }, (_, i) => {
-      const x = i % size;
-      const y = Math.floor(i / size);
-      if (!x || !y || x === size - 1 || y === size - 1) return "";
-      return inner.shift();
-    });
+    let cells = [];
     let selected = -1;
     let matched = 0;
+    let clearing = new Set();
 
     const index = (x, y) => y * size + x;
     const point = (i) => ({ x: i % size, y: Math.floor(i / size) });
     const empty = (i) => cells[i] === "";
+    const playableIndexes = () => cells.map((value, i) => value && point(i).x && point(i).y && point(i).x < size - 1 && point(i).y < size - 1 ? i : -1).filter((i) => i >= 0);
+
     const clearLine = (a, b) => {
       if (a.x !== b.x && a.y !== b.y) return false;
       const dx = Math.sign(b.x - a.x);
@@ -269,6 +349,7 @@
       }
       return true;
     };
+
     const canConnect = (aIndex, bIndex) => {
       const a = point(aIndex);
       const b = point(bIndex);
@@ -290,24 +371,86 @@
       return false;
     };
 
+    const findMove = () => {
+      const items = playableIndexes();
+      for (let a = 0; a < items.length; a += 1) {
+        for (let b = a + 1; b < items.length; b += 1) {
+          if (cells[items[a]] === cells[items[b]] && canConnect(items[a], items[b])) return [items[a], items[b]];
+        }
+      }
+      return null;
+    };
+
+    const reshuffleRemaining = () => {
+      const indexes = playableIndexes();
+      const values = shuffle(indexes.map((i) => cells[i]));
+      indexes.forEach((cellIndex, i) => { cells[cellIndex] = values[i]; });
+      selected = -1;
+    };
+
+    const ensureMove = () => {
+      let guard = 0;
+      while (cells.some(Boolean) && !findMove() && guard < 60) {
+        reshuffleRemaining();
+        guard += 1;
+      }
+      return guard > 0;
+    };
+
+    const buildCells = () => {
+      const values = [];
+      while (values.length < 36) {
+        const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+        values.push(symbol, symbol);
+      }
+      values.length = 36;
+      const shuffled = shuffle(values);
+      cells = Array.from({ length: size * size }, (_, i) => {
+        const x = i % size;
+        const y = Math.floor(i / size);
+        if (!x || !y || x === size - 1 || y === size - 1) return "";
+        return shuffled.shift();
+      });
+      ensureMove();
+    };
+
     function render(hint) {
       board.innerHTML = "";
       board.style.setProperty("--link-size", size);
+      const move = findMove();
       cells.forEach((value, i) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "link-tile";
         button.dataset.empty = value ? "false" : "true";
         button.dataset.selected = selected === i ? "true" : "false";
+        button.dataset.clearing = clearing.has(i) ? "true" : "false";
+        button.dataset.hintPair = move && move.includes(i) ? "true" : "false";
         button.textContent = value;
-        button.disabled = !value;
+        button.disabled = !value || clearing.size > 0;
         button.addEventListener("click", () => pick(i));
         board.appendChild(button);
       });
       setText(matched / 2, cells.filter(Boolean).length, hint || "选择两张相同卡片。");
     }
 
+    function removePair(a, b) {
+      clearing = new Set([a, b]);
+      render("连上了。");
+      window.setTimeout(() => {
+        cells[a] = "";
+        cells[b] = "";
+        clearing = new Set();
+        matched += 2;
+        selected = -1;
+        saveBest(matched / 2);
+        const shuffled = ensureMove();
+        render(cells.some(Boolean) ? (shuffled ? "已自动洗牌，保证还有可连的牌。" : "继续找下一组。") : "全部消除完成。");
+      }, 220);
+    }
+
     function pick(i) {
+      if (clearing.size || !cells[i]) return;
       if (selected < 0) {
         selected = i;
         render("再选一张相同图案。");
@@ -319,31 +462,53 @@
         return;
       }
       if (cells[selected] === cells[i] && canConnect(selected, i)) {
-        cells[selected] = "";
-        cells[i] = "";
-        matched += 2;
-        selected = -1;
-        saveBest(matched / 2);
-        render(cells.some(Boolean) ? "连上了，继续找。" : "全部消除完成。");
+        removePair(selected, i);
       } else {
         selected = i;
-        render("这两张暂时连不上。");
+        render("这两张暂时连不上，已切换选择。");
       }
     }
 
-    render("选择两张相同卡片，路径最多两次转弯。");
+    buildCells();
+    render("开局已检查，若无解会自动洗牌。");
   };
 
   const startQuiz = () => {
     resetBoard("quiz-board");
     const questions = [
       { q: "什么东西越洗越脏？", a: ["水", "毛巾", "肥皂"], ok: 0 },
-      { q: "一只船最多能坐十个人，上来九个后又来一个，船为什么没沉？", a: ["因为是潜水艇", "因为船在岸上", "因为第十个是船长"], ok: 1 },
+      { q: "一只船最多能坐十个人，上来九个后又来一个，船为什么没沉？", a: ["因为船在岸上", "因为是潜水艇", "因为第十个是船长"], ok: 0 },
       { q: "哪一种书买不到？", a: ["秘书", "旧书", "电子书"], ok: 0 },
       { q: "什么门永远关不上？", a: ["球门", "木门", "校门"], ok: 0 },
       { q: "什么东西越分享越多？", a: ["秘密", "知识", "冰块"], ok: 1 },
+      { q: "什么东西越用越少，但越少越亮？", a: ["蜡烛", "影子", "镜子"], ok: 0 },
+      { q: "什么路最窄？", a: ["冤家路", "山路", "小路"], ok: 0 },
+      { q: "什么东西有脚却不会走？", a: ["桌子", "地图", "钟表"], ok: 0 },
+      { q: "什么东西越剪越长？", a: ["队伍", "头发", "布"], ok: 0 },
+      { q: "什么人每天靠运气吃饭？", a: ["气象员", "司机", "厨师"], ok: 0 },
+      { q: "什么字人人都会念错？", a: ["错", "难", "谜"], ok: 0 },
+      { q: "什么东西看得见却摸不着？", a: ["影子", "玻璃", "水"], ok: 0 },
+      { q: "哪种动物最安静？", a: ["睡着的动物", "乌龟", "鱼"], ok: 0 },
+      { q: "什么东西不怕水，却怕太阳？", a: ["雪人", "雨伞", "船"], ok: 0 },
+      { q: "什么东西越走越远却不会动？", a: ["时间", "钟", "路灯"], ok: 0 },
+      { q: "什么东西能装下世界，却放不进抽屉？", a: ["地图", "箱子", "书包"], ok: 0 },
+      { q: "什么东西白天看不见，晚上常出现？", a: ["星星", "云", "太阳"], ok: 0 },
+      { q: "什么东西人人都需要，但没人想失去？", a: ["时间", "钱包", "作业"], ok: 0 },
+      { q: "什么东西越擦越小？", a: ["橡皮", "桌子", "玻璃"], ok: 0 },
+      { q: "什么东西没有嘴却会告诉你时间？", a: ["钟表", "书", "镜子"], ok: 0 },
+      { q: "什么东西可以穿过玻璃却不会打碎它？", a: ["光", "石头", "雨"], ok: 0 },
+      { q: "什么东西总在前面，却永远到不了？", a: ["未来", "影子", "终点"], ok: 0 },
+      { q: "什么东西写出来是黑的，读起来是亮的？", a: ["知识", "墨水", "铅笔"], ok: 0 },
+      { q: "什么东西一说出来就打破了？", a: ["沉默", "玻璃", "谜底"], ok: 0 },
+      { q: "什么东西越冷越爱出来？", a: ["白气", "汗", "影子"], ok: 0 },
+      { q: "什么东西你给别人后，自己仍然拥有？", a: ["建议", "钱", "钥匙"], ok: 0 },
+      { q: "什么东西有城市、河流和山，却没有人？", a: ["地图", "照片", "游戏"], ok: 0 },
+      { q: "什么东西越等越短？", a: ["倒计时", "路", "影子"], ok: 0 },
+      { q: "什么东西没有翅膀却能飞？", a: ["时间", "纸飞机", "鸟"], ok: 0 },
+      { q: "什么东西每天都在变，却从不说话？", a: ["天气", "石头", "尺子"], ok: 0 },
     ];
-    let order = questions.map((_, i) => i).sort(() => Math.random() - .5);
+    const roundSize = 10;
+    let order = shuffle(questions.map((_, i) => i)).slice(0, roundSize);
     let cursor = 0;
     let score = 0;
 
@@ -352,7 +517,7 @@
       board.innerHTML = "";
       const card = document.createElement("div");
       card.className = "quiz-card";
-      card.innerHTML = `<p class=\"eyebrow\">Question ${cursor + 1}/${questions.length}</p><h2>${item.q}</h2>`;
+      card.innerHTML = `<p class="eyebrow">Question ${cursor + 1}/${roundSize}</p><h2>${item.q}</h2>`;
       item.a.forEach((answer, index) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -362,23 +527,24 @@
         card.appendChild(button);
       });
       board.appendChild(card);
-      setText(score, `${cursor + 1}/${questions.length}`, hint || "选择一个答案。");
+      setText(score, `${cursor + 1}/${roundSize}`, hint || "选择一个答案。");
     }
 
     function choose(index) {
       const item = questions[order[cursor]];
-      if (index === item.ok) score += 1;
+      const correct = index === item.ok;
+      if (correct) score += 1;
       cursor += 1;
-      if (cursor >= questions.length) {
+      if (cursor >= roundSize) {
         saveBest(score);
-        board.innerHTML = `<div class=\"quiz-card\"><p class=\"eyebrow\">Result</p><h2>答对 ${score} / ${questions.length}</h2><p>点击开始可以换一组顺序再来。</p></div>`;
-        setText(score, "完成", score >= 4 ? "不错，脑子醒了。" : "再来一轮会更顺。");
+        board.innerHTML = `<div class="quiz-card"><p class="eyebrow">Result</p><h2>答对 ${score} / ${roundSize}</h2><p>题库已扩展，每轮随机抽 10 题。</p></div>`;
+        setText(score, "完成", score >= 8 ? "不错，脑子醒了。" : "再来一轮会更顺。");
       } else {
-        render(index === item.ok ? "答对了。" : `答案是：${item.a[item.ok]}`);
+        render(correct ? "答对了。" : `答案是：${item.a[item.ok]}`);
       }
     }
 
-    render("选择一个答案。");
+    render("题库已扩展，每轮随机抽 10 题。");
   };
 
   const startPianoTiles = () => {
@@ -463,15 +629,6 @@
     let tray = [];
     let cleared = 0;
     let locked = false;
-
-    const shuffle = (items) => {
-      const copy = [...items];
-      for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    };
 
     const buildDeck = () => {
       const cards = [];
