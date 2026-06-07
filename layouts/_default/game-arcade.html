@@ -1,0 +1,38 @@
+{{ define "main" }}
+<section class="game-play-page arcade-play-page">
+  <div class="game-shell game-shell-wide reveal-on-scroll" data-arcade-game="{{ .Params.arcade_game }}">
+    <div class="game-panel arcade-panel">
+      <p class="eyebrow">Game</p>
+      <h1>{{ .Title }}</h1>
+      <div class="module-copy">{{ .Content }}</div>
+
+      <div class="score-row score-row-three" aria-label="游戏状态">
+        <div>
+          <span>{{ .Params.score_label | default "分数" }}</span>
+          <strong id="arcadeScore">0</strong>
+        </div>
+        <div>
+          <span>{{ .Params.stat_label | default "状态" }}</span>
+          <strong id="arcadeStat">-</strong>
+        </div>
+        <div>
+          <span>最好</span>
+          <strong id="arcadeBest">-</strong>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="primary-button" id="arcadeStart" type="button">开始</button>
+        <button class="ghost-button" id="arcadeMode" type="button">普通</button>
+        <a class="ghost-button" href="/games/">返回游戏</a>
+      </div>
+      <p id="arcadeHint" class="game-message" aria-live="polite"></p>
+    </div>
+
+    <div class="board-wrap arcade-wrap">
+      <div id="arcadeBoard" class="arcade-board" tabindex="0" aria-label="{{ .Title }} 游戏区域"></div>
+    </div>
+  </div>
+</section>
+<script src="/js/game-arcade.js" defer></script>
+{{ end }}

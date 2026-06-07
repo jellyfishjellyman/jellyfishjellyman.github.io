@@ -14,17 +14,31 @@
     </div>
   </div>
 
+  <div class="tools-workbench reveal-on-scroll" aria-label="工具页说明">
+    <div>
+      <p class="eyebrow">Workbench</p>
+      <h2>把常用入口收在一张温柔的工具台里</h2>
+    </div>
+    <div class="tools-workbench-steps">
+      <span>收藏</span>
+      <span>处理</span>
+      <span>写作</span>
+      <span>维护</span>
+    </div>
+  </div>
+
   <div class="module-grid tools-grid">
-    {{ range site.Data.tools }}
+    {{ range $groupIndex, $group := site.Data.tools }}
       {{ $visibleCount := 6 }}
-      {{ $items := .items }}
+      {{ $items := $group.items }}
       {{ $hiddenCount := sub (len $items) $visibleCount }}
-      <article class="module-card tool-card reveal-on-scroll">
+      <article class="module-card tool-card reveal-on-scroll" data-tool-index="{{ $groupIndex }}">
         <div class="module-card-head">
-          <span class="module-icon" aria-hidden="true">{{ substr .title 0 1 }}</span>
+          <span class="module-icon" aria-hidden="true">{{ substr $group.title 0 1 }}</span>
           <div>
-            <h2>{{ .title }}</h2>
-            <p>{{ .description }}</p>
+            <p class="tool-count">{{ len $items }} 个入口</p>
+            <h2>{{ $group.title }}</h2>
+            <p>{{ $group.description }}</p>
           </div>
         </div>
         <div class="link-list">
