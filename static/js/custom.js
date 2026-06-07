@@ -603,6 +603,13 @@
         return String(value).slice(0, 16);
       }
     };
+    const formatDuration = (seconds) => {
+      const total = Number(seconds || 0);
+      if (!Number.isFinite(total) || total <= 0) return "";
+      const hours = Math.floor(total / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      return `${hours} 小时 ${minutes} 分钟`;
+    };
     const titleCase = (value) => cleanText(value)
       .split(/[\s_-]+/)
       .filter(Boolean)
@@ -735,7 +742,7 @@
           data = text;
         }
         if (!response.ok) {
-          const message = data?.message || data?.title || `请求失败：${response.status}`;
+          const message = data?.message || data?.title || data?.error || `请求失败：${response.status}`;
           throw new Error(message);
         }
         return data;
@@ -1588,6 +1595,163 @@
             })),
           }],
           note: audioUrl.startsWith("https://") ? "音频不会自动播放，需要手动点击播放。" : "该电台只返回非 HTTPS 音频流，当前页面不直接播放以避免混合内容。",
+        });
+      },
+      catfacts: async () => {
+        const data = await fetchJsonWithTimeout("https://catfact.ninja/fact");
+        if (!data?.fact) throw new Error("没有拿到猫冷知识");
+        renderApiResult("catfacts", {
+          title: "猫冷知识",
+          meta: "Catfact Ninja",
+          summary: data.fact,
+          rows: [
+            { label: "字符数", value: data.length ? `${data.length} 个` : "" },
+            { label: "语言", value: "English" },
+          ],
+        });
+      },
+      sunlight: async (formData) => {
+        const lat = Number(formData.get("lat"));
+        const lng = Number(formData.get("lng"));
+        const date = cleanText(formData.get("date")) || "today";
+        if (!Number.isFinite(lat) || lat < -90 || lat > 90) throw new Error("纬度需要在 -90 到 90 之间");
+        if (!Number.isFinite(lng) || lng < -180 || lng > 180) throw new Error("经度需要在 -180 到 180 之间");
+        const data = await fetchJsonWithTimeout(`https://api.sunrise-sunset.org/json?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&date=${encodeURIComponent(date)}&formatted=0`);
+        const result = data?.results;
+        if (data?.status !== "OK" || !result) throw new Error("日照服务没有返回可用数据");
+        renderApiResult("sunlight", {
+          title: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+          meta: "Sunrise Sunset",
+          rows: [
+            { label: "日出", value: formatDateTime(result.sunrise) },
+            { label: "日落", value: formatDateTime(result.sunset) },
+            { label: "正午", value: formatDateTime(result.solar_noon) },
+            { label: "昼长", value: formatDuration(result.day_length) },
+          ],
+          sections: [{
+            title: "晨昏线",
+            items: [
+              { label: "民用晨光", value: formatDateTime(result.civil_twilight_begin), meta: `结束 ${formatDateTime(result.civil_twilight_end)}` },
+              { label: "航海晨光", value: formatDateTime(result.nautical_twilight_begin), meta: `结束 ${formatDateTime(result.nautical_twilight_end)}` },
+              { label: "天文晨光", value: formatDateTime(result.astronomical_twilight_begin), meta: `结束 ${formatDateTime(result.astronomical_twilight_end)}` },
+            ],
+          }],
+          note: "时间按当前浏览器时区显示。",
+        });
+      },
+      uselessfacts: async () => {
+        const data = await fetchJsonWithTimeout("https://uselessfacts.jsph.pl/api/v2/facts/random?language=en");
+        if (!data?.text) throw new Error("没有拿到冷知识");
+        renderApiResult("uselessfacts", {
+          title: "无用冷知识",
+          meta: "Useless Facts",
+          summary: data.text,
+          rows: [
+            { label: "语言", value: data.language || "en" },
+            { label: "来源", value: data.source },
+          ],
+          link: data.source_url ? { href: data.source_url, label: "查看来源" } : null,
+        });
+      },
+      icefire: async (formData) => {
+        const name = cleanText(formData.get("name"));
+        if (!name) throw new Error("请输入角色名");
+        const data = await fetchJsonWithTimeout(`https://anapioficeandfire.com/api/characters?name=${encodeURIComponent(name)}`);
+        const characters = Array.isArray(data) ? data : [];
+        const character = characters.find((item) => cleanText(item.name).toLowerCase() === name.toLowerCase()) || characters[0];
+        if (!character) throw new Error("没有找到角色");
+        const aliases = (character.aliases || []).map(cleanText).filter((item) => item && item !== character.name);
+        const title = character.name || aliases[0] || name;
+        renderApiResult("icefire", {
+          title,
+          meta: "An API of Ice and Fire",
+          rows: [
+            { label: "性别", value: character.gender },
+            { label: "文化", value: character.culture },
+            { label: "出生", value: character.born },
+            { label: "死亡", value: character.died || "未列出" },
+            { label: "登场书籍", value: character.books?.length ? `${character.books.length} 本` : "" },
+          ],
+          chips: [...(character.titles || []), ...aliases].filter(Boolean).slice(0, 12),
+          sections: [{
+            title: "更多匹配",
+            items: characters.slice(0, 6).map((item) => ({
+              label: item.gender || "角色",
+              value: item.name || (item.aliases || []).find(Boolean) || "未命名角色",
+              meta: compactJoin([item.culture, item.born], " · "),
+            })),
+          }],
+          link: character.url ? { href: character.url, label: "打开 API 记录" } : null,
+        });
+      },
+      rickmorty: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入角色关键词");
+        const data = await fetchJsonWithTimeout(`https://rickandmortyapi.com/api/character/?name=${encodeURIComponent(query)}`);
+        const characters = data?.results || [];
+        const character = characters[0];
+        if (!character) throw new Error("没有找到角色");
+        renderApiResult("rickmorty", {
+          title: character.name,
+          meta: "Rick and Morty API",
+          image: character.image ? { src: character.image, alt: character.name } : null,
+          rows: [
+            { label: "状态", value: character.status },
+            { label: "物种", value: character.species },
+            { label: "性别", value: character.gender },
+            { label: "来源", value: character.origin?.name },
+            { label: "地点", value: character.location?.name },
+            { label: "集数", value: character.episode?.length ? `${character.episode.length} 集` : "" },
+          ],
+          chips: characters.slice(1, 10).map((item) => item.name),
+          sections: [{
+            title: "候选角色",
+            items: characters.slice(0, 6).map((item) => ({
+              label: compactJoin([item.status, item.species], " · "),
+              value: item.name,
+              meta: item.location?.name,
+            })),
+          }],
+          link: character.url ? { href: character.url, label: "打开 API 记录" } : null,
+          note: data?.info?.count ? `共匹配 ${formatNumber(data.info.count, 0)} 个角色。` : "",
+        });
+      },
+      musicSuggest: async (formData) => {
+        const query = cleanText(formData.get("query"));
+        if (!query) throw new Error("请输入音乐关键词");
+        const data = await fetchJsonWithTimeout(`https://verome-api.deno.dev/api/search/suggestions?q=${encodeURIComponent(query)}`);
+        const suggestions = Array.isArray(data?.suggestions) ? data.suggestions : [];
+        if (!suggestions.length) throw new Error("没有找到音乐联想");
+        renderApiResult("musicSuggest", {
+          title: query,
+          meta: "Verome API · suggestions",
+          rows: [
+            { label: "联想数量", value: `${suggestions.length} 条` },
+            { label: "数据类型", value: "音乐搜索建议" },
+          ],
+          chips: suggestions.slice(0, 10),
+          sections: [{
+            title: "建议列表",
+            items: suggestions.slice(0, 8).map((item, index) => ({
+              label: `#${index + 1}`,
+              value: item,
+            })),
+          }],
+        });
+      },
+      virtualface: async () => {
+        renderApiResult("virtualface", {
+          title: "随机虚拟人像",
+          meta: "This Person Does Not Exist",
+          image: {
+            src: `https://thispersondoesnotexist.com/?${Date.now()}`,
+            alt: "AI generated face",
+          },
+          rows: [
+            { label: "类型", value: "AI 生成图像" },
+            { label: "尺寸", value: "通常 1024 × 1024" },
+          ],
+          note: "这是一张随机生成的人像。",
         });
       },
     };

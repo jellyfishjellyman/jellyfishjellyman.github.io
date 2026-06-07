@@ -2404,6 +2404,28 @@ body.home .site-header {
 .api-lab-tabs {
   display: grid;
   gap: 8px;
+  max-block-size: min(62vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  scrollbar-color: color-mix(in srgb, var(--accent) 38%, transparent) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.api-lab-tabs::-webkit-scrollbar {
+  width: 8px;
+}
+
+.api-lab-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.api-lab-tabs::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 36%, transparent);
+  background-clip: padding-box;
 }
 
 .api-lab-tabs button {
@@ -5470,6 +5492,7 @@ blockquote,
 
   .api-lab-tabs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-block-size: 42vh;
   }
 
   .api-lab-tabs button {

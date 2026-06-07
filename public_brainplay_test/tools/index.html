@@ -160,7 +160,7 @@
     <div class="module-stats" aria-label="工具概览">
       <span><strong>8</strong> 个工具组</span>
       <span><strong>30</strong> 个入口</span>
-      <span><strong>30</strong> 个实时工具</span>
+      <span><strong>37</strong> 个实时工具</span>
     </div>
   </div>
 
@@ -182,7 +182,7 @@
       <div class="public-api-lab-head">
         <div>
           <p class="eyebrow">Live Tools</p>
-          <h2>三十个实时小工具</h2>
+          <h2>三十七个实时小工具</h2>
         </div>
         <div class="api-lab-badges" aria-label="实时工具状态">
           <span>免密</span>
@@ -223,6 +223,13 @@
           <button type="button" role="tab" aria-selected="false" data-api-tab="openalex">学术搜索</button>
           <button type="button" role="tab" aria-selected="false" data-api-tab="species">物种搜索</button>
           <button type="button" role="tab" aria-selected="false" data-api-tab="radio">网络电台</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="catfacts">猫冷知识</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="sunlight">日出日落</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="uselessfacts">无用冷知识</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="icefire">冰火角色</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="rickmorty">瑞克莫蒂</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="musicSuggest">音乐联想</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="virtualface">虚拟人像</button>
         </div>
 
         <div class="api-lab-panels">
@@ -749,6 +756,100 @@
               <strong>Radio Browser</strong>
             </div>
           </section>
+
+          <section class="api-lab-panel" data-api-panel="catfacts">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="catfacts">
+              <button class="primary-button" type="submit">换一条</button>
+            </form>
+            <div class="api-result" data-api-result="catfacts" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Catfact Ninja</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="sunlight">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="sunlight">
+              <label>
+                <span>纬度</span>
+                <input name="lat" type="number" min="-90" max="90" step="0.0001" value="31.2304">
+              </label>
+              <label>
+                <span>经度</span>
+                <input name="lng" type="number" min="-180" max="180" step="0.0001" value="121.4737">
+              </label>
+              <label>
+                <span>日期</span>
+                <input name="date" type="date">
+              </label>
+              <button class="primary-button" type="submit">查日照</button>
+            </form>
+            <div class="api-result" data-api-result="sunlight" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Sunrise Sunset</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="uselessfacts">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="uselessfacts">
+              <button class="primary-button" type="submit">换一条</button>
+            </form>
+            <div class="api-result" data-api-result="uselessfacts" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Useless Facts</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="icefire">
+            <form class="api-lab-form" data-api-form="icefire">
+              <label>
+                <span>角色名</span>
+                <input name="name" type="search" value="Jon Snow" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">查角色</button>
+            </form>
+            <div class="api-result" data-api-result="icefire" aria-live="polite">
+              <span>等待查询</span>
+              <strong>An API of Ice and Fire</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="rickmorty">
+            <form class="api-lab-form" data-api-form="rickmorty">
+              <label>
+                <span>角色关键词</span>
+                <input name="query" type="search" value="rick" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">搜角色</button>
+            </form>
+            <div class="api-result" data-api-result="rickmorty" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Rick and Morty API</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="musicSuggest">
+            <form class="api-lab-form" data-api-form="musicSuggest">
+              <label>
+                <span>音乐关键词</span>
+                <input name="query" type="search" value="yellow" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">找联想</button>
+            </form>
+            <div class="api-result" data-api-result="musicSuggest" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Verome API</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="virtualface">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="virtualface">
+              <button class="primary-button" type="submit">换一张</button>
+            </form>
+            <div class="api-result" data-api-result="virtualface" aria-live="polite">
+              <span>等待查询</span>
+              <strong>This Person Does Not Exist</strong>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -1155,7 +1256,7 @@
     <div class="footer-meta">
       <span>&copy; 2026</span>
       <span>Built with Hugo 0.155.2</span>
-      <span>Updated 2026-06-07 22:29</span>
+      <span>Updated 2026-06-07 22:56</span>
     </div>
   </div>
 </footer>

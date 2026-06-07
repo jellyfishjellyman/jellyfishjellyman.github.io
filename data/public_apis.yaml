@@ -236,3 +236,52 @@
   auth: 免密
   cors: CORS 可用
   description: 搜索网络电台并播放 HTTPS 音频流。
+- name: Catfact Ninja
+  tool: catfacts
+  category: Entertainment
+  url: https://catfact.ninja/
+  auth: 免密
+  cors: CORS 可用
+  description: 随机返回英文猫冷知识。
+- name: Sunrise Sunset
+  tool: sunlight
+  category: Calendar
+  url: https://sunrise-sunset.org/api
+  auth: 免密
+  cors: CORS 可用
+  description: 按经纬度和日期查询日出、日落、昼长和晨昏线。
+- name: Useless Facts
+  tool: uselessfacts
+  category: Entertainment
+  url: https://uselessfacts.jsph.pl/
+  auth: 免密
+  cors: CORS 可用
+  description: 随机返回英文无用冷知识，并附来源链接。
+- name: An API of Ice and Fire
+  tool: icefire
+  category: Books
+  url: https://anapioficeandfire.com/
+  auth: 免密
+  cors: 浏览器可读
+  description: 查询冰与火之歌角色、别名、头衔和登场书籍。
+- name: Rick and Morty API
+  tool: rickmorty
+  category: Games & Comics
+  url: https://rickandmortyapi.com/
+  auth: 免密
+  cors: CORS 可用
+  description: 搜索 Rick and Morty 角色、状态、物种、地点和头像。
+- name: Verome API
+  tool: musicSuggest
+  category: Music
+  url: https://github.com/Kirazul/Verome-API
+  auth: 免密
+  cors: CORS 可用
+  description: 基于音乐关键词返回搜索建议；只展示元数据，不调用歌词或流媒体接口。
+- name: This Person Does Not Exist
+  tool: virtualface
+  category: Entertainment
+  url: https://thispersondoesnotexist.com/
+  auth: 免密
+  cors: 图片直连可用
+  description: 以前端图片方式加载随机生成的虚拟人像。
