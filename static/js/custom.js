@@ -996,7 +996,7 @@
     loadGuestMessages();
   }
 
-  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item, .api-source-card");
+  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item, .api-source-card, .api-directory-item");
   if (finePointer) {
     selectableItems.forEach((item) => {
       item.addEventListener(
@@ -1103,7 +1103,7 @@
     setAmbientState("off", "开启氛围声音", "默认关闭");
   }
 
-  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item");
+  const revealItems = document.querySelectorAll(".reveal-on-scroll, .post-card, .feature-card, .module-card, .game-card, .resource-tag, .link-item, .api-source-card, .api-directory-item");
   if ("IntersectionObserver" in window && !reduceMotion) {
     const observer = new IntersectionObserver(
       (entries) => {

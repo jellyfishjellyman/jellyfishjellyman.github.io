@@ -29,6 +29,8 @@
   </div>
 
   {{ with site.Data.public_apis }}
+    {{ $featuredApis := where . "featured" true }}
+    {{ $candidateApis := where . "featured" "ne" true }}
     <section class="public-api-lab reveal-on-scroll" data-public-api-lab>
       <div class="public-api-lab-head">
         <div>
@@ -38,8 +40,8 @@
         <a class="ghost-button" href="https://github.com/public-apis/public-apis" target="_blank" rel="noopener noreferrer">索引来源</a>
       </div>
 
-      <div class="api-source-strip" aria-label="已筛选 API">
-        {{ range . }}
+      <div class="api-source-strip" aria-label="已接入实验 API">
+        {{ range $featuredApis }}
           <a class="api-source-card" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
             <span>{{ .category }}</span>
             <strong>{{ .name }}</strong>
@@ -148,6 +150,28 @@
           </section>
         </div>
       </div>
+
+      {{ if $candidateApis }}
+        <div class="api-directory">
+          <div class="api-directory-head">
+            <div>
+              <p class="eyebrow">Candidate Pool</p>
+              <h3>更多公开 API 候选池</h3>
+            </div>
+            <span>{{ len $candidateApis }} 个候选</span>
+          </div>
+          <div class="api-directory-grid">
+            {{ range $candidateApis }}
+              <a class="api-directory-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+                <span>{{ .category }}</span>
+                <strong>{{ .name }}</strong>
+                <em>{{ .description }}</em>
+                <small>{{ .auth }} · {{ .cors }}</small>
+              </a>
+            {{ end }}
+          </div>
+        </div>
+      {{ end }}
     </section>
   {{ end }}
 

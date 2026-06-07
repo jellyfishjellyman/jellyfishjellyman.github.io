@@ -1,42 +1,235 @@
 - name: Free Dictionary API
+  featured: true
   category: Dictionaries
   url: https://dictionaryapi.dev/
   auth: 免密
   cors: 浏览器可试
   description: 英文释义、音标、词性和发音音频，适合做轻量查词入口。
 - name: Frankfurter
+  featured: true
   category: Currency Exchange
   url: https://www.frankfurter.app/docs
   auth: 免密
   cors: CORS 可用
   description: 汇率换算和历史汇率，适合放进写作、旅行和数据查询流程。
 - name: Currency-api
+  featured: true
   category: Currency Exchange
   url: https://github.com/fawazahmed0/currency-api#readme
   auth: 免密
   cors: CORS 可用
   description: 无密钥汇率数据源，作为汇率换算的浏览器端备用通道。
 - name: REST Countries
+  featured: true
   category: Geocoding
   url: https://restcountries.com/
   auth: 免密
   cors: CORS 可用
   description: 国家、地区、首都、货币、语言和旗帜数据，适合做资料卡。
 - name: Open-Meteo
+  featured: true
   category: Weather
   url: https://open-meteo.com/
   auth: 免密
   cors: CORS 可用
   description: 天气预报和地理编码，适合做无需密钥的城市天气查询。
 - name: Open Trivia DB
+  featured: true
   category: Games & Comics
   url: https://opentdb.com/api_config.php
   auth: 免密
   cors: 浏览器可试
   description: 问答题库，适合给游戏区和学习实验补充题目来源。
 - name: public-apis
+  featured: true
   category: Index
   url: https://github.com/public-apis/public-apis
   auth: 开源索引
   cors: 人工筛选
   description: 社区维护的公开 API 目录，本页实验从免密、HTTPS、可前端调用的条目里筛选。
+- name: APIs.guru
+  category: Development
+  url: https://apis.guru/api-doc/
+  auth: 免密
+  cors: 待评估
+  description: 公开 API 的 OpenAPI/Swagger 规格索引，适合继续扩展本站数据源目录。
+- name: jsDelivr
+  category: Development
+  url: https://github.com/jsdelivr/data.jsdelivr.com
+  auth: 免密
+  cors: CORS 可用
+  description: CDN 包信息和下载统计，适合做前端依赖或资源热度查询。
+- name: npm Registry
+  category: Development
+  url: https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
+  auth: 免密
+  cors: 待评估
+  description: npm 包元数据查询，适合补充开发工具和依赖检索。
+- name: HackerNews
+  category: Social
+  url: https://github.com/HackerNews/API
+  auth: 免密
+  cors: 待评估
+  description: 技术新闻与讨论数据，适合做轻量资讯入口或灵感面板。
+- name: GitHub ReadMe Stats
+  category: Open Source Projects
+  url: https://github.com/anuraghazra/github-readme-stats
+  auth: 免密
+  cors: CORS 可用
+  description: 动态生成 GitHub 统计图，适合关于页或项目展示。
+- name: Icon Horse
+  category: Art & Design
+  url: https://icon.horse
+  auth: 免密
+  cors: CORS 可用
+  description: 通过域名获取网站 favicon，适合优化资源链接卡片。
+- name: EmojiHub
+  category: Art & Design
+  url: https://github.com/cheatsnake/emojihub
+  auth: 免密
+  cors: CORS 可用
+  description: Emoji 分类数据，适合做写作装饰、标签和小游戏素材。
+- name: Art Institute of Chicago
+  category: Art & Design
+  url: https://api.artic.edu/docs/
+  auth: 免密
+  cors: CORS 可用
+  description: 艺术馆藏品数据，适合做随机艺术作品或视觉灵感卡。
+- name: Metropolitan Museum of Art
+  category: Art & Design
+  url: https://metmuseum.github.io/
+  auth: 免密
+  cors: 不适合直连
+  description: 大都会艺术博物馆藏品数据，可作为后端代理或静态生成素材源。
+- name: Open Library
+  category: Books
+  url: https://openlibrary.org/developers/api
+  auth: 免密
+  cors: 不适合直连
+  description: 图书、封面和作者数据，适合读书页或文章引用卡。
+- name: Gutendex
+  category: Books
+  url: https://gutendex.com/
+  auth: 免密
+  cors: 待评估
+  description: 古登堡计划图书数据，适合做公共领域阅读入口。
+- name: PoetryDB
+  category: Books
+  url: https://github.com/thundercomb/poetrydb#readme
+  auth: 免密
+  cors: CORS 可用
+  description: 英文诗歌数据，适合写作灵感或每日诗句。
+- name: Crossref Metadata Search
+  category: Books
+  url: https://github.com/CrossRef/rest-api-doc
+  auth: 免密
+  cors: 待评估
+  description: 论文与文章元数据，适合资料整理和引用查询。
+- name: Wiktionary
+  category: Dictionaries
+  url: https://en.wiktionary.org/w/api.php
+  auth: 免密
+  cors: CORS 可用
+  description: 协作词典数据，可补充 Free Dictionary 查词能力。
+- name: caldays
+  category: Calendar
+  url: https://caldays.com/api
+  auth: 免密
+  cors: CORS 可用
+  description: 多国家公共假日数据，适合做日期查询工具。
+- name: The Calendar
+  category: Calendar
+  url: https://the-calendar.net/api/
+  auth: 免密
+  cors: CORS 可用
+  description: 假日、体育和金融日历静态 JSON，适合做日程信息入口。
+- name: UK Carbon Intensity
+  category: Environment
+  url: https://carbon-intensity.github.io/api-definitions/#carbon-intensity-api-v1-0-0
+  auth: 免密
+  cors: 待评估
+  description: 英国电力碳强度数据，适合环境数据示例和可视化练习。
+- name: Open Brewery DB
+  category: Food & Drink
+  url: https://www.openbrewerydb.org
+  auth: 免密
+  cors: CORS 可用
+  description: 饮品地点数据，适合地图和地点查询实验。
+- name: Open Food Facts
+  category: Food & Drink
+  url: https://world.openfoodfacts.org/data
+  auth: 免密
+  cors: 待评估
+  description: 食品产品开放数据库，适合条码、营养和资料查询。
+- name: Nominatim
+  category: Geocoding
+  url: https://nominatim.org/release-docs/latest/api/Overview/
+  auth: 免密
+  cors: CORS 可用
+  description: OpenStreetMap 地理编码，适合地点搜索和地图实验。
+- name: Universities List
+  category: Open Data
+  url: https://github.com/Hipo/university-domains-list
+  auth: 免密
+  cors: 待评估
+  description: 大学名称、国家和域名数据，适合资料查询和表格练习。
+- name: Wikipedia
+  category: Open Data
+  url: https://www.mediawiki.org/wiki/API:Main_page
+  auth: 免密
+  cors: 待评估
+  description: 百科页面数据，适合摘要查询、链接扩展和知识卡片。
+- name: Advice Slip
+  category: Personality
+  url: http://api.adviceslip.com/
+  auth: 免密
+  cors: 待评估
+  description: 随机建议文本，可作为灵感卡候选，但需要注意 HTTP 与前端调用限制。
+- name: Programming Quotes
+  category: Personality
+  url: https://github.com/skolakoda/programming-quotes-api
+  auth: 免密
+  cors: 待评估
+  description: 编程语录，适合开发者工具页或文章页侧边栏。
+- name: Quotable Quotes
+  category: Personality
+  url: https://github.com/lukePeavey/quotable
+  auth: 免密
+  cors: 待评估
+  description: 开源名言 API，可作为随机一言的英文备用源。
+- name: Jikan
+  category: Anime
+  url: https://jikan.moe
+  auth: 免密
+  cors: CORS 可用
+  description: MyAnimeList 非官方 API，适合动漫资源页扩展。
+- name: Studio Ghibli
+  category: Anime
+  url: https://ghibliapi.herokuapp.com
+  auth: 免密
+  cors: CORS 可用
+  description: 吉卜力作品资源数据，可作为影视资料卡候选。
+- name: Trace Moe
+  category: Anime
+  url: https://soruly.github.io/trace.moe-api/#/
+  auth: 免密
+  cors: CORS 可用
+  description: 动画截图场景识别，适合图片工具方向，但需要单独处理上传体验。
+- name: NASA
+  category: Science & Math
+  url: https://api.nasa.gov
+  auth: 免密
+  cors: 不适合直连
+  description: NASA 图像和科学数据，可作为静态生成或代理后的素材源。
+- name: SpaceX
+  category: Science & Math
+  url: https://github.com/r-spacex/SpaceX-API
+  auth: 免密
+  cors: 不适合直连
+  description: 航天发射和载具数据，适合时间线或科普卡片。
+- name: Bored
+  category: Entertainment
+  url: https://www.boredapi.com/
+  auth: 免密
+  cors: 待评估
+  description: 随机活动建议，可做轻量灵感按钮，但需要先验证服务稳定性。

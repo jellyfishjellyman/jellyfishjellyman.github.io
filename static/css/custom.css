@@ -2601,6 +2601,87 @@ body.home .site-header {
   width: min(100%, 340px);
 }
 
+.api-directory {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--panel-border-soft);
+}
+
+.api-directory-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.api-directory-head h3 {
+  margin: 0;
+  font-size: clamp(19px, 2.2vw, 26px);
+}
+
+.api-directory-head > span {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid var(--chip-border);
+  border-radius: var(--radius);
+  background: var(--field-bg);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.api-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+}
+
+.api-directory-item {
+  min-height: 118px;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--panel-border-soft);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--field-bg) 86%, transparent);
+  color: var(--text);
+}
+
+.api-directory-item:hover,
+.api-directory-item:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--vapor-cyan) 38%, var(--panel-border));
+  background: var(--panel-hover);
+  box-shadow: var(--shadow-soft);
+}
+
+.api-directory-item span,
+.api-directory-item small {
+  color: var(--accent-2);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.api-directory-item strong {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.api-directory-item em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.api-directory-item small {
+  align-self: end;
+  color: var(--accent);
+}
+
 .tools-grid {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   align-items: start;
@@ -5354,6 +5435,15 @@ blockquote,
 
   .api-result {
     min-height: 150px;
+  }
+
+  .api-directory-head {
+    display: grid;
+    align-items: start;
+  }
+
+  .api-directory-head > span {
+    justify-self: start;
   }
 
   .tools-grid {
