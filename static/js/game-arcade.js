@@ -798,6 +798,260 @@
     render();
   };
 
+  const startReaction = () => {
+    resetBoard("brain-board reaction-board");
+    let state = "waiting";
+    let timer = 0;
+    let startAt = 0;
+    let best = Number(localStorage.getItem(bestKey) || 0);
+    const pad = document.createElement("button");
+    pad.type = "button";
+    pad.className = "reaction-pad";
+    board.appendChild(pad);
+
+    const arm = () => {
+      window.clearTimeout(timer);
+      state = "waiting";
+      pad.dataset.state = "waiting";
+      pad.textContent = "等它变绿";
+      setText(best || "-", "准备", "不要提前点。");
+      timer = window.setTimeout(() => {
+        state = "go";
+        startAt = performance.now();
+        pad.dataset.state = "go";
+        pad.textContent = "点！";
+        setText(best || "-", "现在", "立刻点击。");
+      }, 1200 + Math.random() * 2600);
+    };
+
+    pad.addEventListener("click", () => {
+      if (state === "waiting") {
+        window.clearTimeout(timer);
+        state = "early";
+        pad.dataset.state = "early";
+        pad.textContent = "太早了";
+        setText(best || "-", "抢跑", "等颜色变化后再点。");
+        return;
+      }
+      if (state === "go") {
+        const ms = Math.round(performance.now() - startAt);
+        best = best ? Math.min(best, ms) : ms;
+        localStorage.setItem(bestKey, String(best));
+        state = "done";
+        pad.dataset.state = "done";
+        pad.textContent = `${ms} ms`;
+        setText(ms, "完成", "点击开始再测一次。");
+      }
+    });
+    cleanup = () => window.clearTimeout(timer);
+    arm();
+  };
+
+  const startPattern = () => {
+    resetBoard("brain-board pattern-board");
+    const cells = Array.from({ length: 9 }, (_, index) => index);
+    let level = 1;
+    let sequence = [];
+    let input = [];
+    let showing = false;
+
+    const render = (hint) => {
+      board.innerHTML = "";
+      cells.forEach((index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "pattern-cell";
+        button.dataset.flash = "false";
+        button.addEventListener("click", () => pick(index));
+        board.appendChild(button);
+      });
+      setText(level - 1, `${input.length}/${sequence.length || level}`, hint || "记住亮起顺序。");
+    };
+
+    const flash = async () => {
+      showing = true;
+      input = [];
+      sequence.push(Math.floor(Math.random() * 9));
+      setText(level - 1, `0/${sequence.length}`, "看清顺序。");
+      await new Promise((resolve) => window.setTimeout(resolve, 420));
+      for (const index of sequence) {
+        const cell = board.children[index];
+        cell.dataset.flash = "true";
+        await new Promise((resolve) => window.setTimeout(resolve, 360));
+        cell.dataset.flash = "false";
+        await new Promise((resolve) => window.setTimeout(resolve, 140));
+      }
+      showing = false;
+      setText(level - 1, `0/${sequence.length}`, "按同样顺序点回来。");
+    };
+
+    const pick = (index) => {
+      if (showing || !sequence.length) return;
+      input.push(index);
+      if (sequence[input.length - 1] !== index) {
+        saveBest(level - 1);
+        setText(level - 1, "失误", "顺序错了，点击开始重来。");
+        sequence = [];
+        return;
+      }
+      if (input.length === sequence.length) {
+        level += 1;
+        saveBest(level - 1);
+        flash();
+      } else {
+        setText(level - 1, `${input.length}/${sequence.length}`, "继续。");
+      }
+    };
+
+    render("记住亮起顺序。");
+    flash();
+  };
+
+  const startAimTrainer = () => {
+    resetBoard("brain-board aim-board");
+    let hits = 0;
+    let left = 20;
+    let currentTarget = null;
+    const field = document.createElement("div");
+    field.className = "aim-field";
+    board.appendChild(field);
+
+    const spawn = () => {
+      field.innerHTML = "";
+      if (left <= 0) {
+        saveBest(hits);
+        setText(hits, "完成", "20 个目标结束。");
+        return;
+      }
+      const target = document.createElement("button");
+      target.type = "button";
+      target.className = "aim-target";
+      currentTarget = { x: 8 + Math.random() * 78, y: 8 + Math.random() * 74 };
+      target.style.left = `${currentTarget.x}%`;
+      target.style.top = `${currentTarget.y}%`;
+      target.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        hits += 1;
+        left -= 1;
+        setText(hits, left, "命中。");
+        spawn();
+      });
+      field.appendChild(target);
+      setText(hits, left, "点击圆形目标。");
+    };
+
+    field.addEventListener("click", (event) => {
+      if (!currentTarget || left <= 0) return;
+      const rect = field.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      const dx = x - currentTarget.x;
+      const dy = y - currentTarget.y;
+      if (Math.sqrt(dx * dx + dy * dy) > 7.5) return;
+      hits += 1;
+      left -= 1;
+      setText(hits, left, "命中。");
+      spawn();
+    });
+
+    spawn();
+  };
+
+  const startCountdown = () => {
+    resetBoard("brain-board countdown-board");
+    const target = 5 + Math.floor(Math.random() * 6);
+    let started = false;
+    let startTime = 0;
+    let raf = 0;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "countdown-button";
+    button.textContent = "开始计时";
+    board.appendChild(button);
+
+    const tick = () => {
+      if (!started) return;
+      setText(Math.round((performance.now() - startTime) / 100) / 10, `${target}s`, "凭感觉停下。");
+      raf = requestAnimationFrame(tick);
+    };
+
+    button.addEventListener("click", () => {
+      if (!started) {
+        started = true;
+        startTime = performance.now();
+        button.textContent = "停止";
+        tick();
+        return;
+      }
+      started = false;
+      cancelAnimationFrame(raf);
+      const elapsed = (performance.now() - startTime) / 1000;
+      const diff = Math.round(Math.abs(elapsed - target) * 100) / 100;
+      const score = Math.max(0, Math.round((10 - diff) * 100));
+      saveBest(score);
+      button.textContent = "再来一次";
+      setText(`${diff}s`, `${target}s`, diff < .25 ? "非常准。" : "再校准一下时间感。");
+    });
+    cleanup = () => cancelAnimationFrame(raf);
+    setText("-", `${target}s`, "点击开始，然后在目标秒数停下。");
+  };
+
+  const startCupBall = () => {
+    resetBoard("brain-board cup-board");
+    let ball = Math.floor(Math.random() * 3);
+    let round = 1;
+    let locked = true;
+    const cups = [0, 1, 2];
+
+    const render = (hint) => {
+      board.innerHTML = "";
+      const row = document.createElement("div");
+      row.className = "cup-row";
+      cups.forEach((cup, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "cup";
+        button.textContent = locked ? "杯" : (cup === ball ? "球" : "杯");
+        button.addEventListener("click", () => guess(index));
+        row.appendChild(button);
+      });
+      board.appendChild(row);
+      setText(Number(localStorage.getItem(bestKey) || 0), round, hint || "盯住有球的杯子。");
+    };
+
+    const shuffleCups = async () => {
+      locked = false;
+      render("先看球在哪。");
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      locked = true;
+      for (let i = 0; i < 7; i += 1) {
+        const a = Math.floor(Math.random() * 3);
+        let b = Math.floor(Math.random() * 3);
+        if (a === b) b = (b + 1) % 3;
+        [cups[a], cups[b]] = [cups[b], cups[a]];
+        render("洗牌中。");
+        await new Promise((resolve) => window.setTimeout(resolve, 220));
+      }
+      render("猜球在哪个杯子里。");
+    };
+
+    const guess = (index) => {
+      if (!locked) return;
+      const ok = cups[index] === ball;
+      if (ok) {
+        round += 1;
+        saveBest(round - 1);
+        ball = Math.floor(Math.random() * 3);
+        shuffleCups();
+      } else {
+        render("猜错了，点击开始重来。");
+      }
+    };
+
+    shuffleCups();
+  };
+
   const starters = {
     jump: startJump,
     snake: startSnake,
@@ -805,6 +1059,11 @@
     quiz: startQuiz,
     "piano-tiles": startPianoTiles,
     "tile-stack": startTileStack,
+    reaction: startReaction,
+    pattern: startPattern,
+    "aim-trainer": startAimTrainer,
+    countdown: startCountdown,
+    "cup-ball": startCupBall,
   };
 
   startBtn.addEventListener("click", () => starters[game]?.());
