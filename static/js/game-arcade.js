@@ -600,7 +600,7 @@
         card.className = "quiz-card";
         card.appendChild(createText("p", "Result", "eyebrow"));
         card.appendChild(createText("h2", `答对 ${score} / ${roundSize}`));
-        card.appendChild(createText("p", activeSource === "local" ? "离线中文题库会随机抽题，后续可继续扩充到上千题。" : "在线英文挑战来自 OpenTDB，网络不可用时会回退离线题库。"));
+        card.appendChild(createText("p", activeSource === "local" ? "当前离线中文题库约 1000 题，每轮随机抽取 10 题。" : "在线英文挑战来自 OpenTDB，网络不可用时会回退离线题库。"));
         card.appendChild(createText("p", activeSource === "local" ? "题库结构参考 CEval，CEval: CC BY-NC-SA 4.0。" : "Online questions from Open Trivia DB, CC BY-SA 4.0.", "quiz-credit"));
         board.appendChild(card);
         setText(score, "完成", score >= 8 ? "答得不错，可以切换模式再来一轮。" : "再来一轮会更顺。");
