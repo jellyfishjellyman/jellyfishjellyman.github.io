@@ -1,5 +1,6 @@
 baseURL = "https://gwbblog.top/"
 languageCode = "zh-cn"
+hasCJKLanguage = true
 title = "Jellyfish 的博客"
 theme = "ananke"
 
