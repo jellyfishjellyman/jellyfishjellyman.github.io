@@ -7,25 +7,149 @@
     <div class="module-copy">{{ .Content }}</div>
     {{ $total := 0 }}
     {{ range site.Data.tools }}{{ $total = add $total (len .items) }}{{ end }}
+    {{ $apiTotal := len site.Data.public_apis }}
     <div class="module-stats" aria-label="工具概览">
       <span><strong>{{ len site.Data.tools }}</strong> 个工具组</span>
       <span><strong>{{ $total }}</strong> 个入口</span>
-      <span><strong>Local</strong> 预留集成</span>
+      <span><strong>{{ $apiTotal }}</strong> 个公开 API</span>
     </div>
   </div>
 
   <div class="tools-workbench reveal-on-scroll" aria-label="工具页说明">
     <div>
       <p class="eyebrow">Workbench</p>
-      <h2>把常用入口收在一张温柔的工具台里</h2>
+      <h2>把常用入口和公开数据源收在一张工具台里</h2>
     </div>
     <div class="tools-workbench-steps">
       <span>收藏</span>
+      <span>发现</span>
       <span>处理</span>
-      <span>写作</span>
-      <span>维护</span>
+      <span>集成</span>
     </div>
   </div>
+
+  {{ with site.Data.public_apis }}
+    <section class="public-api-lab reveal-on-scroll" data-public-api-lab>
+      <div class="public-api-lab-head">
+        <div>
+          <p class="eyebrow">Public APIs</p>
+          <h2>公开 API 实验室</h2>
+        </div>
+        <a class="ghost-button" href="https://github.com/public-apis/public-apis" target="_blank" rel="noopener noreferrer">索引来源</a>
+      </div>
+
+      <div class="api-source-strip" aria-label="已筛选 API">
+        {{ range . }}
+          <a class="api-source-card" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+            <span>{{ .category }}</span>
+            <strong>{{ .name }}</strong>
+            <em>{{ .description }}</em>
+            <small>{{ .auth }} · {{ .cors }}</small>
+          </a>
+        {{ end }}
+      </div>
+
+      <div class="api-lab-shell">
+        <div class="api-lab-tabs" role="tablist" aria-label="公开 API 工具">
+          <button class="is-active" type="button" role="tab" aria-selected="true" data-api-tab="dictionary">词典</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="exchange">汇率</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="country">国家资料</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="weather">天气</button>
+          <button type="button" role="tab" aria-selected="false" data-api-tab="trivia">问答</button>
+        </div>
+
+        <div class="api-lab-panels">
+          <section class="api-lab-panel is-active" data-api-panel="dictionary">
+            <form class="api-lab-form" data-api-form="dictionary">
+              <label>
+                <span>英文单词</span>
+                <input name="word" type="search" value="serendipity" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="primary-button" type="submit">查词</button>
+            </form>
+            <div class="api-result" data-api-result="dictionary" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Free Dictionary API</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="exchange">
+            <form class="api-lab-form api-lab-form-inline" data-api-form="exchange">
+              <label>
+                <span>金额</span>
+                <input name="amount" type="number" min="0" step="0.01" value="100">
+              </label>
+              <label>
+                <span>从</span>
+                <select name="from">
+                  <option selected>CNY</option>
+                  <option>USD</option>
+                  <option>EUR</option>
+                  <option>JPY</option>
+                  <option>GBP</option>
+                  <option>HKD</option>
+                </select>
+              </label>
+              <label>
+                <span>到</span>
+                <select name="to">
+                  <option selected>USD</option>
+                  <option>CNY</option>
+                  <option>EUR</option>
+                  <option>JPY</option>
+                  <option>GBP</option>
+                  <option>HKD</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">换算</button>
+            </form>
+            <div class="api-result" data-api-result="exchange" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Frankfurter</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="country">
+            <form class="api-lab-form" data-api-form="country">
+              <label>
+                <span>国家或地区</span>
+                <input name="country" type="search" value="China" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">查询</button>
+            </form>
+            <div class="api-result" data-api-result="country" aria-live="polite">
+              <span>等待查询</span>
+              <strong>REST Countries</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="weather">
+            <form class="api-lab-form" data-api-form="weather">
+              <label>
+                <span>城市</span>
+                <input name="city" type="search" value="Shanghai" autocomplete="off">
+              </label>
+              <button class="primary-button" type="submit">看天气</button>
+            </form>
+            <div class="api-result" data-api-result="weather" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Open-Meteo</strong>
+            </div>
+          </section>
+
+          <section class="api-lab-panel" data-api-panel="trivia">
+            <form class="api-lab-form api-lab-form-compact" data-api-form="trivia">
+              <button class="primary-button" type="submit">抽一题</button>
+            </form>
+            <div class="api-result" data-api-result="trivia" aria-live="polite">
+              <span>等待查询</span>
+              <strong>Open Trivia DB</strong>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  {{ end }}
 
   <div class="module-grid tools-grid">
     {{ range $groupIndex, $group := site.Data.tools }}

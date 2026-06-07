@@ -1,0 +1,42 @@
+- name: Free Dictionary API
+  category: Dictionaries
+  url: https://dictionaryapi.dev/
+  auth: 免密
+  cors: 浏览器可试
+  description: 英文释义、音标、词性和发音音频，适合做轻量查词入口。
+- name: Frankfurter
+  category: Currency Exchange
+  url: https://www.frankfurter.app/docs
+  auth: 免密
+  cors: CORS 可用
+  description: 汇率换算和历史汇率，适合放进写作、旅行和数据查询流程。
+- name: Currency-api
+  category: Currency Exchange
+  url: https://github.com/fawazahmed0/currency-api#readme
+  auth: 免密
+  cors: CORS 可用
+  description: 无密钥汇率数据源，作为汇率换算的浏览器端备用通道。
+- name: REST Countries
+  category: Geocoding
+  url: https://restcountries.com/
+  auth: 免密
+  cors: CORS 可用
+  description: 国家、地区、首都、货币、语言和旗帜数据，适合做资料卡。
+- name: Open-Meteo
+  category: Weather
+  url: https://open-meteo.com/
+  auth: 免密
+  cors: CORS 可用
+  description: 天气预报和地理编码，适合做无需密钥的城市天气查询。
+- name: Open Trivia DB
+  category: Games & Comics
+  url: https://opentdb.com/api_config.php
+  auth: 免密
+  cors: 浏览器可试
+  description: 问答题库，适合给游戏区和学习实验补充题目来源。
+- name: public-apis
+  category: Index
+  url: https://github.com/public-apis/public-apis
+  auth: 开源索引
+  cors: 人工筛选
+  description: 社区维护的公开 API 目录，本页实验从免密、HTTPS、可前端调用的条目里筛选。

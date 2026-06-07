@@ -417,6 +417,7 @@
   const getSearchKindLabel = (item) => {
     if (item.kind === "link") return "资源外链";
     if (item.kind === "tool") return item.external ? "工具外链" : "工具";
+    if (item.kind === "api") return "公开 API";
     if (item.kind === "game") return item.external ? "游戏外链" : "游戏";
     if (item.section === "posts") return "文章";
     if (item.section === "links") return "资源页";
@@ -517,6 +518,260 @@
   }
   quoteNext?.addEventListener("click", () => window.setTimeout(repairHomeToolText, 0));
   themeToggle?.addEventListener("click", () => window.setTimeout(repairHomeToolText, 0));
+
+  const apiLab = document.querySelector("[data-public-api-lab]");
+  if (apiLab) {
+    const tabs = Array.from(apiLab.querySelectorAll("[data-api-tab]"));
+    const panels = Array.from(apiLab.querySelectorAll("[data-api-panel]"));
+    const forms = Array.from(apiLab.querySelectorAll("[data-api-form]"));
+    const resultFor = (name) => apiLab.querySelector(`[data-api-result="${name}"]`);
+    const activateApiTab = (name) => {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.apiTab === name;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.apiPanel === name));
+    };
+    const escapeHtml = (value) => {
+      const span = document.createElement("span");
+      span.textContent = value == null ? "" : String(value);
+      return span.innerHTML;
+    };
+    const decodeApiText = (value) => {
+      try {
+        return decodeURIComponent(String(value || "").replace(/\+/g, "%20"));
+      } catch (_) {
+        return String(value || "");
+      }
+    };
+    const formatNumber = (value) => new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 2 }).format(Number(value || 0));
+    const weatherNames = {
+      0: "晴朗",
+      1: "大体晴朗",
+      2: "局部多云",
+      3: "阴天",
+      45: "有雾",
+      48: "雾凇",
+      51: "小毛毛雨",
+      53: "毛毛雨",
+      55: "强毛毛雨",
+      61: "小雨",
+      63: "中雨",
+      65: "大雨",
+      71: "小雪",
+      73: "中雪",
+      75: "大雪",
+      80: "阵雨",
+      81: "较强阵雨",
+      82: "强阵雨",
+      95: "雷暴",
+    };
+    const setApiState = (name, state, title, message) => {
+      const result = resultFor(name);
+      if (!result) return;
+      result.classList.remove("is-loading", "is-error", "is-success");
+      result.classList.add(`is-${state}`);
+      result.innerHTML = `<span>${escapeHtml(message)}</span><strong>${escapeHtml(title)}</strong>`;
+    };
+    const renderApiResult = (name, payload) => {
+      const result = resultFor(name);
+      if (!result) return;
+      const rows = (payload.rows || [])
+        .filter((row) => row && row.value)
+        .map((row) => `
+          <div class="api-result-item">
+            <small>${escapeHtml(row.label)}</small>
+            <strong>${escapeHtml(row.value)}</strong>
+          </div>
+        `).join("");
+      const note = payload.note ? `<p>${escapeHtml(payload.note)}</p>` : "";
+      const image = payload.image
+        ? `<img class="api-result-image" src="${escapeHtml(payload.image.src)}" alt="${escapeHtml(payload.image.alt || "")}" loading="lazy">`
+        : "";
+      const audio = payload.audio
+        ? `<audio controls preload="none" src="${escapeHtml(payload.audio)}"></audio>`
+        : "";
+      result.classList.remove("is-loading", "is-error");
+      result.classList.add("is-success");
+      result.innerHTML = `
+        <span>${escapeHtml(payload.meta || "公开 API 返回")}</span>
+        <strong>${escapeHtml(payload.title)}</strong>
+        ${image}
+        ${rows ? `<div class="api-result-grid">${rows}</div>` : ""}
+        ${note}
+        ${audio}
+      `;
+    };
+    const fetchJsonWithTimeout = async (url) => {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 8000);
+      try {
+        const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+        const text = await response.text();
+        let data = null;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch (_) {
+          data = text;
+        }
+        if (!response.ok) {
+          const message = data?.message || data?.title || `请求失败：${response.status}`;
+          throw new Error(message);
+        }
+        return data;
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    };
+    const runApiForm = async (form, runner) => {
+      const name = form.dataset.apiForm;
+      const submit = form.querySelector('button[type="submit"]');
+      setApiState(name, "loading", "正在连接公开 API", "如果服务限流或 CORS 变化，会在这里提示");
+      if (submit) submit.disabled = true;
+      try {
+        await runner(new FormData(form));
+      } catch (error) {
+        const message = error?.name === "AbortError" ? "请求超时，稍后再试" : (error?.message || "公开 API 暂时不可用");
+        setApiState(name, "error", "没有拿到可用结果", message);
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    };
+    const runners = {
+      dictionary: async (formData) => {
+        const word = cleanText(formData.get("word"));
+        if (!word) throw new Error("请输入要查询的英文单词");
+        const data = await fetchJsonWithTimeout(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+        const entry = Array.isArray(data) ? data[0] : null;
+        const meaning = entry?.meanings?.[0];
+        const definition = meaning?.definitions?.[0]?.definition;
+        if (!entry || !definition) throw new Error("没有找到释义");
+        const audio = (entry.phonetics || []).find((item) => item.audio)?.audio;
+        renderApiResult("dictionary", {
+          title: entry.word || word,
+          meta: [meaning.partOfSpeech, entry.phonetic].filter(Boolean).join(" · ") || "Free Dictionary API",
+          rows: [
+            { label: "释义", value: definition },
+            { label: "近义词", value: (meaning.synonyms || []).slice(0, 6).join("、") },
+          ],
+          note: (entry.sourceUrls || [])[0] ? `来源：${entry.sourceUrls[0]}` : "",
+          audio,
+        });
+      },
+      exchange: async (formData) => {
+        const amount = Number(formData.get("amount") || 0);
+        const from = cleanText(formData.get("from")).toUpperCase();
+        const to = cleanText(formData.get("to")).toUpperCase();
+        if (!amount || amount < 0) throw new Error("请输入大于 0 的金额");
+        if (!from || !to) throw new Error("请选择币种");
+        if (from === to) {
+          renderApiResult("exchange", {
+            title: `${formatNumber(amount)} ${to}`,
+            meta: "同币种无需换算",
+            rows: [{ label: "汇率", value: "1" }],
+          });
+          return;
+        }
+        let data = null;
+        let value = null;
+        let source = "Frankfurter";
+        try {
+          data = await fetchJsonWithTimeout(`https://api.frankfurter.app/latest?amount=${encodeURIComponent(amount)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+          value = data?.rates?.[to];
+        } catch (_) {
+          const base = from.toLowerCase();
+          const target = to.toLowerCase();
+          data = await fetchJsonWithTimeout(`https://latest.currency-api.pages.dev/v1/currencies/${encodeURIComponent(base)}.json`);
+          const rate = data?.[base]?.[target];
+          if (typeof rate === "number") {
+            value = amount * rate;
+            source = "Currency-api";
+            data = { amount, base: from, date: data.date, rates: { [to]: value } };
+          }
+        }
+        if (typeof value !== "number") throw new Error("汇率服务没有返回目标币种");
+        renderApiResult("exchange", {
+          title: `${formatNumber(amount)} ${from} ≈ ${formatNumber(value)} ${to}`,
+          meta: `${source} · ${data.date || "最新可用日期"}`,
+          rows: [
+            { label: "基准金额", value: `${formatNumber(data.amount || amount)} ${data.base || from}` },
+            { label: "折算结果", value: `${formatNumber(value)} ${to}` },
+          ],
+          note: "汇率日期取决于服务端最新可用交易日；Frankfurter 不可用时自动切换备用源。",
+        });
+      },
+      country: async (formData) => {
+        const query = cleanText(formData.get("country"));
+        if (!query) throw new Error("请输入国家或地区名称");
+        const data = await fetchJsonWithTimeout(`https://restcountries.com/v3.1/name/${encodeURIComponent(query)}?fields=name,capital,region,subregion,population,currencies,languages,flags`);
+        const entries = Array.isArray(data) ? data : [];
+        const country = entries.find((item) => item.name?.common?.toLowerCase() === query.toLowerCase()) || entries[0];
+        if (!country) throw new Error("没有找到国家资料");
+        const currencies = Object.entries(country.currencies || {})
+          .map(([code, value]) => `${code} ${value.name || ""}`.trim())
+          .join("、");
+        const languages = Object.values(country.languages || {}).join("、");
+        renderApiResult("country", {
+          title: country.name?.common || query,
+          meta: country.name?.official || "REST Countries",
+          image: country.flags?.svg ? { src: country.flags.svg, alt: country.flags.alt || `${country.name?.common || query} flag` } : null,
+          rows: [
+            { label: "首都", value: (country.capital || []).join("、") || "未列出" },
+            { label: "地区", value: [country.region, country.subregion].filter(Boolean).join(" · ") },
+            { label: "人口", value: country.population ? `${formatNumber(country.population)} 人` : "" },
+            { label: "货币", value: currencies },
+            { label: "语言", value: languages },
+          ],
+        });
+      },
+      weather: async (formData) => {
+        const city = cleanText(formData.get("city"));
+        if (!city) throw new Error("请输入城市名");
+        const geo = await fetchJsonWithTimeout(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=zh&format=json`);
+        const place = geo?.results?.[0];
+        if (!place) throw new Error("没有找到城市坐标");
+        const weather = await fetchJsonWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(place.latitude)}&longitude=${encodeURIComponent(place.longitude)}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`);
+        const current = weather?.current;
+        if (!current) throw new Error("天气服务没有返回当前数据");
+        renderApiResult("weather", {
+          title: `${place.name}${place.admin1 ? ` · ${place.admin1}` : ""}`,
+          meta: `Open-Meteo · ${current.time || "当前天气"}`,
+          rows: [
+            { label: "天气", value: weatherNames[current.weather_code] || `天气代码 ${current.weather_code}` },
+            { label: "温度", value: `${current.temperature_2m}°C` },
+            { label: "湿度", value: `${current.relative_humidity_2m}%` },
+            { label: "风速", value: `${current.wind_speed_10m} km/h` },
+          ],
+          note: `${place.country || ""}${place.timezone ? ` · ${place.timezone}` : ""}`,
+        });
+      },
+      trivia: async () => {
+        const data = await fetchJsonWithTimeout("https://opentdb.com/api.php?amount=1&type=multiple&encode=url3986");
+        const item = data?.results?.[0];
+        if (!item) throw new Error("题库暂时没有返回题目");
+        const answers = [item.correct_answer, ...(item.incorrect_answers || [])]
+          .map(decodeApiText)
+          .sort(() => Math.random() - 0.5);
+        renderApiResult("trivia", {
+          title: decodeApiText(item.question),
+          meta: [decodeApiText(item.category), decodeApiText(item.difficulty)].filter(Boolean).join(" · "),
+          rows: [
+            { label: "选项", value: answers.join(" / ") },
+            { label: "答案", value: decodeApiText(item.correct_answer) },
+          ],
+        });
+      },
+    };
+    tabs.forEach((tab) => tab.addEventListener("click", () => activateApiTab(tab.dataset.apiTab)));
+    forms.forEach((form) => {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const runner = runners[form.dataset.apiForm];
+        if (runner) runApiForm(form, runner);
+      });
+    });
+  }
 
   const guestbook = document.querySelector("[data-guestbook]");
   if (guestbook) {
@@ -741,7 +996,7 @@
     loadGuestMessages();
   }
 
-  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item");
+  const selectableItems = document.querySelectorAll(".post-card, .module-card, .game-card, .feature-card, .resource-tag, .link-item, .api-source-card");
   if (finePointer) {
     selectableItems.forEach((item) => {
       item.addEventListener(

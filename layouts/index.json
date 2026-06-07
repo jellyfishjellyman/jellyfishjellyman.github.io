@@ -50,6 +50,21 @@
     {{- end -}}
   {{- end -}}
 {{- end -}}
+{{- range site.Data.public_apis -}}
+  {{- if and .name .url -}}
+    {{- $items = $items | append (dict
+      "title" (.name | plainify)
+      "url" .url
+      "section" "工具"
+      "kind" "api"
+      "group" "公开 API"
+      "summary" ((printf "%s %s" (.description | default "") (.category | default "")) | plainify | truncate 180)
+      "date" ""
+      "tags" (slice "公开 API" (.category | default "" | plainify) (.auth | default "" | plainify) (.cors | default "" | plainify))
+      "external" (hasPrefix .url "http")
+    ) -}}
+  {{- end -}}
+{{- end -}}
 {{- range site.Data.games -}}
   {{- if and .name .url -}}
     {{- $items = $items | append (dict
