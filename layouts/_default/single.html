@@ -2,8 +2,9 @@
 <article class="post-single mw8 center ph3 pv4">
   {{ if eq .Section "posts" }}
     <header class="post-single-header">
-      {{ partial "ambient-video.html" (dict "base" "post-loop" "class" "ambient-bg-video post-hero-video" "autoplay" true) }}
+      {{ partial "ambient-video.html" (dict "base" "post-loop" "class" "ambient-bg-video post-hero-video" "preload" "none" "lazy" true) }}
       <span class="post-category">{{ .Params.category | default "其他" }}</span>
+      <p class="post-epigraph" lang="it">Nel mezzo del cammin di nostra vita.</p>
       <h1>{{ .Title }}</h1>
       <div class="post-meta">
         {{ .Date.Format "2006-01-02" }}{{ with .ReadingTime }} · {{ . }} 分钟阅读{{ end }}

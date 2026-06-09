@@ -7,6 +7,8 @@
   const cleanText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
   const themeToggle = document.querySelector("[data-theme-toggle]");
+  const menuToggle = document.querySelector("[data-menu-toggle]");
+  const siteMenu = document.querySelector("[data-site-menu]");
   const storedTheme = window.localStorage.getItem("site-theme");
   const themeColorMeta = document.querySelector('meta[name="theme-color"]:not([media])') || document.createElement("meta");
   themeColorMeta.name = "theme-color";
@@ -32,6 +34,44 @@
     }, reduceMotion ? 0 : 760);
     setTheme(nextTheme);
   });
+
+  const setMenuOpen = (open) => {
+    if (!menuToggle || !siteMenu) return;
+    document.body.classList.toggle("site-menu-open", open);
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? "关闭导航" : "打开导航");
+  };
+
+  menuToggle?.addEventListener("click", () => {
+    setMenuOpen(!document.body.classList.contains("site-menu-open"));
+  });
+
+  siteMenu?.addEventListener("click", (event) => {
+    if (event.target.closest("a")) setMenuOpen(false);
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setMenuOpen(false);
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.matchMedia("(min-width: 821px)").matches) setMenuOpen(false);
+  }, { passive: true });
+
+  const hydrateVideo = (video) => {
+    if (!video || video.dataset.videoHydrated === "true") return;
+    const base = video.dataset.videoBase;
+    if (!base) return;
+    const webm = document.createElement("source");
+    webm.src = `/videos/${base}.webm`;
+    webm.type = "video/webm";
+    const mp4 = document.createElement("source");
+    mp4.src = `/videos/${base}.mp4`;
+    mp4.type = "video/mp4";
+    video.append(webm, mp4);
+    video.dataset.videoHydrated = "true";
+    video.load();
+  };
 
   const setPointerVars = (event) => {
     root.style.setProperty("--mouse-x", `${event.clientX}px`);
@@ -2133,7 +2173,8 @@
       cardVideo.pause();
       cardVideo.currentTime = 0;
       const playCardVideo = () => {
-        if (reduceMotion) return;
+        if (reduceMotion || coarsePointer) return;
+        hydrateVideo(cardVideo);
         cardVideo.play().catch(() => {});
       };
       const pauseCardVideo = () => {
@@ -2150,6 +2191,26 @@
       if (event.target.closest("a")) return;
       window.location.href = link.href;
     });
+  });
+
+  document.querySelectorAll(".post-hero-video[data-lazy-video='true'], .module-intro-video[data-lazy-video='true'], .search-panel-video[data-lazy-video='true']").forEach((video) => {
+    if (reduceMotion || coarsePointer) return;
+    const playAmbientVideo = () => {
+      hydrateVideo(video);
+      video.play().catch(() => {});
+    };
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          playAmbientVideo();
+          observer.unobserve(video);
+        });
+      }, { rootMargin: "160px" });
+      observer.observe(video);
+    } else {
+      playAmbientVideo();
+    }
   });
 
   const ambientPanel = document.querySelector("[data-ambient-player]");

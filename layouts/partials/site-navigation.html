@@ -7,7 +7,11 @@
   </a>
 
   {{ if .Site.Menus.main }}
-    <ul class="site-menu">
+    <button class="site-menu-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="siteMenu" data-menu-toggle>
+      <span aria-hidden="true"></span>
+    </button>
+
+    <ul id="siteMenu" class="site-menu" data-site-menu>
       {{ $current := .RelPermalink }}
       {{ range .Site.Menus.main }}
         {{ $active := or (eq .URL $current) (and (ne .URL "/") (hasPrefix $current .URL)) }}

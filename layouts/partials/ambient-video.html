@@ -2,6 +2,7 @@
 {{- $class := .class | default "ambient-bg-video" -}}
 {{- $autoplay := .autoplay | default false -}}
 {{- $preload := .preload | default "metadata" -}}
+{{- $lazy := or .lazy (eq $preload "none") -}}
 {{- if $base -}}
 <video
   class="{{ $class }}"
@@ -11,9 +12,13 @@
   playsinline
   preload="{{ $preload }}"
   poster="/videos/{{ $base }}-poster.jpg"
+  data-video-base="{{ $base }}"
+  {{ if $lazy }}data-lazy-video="true"{{ end }}
   aria-hidden="true"
 >
-  <source src="/videos/{{ $base }}.webm" type="video/webm">
-  <source src="/videos/{{ $base }}.mp4" type="video/mp4">
+  {{ if not $lazy }}
+    <source src="/videos/{{ $base }}.webm" type="video/webm">
+    <source src="/videos/{{ $base }}.mp4" type="video/mp4">
+  {{ end }}
 </video>
 {{- end -}}
