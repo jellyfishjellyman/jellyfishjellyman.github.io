@@ -813,6 +813,33 @@
       if (level === "需复查") return Math.min(74, 42 + signals.length * 8);
       return Math.max(8, 18 + Math.max(0, signals.length - 1) * 5);
     };
+    const aiUsabilityPercent = ({ level, idc, webRtcMismatch }) => {
+      let score = level === "高风险" ? 36 : level === "需复查" ? 64 : 84;
+      if (idc) score -= 18;
+      if (webRtcMismatch) score -= 8;
+      return Math.max(8, Math.min(96, score));
+    };
+    const zhPlaceName = (value) => {
+      const map = {
+        "Hong Kong": "中国香港",
+        Singapore: "新加坡",
+        Japan: "日本",
+        Tokyo: "东京",
+        "United States": "美国",
+        China: "中国",
+        Taiwan: "中国台湾",
+        Korea: "韩国",
+        "South Korea": "韩国",
+        Germany: "德国",
+        France: "法国",
+        "United Kingdom": "英国",
+        Netherlands: "荷兰",
+        Canada: "加拿大",
+        Australia: "澳大利亚",
+      };
+      return map[value] || value || "";
+    };
+    const zhLocation = (...parts) => uniq(parts.map(zhPlaceName)).join(" ");
     const renderIpCheckResult = (name, payload) => {
       const result = resultFor(name);
       if (!result) return;
@@ -820,48 +847,76 @@
       const risk = ipRiskPercent(data.level, data.signals);
       const levelClass = data.level === "高风险" ? "is-danger" : data.level === "需复查" ? "is-warn" : "is-good";
       const numericIp = ipToNumber(data.ip);
-      const sceneCards = (data.scenes || []).map((scene) => `
-        <article class="ip-scene-card ${scene.recommended ? "is-recommended" : "is-muted"}">
-          <strong>${escapeHtml(scene.name)}</strong>
-          <div aria-label="${escapeHtml(scene.stars)} 星">${"★".repeat(scene.stars)}${"☆".repeat(5 - scene.stars)}</div>
-          <span>${scene.recommended ? "✓ 可尝试" : "× 不推荐"}</span>
+      const aiCards = (data.aiTools || []).map((tool) => `
+        <article class="ip-ai-card ${tool.percent >= 70 ? "is-good" : tool.percent >= 45 ? "is-warn" : "is-danger"}">
+          <span>${escapeHtml(tool.name)}</span>
+          <strong>${tool.percent}%</strong>
+          <i><em style="width:${tool.percent}%"></em></i>
+          <small>${escapeHtml(tool.note)}</small>
         </article>
       `).join("");
-      const row = (label, value, options = {}) => `
-        <div class="ip-check-row ${options.wide ? "is-wide" : ""}">
-          <div class="ip-check-label">
-            <span>${escapeHtml(label)}</span>
-            ${options.help ? `<small>${escapeHtml(options.help)}</small>` : ""}
+      const checkItems = (data.checks || []).map((item) => `
+        <article class="ip-check-test ${item.ok ? "is-ok" : "is-bad"}">
+          <span>${item.ok ? "✓" : "×"}</span>
+          <div>
+            <strong>${escapeHtml(item.title)}</strong>
+            <p>${escapeHtml(item.detail)}</p>
           </div>
-          <div class="ip-check-value">
-            ${value}
-            ${options.side ? `<aside>${options.side}</aside>` : ""}
-          </div>
+        </article>
+      `).join("");
+      const miniItems = (data.mini || []).filter((item) => item.value).map((item) => `
+        <div class="ip-mini-item">
+          <small>${escapeHtml(item.label)}</small>
+          <strong>${escapeHtml(item.value)}</strong>
         </div>
-      `;
+      `).join("");
       const badge = (text, tone = "") => `<span class="ip-badge ${tone}">${escapeHtml(text)}</span>`;
       result.classList.remove("is-loading", "is-error");
       result.classList.add("is-success", "api-result-ipcheck");
       result.innerHTML = `
         <div class="ip-check-head">
-          <strong>查询结果</strong>
-          <a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">复查</a>
+          <div>
+            <span>出口体检</span>
+            <strong>${escapeHtml(data.ip || "未知出口")}</strong>
+          </div>
+          <button class="ip-icon-button" type="button" data-copy-ip="${escapeHtml(data.ip || "")}" aria-label="复制 IP">⧉</button>
         </div>
-        <div class="ip-check-table">
-          ${row("IP 地址", `<strong class="ip-main">${escapeHtml(data.ip || "未知")}</strong><button class="ip-icon-button" type="button" data-copy-ip="${escapeHtml(data.ip || "")}" aria-label="复制 IP">⧉</button>`, { side: `<a href="https://ping0.cc/ping/${encodeURIComponent(data.ip || "")}" target="_blank" rel="noopener noreferrer">ping</a><a href="https://ping0.cc/trace/${encodeURIComponent(data.ip || "")}" target="_blank" rel="noopener noreferrer">trace</a>` })}
-          ${row("IP 位置", `${data.flag ? `<span class="ip-flag">${escapeHtml(data.flag)}</span>` : ""}<strong>${escapeHtml(data.location || "未知")}</strong>`, { side: `<a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">错误提交</a>` })}
-          ${row("ASN", data.asn ? `<a href="https://bgp.he.net/${encodeURIComponent(data.asn)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.asn)}</a>` : "<strong>未知</strong>")}
-          ${row("ASN 所有者", `${data.idc ? badge("IDC", "is-danger") : ""}<strong>${escapeHtml(data.org || "未知")}</strong>`)}
-          ${row("企业", `${data.idc ? badge("IDC", "is-danger") : ""}<strong>${escapeHtml(data.company || data.org || "未知")}</strong>`)}
-          ${row("经度", `<strong>${escapeHtml(data.longitude || "未知")}</strong>`)}
-          ${row("纬度", `<strong>${escapeHtml(data.latitude || "未知")}</strong>`)}
-          ${row("IP 类型", badge(data.ipType || "普通出口", data.idc ? "is-danger" : "is-good"), { help: "说明?", side: data.idc ? `<a href="https://ipcheck.ing/" target="_blank" rel="noopener noreferrer">为什么会显示 IDC?</a>` : "" })}
-          ${row("风控值", `<div class="ip-risk"><i style="--risk:${risk}%"></i><strong>${risk}% ${escapeHtml(data.level)}</strong></div>`, { help: "说明?" })}
-          ${row("原生 IP", badge(data.nativeLabel || "信息不足", data.native ? "is-good" : "is-warn"), { help: "说明?" })}
-          ${row("大模型检测", `<a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">点击检测</a>`, { help: "说明?" })}
-          ${row("IP 地址(数字)", `<strong data-ip-number>${numericIp ? "********" : "未知"}</strong>${numericIp ? `<button class="ip-icon-button" type="button" data-toggle-ip-number="${escapeHtml(numericIp)}" aria-label="显示或隐藏数字 IP">◉</button>` : ""}`)}
-          ${row("共享人数", badge(data.shareLabel || "信息不足", data.shareGood ? "is-good" : "is-warn"), { help: "说明?" })}
-          ${row("适用场景", `<div class="ip-scene-grid">${sceneCards}</div>`, { help: "说明?", wide: true })}
+        <div class="ip-hero-grid">
+          <section class="ip-verdict-card ${levelClass}">
+            <span>Codex / Gemini / Claude 可用性估计</span>
+            <strong>${data.aiPercent}%</strong>
+            <p>${escapeHtml(data.aiVerdict)}</p>
+          </section>
+          <section class="ip-focus-card">
+            <small>IP 位置</small>
+            <strong>${data.flag ? `<span class="ip-flag">${escapeHtml(data.flag)}</span>` : ""}${escapeHtml(data.location || "未知")}</strong>
+          </section>
+          <section class="ip-focus-card">
+            <small>IP 类型</small>
+            ${badge(data.ipType || "普通出口", data.idc ? "is-danger" : "is-good")}
+          </section>
+          <section class="ip-focus-card">
+            <small>风控程度</small>
+            <div class="ip-risk"><i style="--risk:${risk}%"></i><strong>${risk}% ${escapeHtml(data.level)}</strong></div>
+          </section>
+        </div>
+        <div class="ip-ai-grid">${aiCards}</div>
+        <div class="ip-check-tests">
+          <h4>测试项目</h4>
+          ${checkItems}
+        </div>
+        <div class="ip-mini-grid">
+          ${miniItems}
+          <div class="ip-mini-item">
+            <small>IP 地址(数字)</small>
+            <strong data-ip-number>${numericIp ? "********" : "未知"}</strong>
+            ${numericIp ? `<button class="ip-icon-button" type="button" data-toggle-ip-number="${escapeHtml(numericIp)}" aria-label="显示或隐藏数字 IP">◉</button>` : ""}
+          </div>
+        </div>
+        <div class="ip-review-links">
+          <a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">ping0 复查</a>
+          <a href="https://ipcheck.ing/" target="_blank" rel="noopener noreferrer">IPCheck 复查</a>
+          <a href="https://browserleaks.com/webrtc" target="_blank" rel="noopener noreferrer">WebRTC 泄露</a>
         </div>
         <p class="ip-check-note">${escapeHtml(payload.note || "")}</p>
       `;
@@ -1456,14 +1511,27 @@
         const ipTitle = geo?.ip || ipInfo?.ip || trace.ip || "当前出口";
         const orgName = geo?.organization_name || ipInfo?.org || "";
         const idcLike = /(amazon|aws|google|microsoft|azure|oracle|digitalocean|linode|akamai|cloudflare|ovh|hetzner|vultr|tencent|alibaba|huawei|colo|hosting|data center|datacenter|server|cloud)/i.test(orgName);
-        const locationText = compactJoin([geo?.country || ipInfo?.country, geo?.region || ipInfo?.region, geo?.city || ipInfo?.city], " ");
+        const locationText = zhLocation(geo?.country || ipInfo?.country, geo?.region || ipInfo?.region, geo?.city || ipInfo?.city);
         const native = !idcLike && posture.level === "较干净";
-        const sceneStars = posture.level === "高风险" ? 1 : posture.level === "需复查" ? 3 : 4;
-        const scenes = [
-          { name: "TikTok", stars: Math.max(1, sceneStars - (idcLike ? 1 : 0)), recommended: !idcLike && posture.level !== "高风险" },
-          { name: "跨境电商", stars: sceneStars, recommended: posture.level !== "高风险" },
-          { name: "社媒运营", stars: Math.max(1, sceneStars - 1), recommended: !idcLike && posture.level === "较干净" },
-          { name: "AI 应用", stars: posture.level === "高风险" ? 2 : 4, recommended: posture.level !== "高风险" },
+        const webRtcMismatch = Boolean(webRtc?.addresses?.length && geo?.ip && !webRtc.addresses.includes(geo.ip));
+        const aiPercent = aiUsabilityPercent({ level: posture.level, idc: idcLike, webRtcMismatch });
+        const aiVerdict = aiPercent >= 75
+          ? "公开信号较稳，适合尝试使用，但仍可能受服务商策略影响。"
+          : aiPercent >= 50
+            ? "有一定可用概率，建议登录前换节点或用外部站复查。"
+            : "可疑信号偏多，不建议作为主要出口。";
+        const aiTools = [
+          { name: "Codex", percent: aiPercent, note: aiPercent >= 70 ? "较适合" : aiPercent >= 45 ? "需复查" : "不稳" },
+          { name: "Gemini", percent: Math.max(5, Math.min(96, aiPercent - (idcLike ? 6 : 0))), note: idcLike ? "机房出口扣分" : "按公开信号估计" },
+          { name: "Claude", percent: Math.max(5, Math.min(96, aiPercent - (posture.level === "高风险" ? 8 : 2))), note: "对风控更敏感" },
+        ];
+        const checks = [
+          { title: "HTTP 出口", ok: Boolean(ipTitle && ipTitle !== "当前出口"), detail: `主观 IP：${ipTitle}` },
+          { title: "IP 位置", ok: Boolean(locationText), detail: locationText || "暂未取得中文位置" },
+          { title: "数据中心 IP", ok: !idcLike, detail: idcLike ? "组织名称像云厂商、机房或托管出口。" : "未从组织名称观察到明显机房特征。" },
+          { title: "Cloudflare 路径", ok: Boolean(trace.colo), detail: compactJoin([trace.colo ? `节点 ${trace.colo}` : "", trace.loc ? `位置 ${trace.loc}` : "", trace.warp ? `WARP ${trace.warp}` : ""], "，") || "未取得 Cloudflare Trace" },
+          { title: "WebRTC 检测", ok: !webRtcMismatch, detail: webRtc?.addresses?.length ? `观察到 ${webRtc.addresses.length} 个候选地址。` : (webRtc?.note || "未观察到可见候选地址。") },
+          { title: "风险线索", ok: posture.level === "较干净", detail: posture.signals.join("；") },
         ];
         const geoRows = [
           { label: "HTTP 出口", value: ipTitle },
@@ -1507,11 +1575,21 @@
             ipType: idcLike ? "IDC机房 IP" : "住宅/原生倾向",
             level: posture.level,
             signals: posture.signals,
+            aiPercent,
+            aiVerdict,
+            aiTools,
+            checks,
             native,
             nativeLabel: native ? "原生 IP" : idcLike ? "非原生倾向" : "需复查",
             shareLabel: posture.level === "高风险" ? "较高共享风险" : posture.level === "需复查" ? "信息不足" : "1 - 10 (较好)",
             shareGood: posture.level === "较干净",
-            scenes,
+            mini: [
+              { label: "HTTP/TLS", value: compactJoin([trace.http, trace.tls], " / ") },
+              { label: "Cloudflare", value: compactJoin([trace.colo, trace.loc], " · ") },
+              { label: "经纬度", value: compactJoin([geo?.latitude || ipInfo?.loc?.split(",")?.[0], geo?.longitude || ipInfo?.loc?.split(",")?.[1]], ", ") },
+              { label: "原生倾向", value: native ? "原生 IP" : idcLike ? "非原生倾向" : "需复查" },
+              { label: "共享人数", value: posture.level === "较干净" ? "1 - 10 (较好)" : posture.level === "需复查" ? "信息不足" : "较高共享风险" },
+            ],
           },
           title: `${ipTitle} · ${posture.level}`,
           meta: compactJoin(["GeoJS", "Cloudflare Trace", "IPinfo", "WebRTC"], " · "),
