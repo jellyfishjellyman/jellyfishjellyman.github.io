@@ -109,7 +109,14 @@
   url: https://github.com/fawazahmed0/cloudflare-trace-api
   auth: 免密
   cors: CORS 可用
-  description: 当前浏览器连接的 HTTP、TLS、CDN 节点和网络诊断信息。
+  description: 当前浏览器连接的 HTTP、TLS、CDN 节点、WARP 和边缘路径信息。
+- name: IPinfo
+  tool: network
+  category: Geocoding
+  url: https://ipinfo.io/
+  auth: 免密
+  cors: CORS 可用
+  description: 当前出口 IP 的位置与 ASN/组织补充信号。
 - name: Kickbox Open
   tool: emailcheck
   category: Email

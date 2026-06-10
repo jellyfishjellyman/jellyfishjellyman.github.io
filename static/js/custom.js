@@ -694,6 +694,87 @@
       .map((line) => line.split("="))
       .filter((parts) => parts.length >= 2)
       .map(([key, ...rest]) => [key, rest.join("=")]));
+    const fetchOptional = async (url) => {
+      try {
+        return await fetchJsonWithTimeout(url);
+      } catch (error) {
+        return { __error: error?.message || "请求失败" };
+      }
+    };
+    const summarizeError = (data) => data?.__error ? `不可用：${data.__error}` : "";
+    const uniq = (items) => [...new Set(items.filter(Boolean))];
+    const detectWebRtcAddresses = () => new Promise((resolve) => {
+      const PeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection;
+      if (!PeerConnection) {
+        resolve({ supported: false, addresses: [], note: "浏览器不支持 WebRTC 探测" });
+        return;
+      }
+      const addresses = new Set();
+      let pc = null;
+      const done = (note = "") => {
+        try { pc?.close(); } catch (_) {}
+        resolve({ supported: true, addresses: [...addresses], note });
+      };
+      const timer = window.setTimeout(() => done(addresses.size ? "" : "未观察到可见候选地址，可能被浏览器 mDNS 或策略隐藏"), 2600);
+      const collect = (candidate) => {
+        const text = String(candidate || "");
+        const matches = text.match(/(?:\d{1,3}\.){3}\d{1,3}|[a-f0-9:]{8,}/gi) || [];
+        matches
+          .filter((item) => !item.includes("::") && item !== "0.0.0.0")
+          .forEach((item) => addresses.add(item));
+      };
+      try {
+        pc = new PeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+        pc.createDataChannel("ip-check");
+        pc.onicecandidate = (event) => {
+          if (event.candidate) collect(event.candidate.candidate);
+          if (!event.candidate) {
+            window.clearTimeout(timer);
+            done();
+          }
+        };
+        pc.createOffer()
+          .then((offer) => pc.setLocalDescription(offer))
+          .catch(() => {
+            window.clearTimeout(timer);
+            done("WebRTC 探测被浏览器阻止");
+          });
+      } catch (_) {
+        window.clearTimeout(timer);
+        done("WebRTC 探测不可用");
+      }
+    });
+    const classifyIpPosture = ({ geo, trace, webRtc }) => {
+      const signals = [];
+      let score = 0;
+      const org = cleanText(geo?.organization_name || "");
+      const cloudHints = /(amazon|aws|google|microsoft|azure|oracle|digitalocean|linode|akamai|cloudflare|ovh|hetzner|vultr|tencent|alibaba|huawei|colo|hosting|data center|datacenter|server)/i;
+      if (cloudHints.test(org)) {
+        score += 2;
+        signals.push("组织名称像云厂商或机房出口");
+      }
+      if (trace?.warp && trace.warp !== "off") signals.push(`Cloudflare WARP：${trace.warp}`);
+      if (trace?.loc && geo?.country_code && trace.loc !== geo.country_code) {
+        score += 1;
+        signals.push("Cloudflare 位置与 GeoJS 国家码不一致");
+      }
+      const webRtcAddresses = webRtc?.addresses || [];
+      if (webRtcAddresses.length > 1) {
+        score += 1;
+        signals.push("WebRTC 暴露了多个候选地址");
+      }
+      if (webRtcAddresses.length && geo?.ip && !webRtcAddresses.includes(geo.ip)) {
+        signals.push("WebRTC 地址与 HTTP 出口不完全一致");
+      }
+      if (!signals.length) signals.push("未观察到明显异常信号");
+      const level = score >= 3 ? "高风险" : score >= 1 ? "需复查" : "较干净";
+      const summary = score >= 3
+        ? "这个出口有较多可疑信号，建议换节点后复查。"
+        : score >= 1
+          ? "这个出口不一定有问题，但存在需要人工复查的线索。"
+          : "公开信号较平稳，但不能保证任何服务一定可用。";
+      return { level, summary, signals };
+    };
     const weatherNames = {
       0: "晴朗",
       1: "大体晴朗",
@@ -1297,24 +1378,81 @@
         });
       },
       network: async () => {
-        const [geo, traceText] = await Promise.all([
-          fetchJsonWithTimeout("https://get.geojs.io/v1/ip/geo.json"),
-          fetchJsonWithTimeout("https://one.one.one.one/cdn-cgi/trace"),
+        const [geo, traceText, ipInfo, webRtc] = await Promise.all([
+          fetchOptional("https://get.geojs.io/v1/ip/geo.json"),
+          fetchOptional("https://one.one.one.one/cdn-cgi/trace"),
+          fetchOptional("https://ipinfo.io/json"),
+          detectWebRtcAddresses(),
         ]);
         const trace = typeof traceText === "string" ? parseTraceText(traceText) : {};
+        const posture = classifyIpPosture({ geo, trace, webRtc });
+        const ipTitle = geo?.ip || ipInfo?.ip || trace.ip || "当前出口";
+        const geoRows = [
+          { label: "HTTP 出口", value: ipTitle },
+          { label: "GeoJS 位置", value: compactJoin([geo?.city, geo?.region, geo?.country_code], " · ") },
+          { label: "GeoJS ASN", value: geo?.asn ? `AS${geo.asn}` : "" },
+          { label: "GeoJS 组织", value: geo?.organization_name },
+          { label: "IPinfo 位置", value: compactJoin([ipInfo?.city, ipInfo?.region, ipInfo?.country], " · ") },
+          { label: "IPinfo ASN/组织", value: ipInfo?.org },
+        ];
+        const traceRows = [
+          { label: "Cloudflare 节点", value: trace.colo },
+          { label: "Cloudflare 位置", value: trace.loc },
+          { label: "HTTP 协议", value: trace.http },
+          { label: "TLS", value: trace.tls },
+          { label: "访问方案", value: trace.visit_scheme },
+          { label: "WARP", value: trace.warp },
+        ];
+        const webRtcItems = webRtc?.addresses?.length
+          ? webRtc.addresses.map((address) => ({
+              label: "候选地址",
+              value: address,
+              meta: address === ipTitle ? "与 HTTP 出口一致" : "与 HTTP 出口不同或属于本地候选",
+            }))
+          : [{
+              label: webRtc?.supported ? "未暴露可见地址" : "不可用",
+              value: webRtc?.note || "未观察到 WebRTC 候选地址",
+              meta: "浏览器策略可能隐藏 mDNS/本地地址",
+            }];
         renderApiResult("network", {
-          title: geo?.ip || trace.ip || "当前网络",
-          meta: compactJoin(["GeoJS", "Cloudflare Trace"], " · "),
+          title: `${ipTitle} · ${posture.level}`,
+          meta: compactJoin(["GeoJS", "Cloudflare Trace", "IPinfo", "WebRTC"], " · "),
+          summary: posture.summary,
           rows: [
-            { label: "城市", value: compactJoin([geo?.city, geo?.region], " · ") },
-            { label: "国家/地区", value: compactJoin([geo?.country, geo?.country_code], " · ") },
-            { label: "ASN", value: geo?.asn ? `AS${geo.asn}` : "" },
-            { label: "组织", value: geo?.organization_name },
-            { label: "HTTP 协议", value: trace.http },
-            { label: "TLS", value: trace.tls },
+            { label: "出口判断", value: posture.level },
+            { label: "当前 IP", value: ipTitle },
+            { label: "主要位置", value: compactJoin([geo?.city || ipInfo?.city, geo?.region || ipInfo?.region, geo?.country_code || ipInfo?.country], " · ") },
+            { label: "主要 ASN/组织", value: compactJoin([geo?.asn ? `AS${geo.asn}` : "", geo?.organization_name || ipInfo?.org], " · ") },
           ],
-          chips: [trace.colo ? `Cloudflare ${trace.colo}` : "", trace.loc, trace.visit_scheme, trace.warp ? `WARP ${trace.warp}` : ""],
-          note: "这是浏览器当前出口网络信息，可能受代理、CDN 或运营商出口影响。",
+          chips: uniq([
+            trace.colo ? `CF ${trace.colo}` : "",
+            trace.loc ? `LOC ${trace.loc}` : "",
+            trace.http ? `HTTP ${trace.http}` : "",
+            trace.tls ? `TLS ${trace.tls}` : "",
+            trace.warp ? `WARP ${trace.warp}` : "",
+            webRtc?.addresses?.length ? `WebRTC ${webRtc.addresses.length}` : "WebRTC 隐藏",
+          ]),
+          sections: [
+            { title: "出口与归属", items: geoRows.map((row) => ({ label: row.label, value: row.value })) },
+            { title: "Cloudflare 路径", items: traceRows.map((row) => ({ label: row.label, value: row.value })) },
+            { title: "WebRTC 观察", items: webRtcItems },
+            { title: "风险线索", items: posture.signals.map((signal, index) => ({ label: `信号 ${index + 1}`, value: signal })) },
+            {
+              title: "深度复查入口",
+              items: [
+                { label: "综合检测", value: "ping0.cc", meta: "https://ping0.cc/" },
+                { label: "开源工具箱", value: "ipcheck.ing", meta: "https://ipcheck.ing/" },
+                { label: "隐私泄露", value: "BrowserLeaks WebRTC", meta: "https://browserleaks.com/webrtc" },
+              ],
+            },
+          ],
+          note: compactJoin([
+            "这里只根据浏览器可见的公开信号做提示，不代表任何服务一定可用或不可用。",
+            summarizeError(geo) ? `GeoJS ${summarizeError(geo)}` : "",
+            summarizeError(traceText) ? `Cloudflare Trace ${summarizeError(traceText)}` : "",
+            summarizeError(ipInfo) ? `IPinfo ${summarizeError(ipInfo)}` : "",
+            webRtc?.note || "",
+          ], " "),
         });
       },
       emailcheck: async (formData) => {
