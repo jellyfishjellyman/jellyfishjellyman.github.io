@@ -808,17 +808,7 @@
       if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return "";
       return String(((parts[0] * 256 ** 3) + (parts[1] * 256 ** 2) + (parts[2] * 256) + parts[3]) >>> 0);
     };
-    const ipRiskPercent = (level, signals = []) => {
-      if (level === "高风险") return Math.min(96, 76 + signals.length * 5);
-      if (level === "需复查") return Math.min(74, 42 + signals.length * 8);
-      return Math.max(8, 18 + Math.max(0, signals.length - 1) * 5);
-    };
-    const aiUsabilityPercent = ({ level, idc, webRtcMismatch }) => {
-      let score = level === "高风险" ? 36 : level === "需复查" ? 64 : 84;
-      if (idc) score -= 18;
-      if (webRtcMismatch) score -= 8;
-      return Math.max(8, Math.min(96, score));
-    };
+    const evidenceTone = (level) => level === "高风险" ? "is-danger" : level === "需复查" ? "is-warn" : "is-good";
     const zhPlaceName = (value) => {
       const map = {
         "Hong Kong": "中国香港",
@@ -844,15 +834,13 @@
       const result = resultFor(name);
       if (!result) return;
       const data = payload.ipcheck || {};
-      const risk = ipRiskPercent(data.level, data.signals);
-      const levelClass = data.level === "高风险" ? "is-danger" : data.level === "需复查" ? "is-warn" : "is-good";
+      const levelClass = evidenceTone(data.level);
       const numericIp = ipToNumber(data.ip);
-      const aiCards = (data.aiTools || []).map((tool) => `
-        <article class="ip-ai-card ${tool.percent >= 70 ? "is-good" : tool.percent >= 45 ? "is-warn" : "is-danger"}">
-          <span>${escapeHtml(tool.name)}</span>
-          <strong>${tool.percent}%</strong>
-          <i><em style="width:${tool.percent}%"></em></i>
-          <small>${escapeHtml(tool.note)}</small>
+      const evidenceCards = (data.evidence || []).map((item) => `
+        <article class="ip-ai-card ${evidenceTone(item.tone)}">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(item.value)}</strong>
+          <small>${escapeHtml(item.note)}</small>
         </article>
       `).join("");
       const checkItems = (data.checks || []).map((item) => `
@@ -883,9 +871,9 @@
         </div>
         <div class="ip-hero-grid">
           <section class="ip-verdict-card ${levelClass}">
-            <span>Codex / Gemini / Claude 可用性估计</span>
-            <strong>${data.aiPercent}%</strong>
-            <p>${escapeHtml(data.aiVerdict)}</p>
+            <span>AI 服务可用性提示</span>
+            <strong>${escapeHtml(data.aiVerdict)}</strong>
+            <p>${escapeHtml(data.aiNote)}</p>
           </section>
           <section class="ip-focus-card">
             <small>IP 位置</small>
@@ -896,11 +884,12 @@
             ${badge(data.ipType || "普通出口", data.idc ? "is-danger" : "is-good")}
           </section>
           <section class="ip-focus-card">
-            <small>风控程度</small>
-            <div class="ip-risk"><i style="--risk:${risk}%"></i><strong>${risk}% ${escapeHtml(data.level)}</strong></div>
+            <small>风险提示</small>
+            ${badge(data.level || "信息不足", levelClass)}
+            <p>${escapeHtml(data.riskNote || "")}</p>
           </section>
         </div>
-        <div class="ip-ai-grid">${aiCards}</div>
+        <div class="ip-ai-grid">${evidenceCards}</div>
         <div class="ip-check-tests">
           <h4>测试项目</h4>
           ${checkItems}
@@ -1514,24 +1503,25 @@
         const locationText = zhLocation(geo?.country || ipInfo?.country, geo?.region || ipInfo?.region, geo?.city || ipInfo?.city);
         const native = !idcLike && posture.level === "较干净";
         const webRtcMismatch = Boolean(webRtc?.addresses?.length && geo?.ip && !webRtc.addresses.includes(geo.ip));
-        const aiPercent = aiUsabilityPercent({ level: posture.level, idc: idcLike, webRtcMismatch });
-        const aiVerdict = aiPercent >= 75
-          ? "公开信号较稳，适合尝试使用，但仍可能受服务商策略影响。"
-          : aiPercent >= 50
-            ? "有一定可用概率，建议登录前换节点或用外部站复查。"
-            : "可疑信号偏多，不建议作为主要出口。";
-        const aiTools = [
-          { name: "Codex", percent: aiPercent, note: aiPercent >= 70 ? "较适合" : aiPercent >= 45 ? "需复查" : "不稳" },
-          { name: "Gemini", percent: Math.max(5, Math.min(96, aiPercent - (idcLike ? 6 : 0))), note: idcLike ? "机房出口扣分" : "按公开信号估计" },
-          { name: "Claude", percent: Math.max(5, Math.min(96, aiPercent - (posture.level === "高风险" ? 8 : 2))), note: "对风控更敏感" },
+        const evidenceLevel = idcLike || webRtcMismatch ? "需复查" : posture.level === "较干净" ? "信号较平稳" : posture.level;
+        const aiVerdict = idcLike || webRtcMismatch ? "建议复查" : posture.level === "较干净" ? "可尝试" : "信息不足";
+        const aiNote = "本站没有 Ping0 的 IP 段人工标注、风控库或大模型检测数据，因此不输出可用概率；这里只展示公开 API 能看到的证据。";
+        const riskNote = idcLike
+          ? "公开组织名像云厂商、机房或托管出口；这不是 Ping0 的 IP 段标注，置信度有限。"
+          : "未从公开组织名观察到明显机房特征；仍不能证明它一定是家庭宽带。";
+        const evidence = [
+          { label: "位置来源", value: compactJoin(["GeoJS", "IPinfo"], " + "), tone: "较干净", note: "第三方地理库，可能与 Ping0 不一致。" },
+          { label: "IP 类型依据", value: idcLike ? "组织名命中" : "未命中机房词", tone: idcLike ? "需复查" : "较干净", note: "只能判断所有者/组织线索，不能判断 IP 段实际用途。" },
+          { label: "风控依据", value: "无风控库", tone: "需复查", note: "没有扫描、爆破、垃圾邮件等大数据记录，不能给 Ping0 式风控值。" },
+          { label: "AI 服务", value: aiVerdict, tone: evidenceLevel, note: "Codex/Gemini/Claude 是否可用需实际登录或外部检测确认。" },
         ];
         const checks = [
           { title: "HTTP 出口", ok: Boolean(ipTitle && ipTitle !== "当前出口"), detail: `主观 IP：${ipTitle}` },
           { title: "IP 位置", ok: Boolean(locationText), detail: locationText || "暂未取得中文位置" },
-          { title: "数据中心 IP", ok: !idcLike, detail: idcLike ? "组织名称像云厂商、机房或托管出口。" : "未从组织名称观察到明显机房特征。" },
+          { title: "机房线索", ok: !idcLike, detail: idcLike ? "公开组织名称像云厂商、机房或托管出口；不是 IP 段实用场景标注。" : "未从公开组织名称观察到明显机房特征。" },
           { title: "Cloudflare 路径", ok: Boolean(trace.colo), detail: compactJoin([trace.colo ? `节点 ${trace.colo}` : "", trace.loc ? `位置 ${trace.loc}` : "", trace.warp ? `WARP ${trace.warp}` : ""], "，") || "未取得 Cloudflare Trace" },
           { title: "WebRTC 检测", ok: !webRtcMismatch, detail: webRtc?.addresses?.length ? `观察到 ${webRtc.addresses.length} 个候选地址。` : (webRtc?.note || "未观察到可见候选地址。") },
-          { title: "风险线索", ok: posture.level === "较干净", detail: posture.signals.join("；") },
+          { title: "风险线索", ok: posture.level === "较干净", detail: `${posture.signals.join("；")}。无 Ping0 风控值数据。` },
         ];
         const geoRows = [
           { label: "HTTP 出口", value: ipTitle },
@@ -1575,9 +1565,10 @@
             ipType: idcLike ? "IDC机房 IP" : "住宅/原生倾向",
             level: posture.level,
             signals: posture.signals,
-            aiPercent,
             aiVerdict,
-            aiTools,
+            aiNote,
+            riskNote,
+            evidence,
             checks,
             native,
             nativeLabel: native ? "原生 IP" : idcLike ? "非原生倾向" : "需复查",
