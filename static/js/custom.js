@@ -803,9 +803,76 @@
       result.classList.add(`is-${state}`);
       result.innerHTML = `<span>${escapeHtml(message)}</span><strong>${escapeHtml(title)}</strong>`;
     };
+    const ipToNumber = (ip) => {
+      const parts = String(ip || "").split(".").map(Number);
+      if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return "";
+      return String(((parts[0] * 256 ** 3) + (parts[1] * 256 ** 2) + (parts[2] * 256) + parts[3]) >>> 0);
+    };
+    const ipRiskPercent = (level, signals = []) => {
+      if (level === "高风险") return Math.min(96, 76 + signals.length * 5);
+      if (level === "需复查") return Math.min(74, 42 + signals.length * 8);
+      return Math.max(8, 18 + Math.max(0, signals.length - 1) * 5);
+    };
+    const renderIpCheckResult = (name, payload) => {
+      const result = resultFor(name);
+      if (!result) return;
+      const data = payload.ipcheck || {};
+      const risk = ipRiskPercent(data.level, data.signals);
+      const levelClass = data.level === "高风险" ? "is-danger" : data.level === "需复查" ? "is-warn" : "is-good";
+      const numericIp = ipToNumber(data.ip);
+      const sceneCards = (data.scenes || []).map((scene) => `
+        <article class="ip-scene-card ${scene.recommended ? "is-recommended" : "is-muted"}">
+          <strong>${escapeHtml(scene.name)}</strong>
+          <div aria-label="${escapeHtml(scene.stars)} 星">${"★".repeat(scene.stars)}${"☆".repeat(5 - scene.stars)}</div>
+          <span>${scene.recommended ? "✓ 可尝试" : "× 不推荐"}</span>
+        </article>
+      `).join("");
+      const row = (label, value, options = {}) => `
+        <div class="ip-check-row ${options.wide ? "is-wide" : ""}">
+          <div class="ip-check-label">
+            <span>${escapeHtml(label)}</span>
+            ${options.help ? `<small>${escapeHtml(options.help)}</small>` : ""}
+          </div>
+          <div class="ip-check-value">
+            ${value}
+            ${options.side ? `<aside>${options.side}</aside>` : ""}
+          </div>
+        </div>
+      `;
+      const badge = (text, tone = "") => `<span class="ip-badge ${tone}">${escapeHtml(text)}</span>`;
+      result.classList.remove("is-loading", "is-error");
+      result.classList.add("is-success", "api-result-ipcheck");
+      result.innerHTML = `
+        <div class="ip-check-head">
+          <strong>查询结果</strong>
+          <a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">复查</a>
+        </div>
+        <div class="ip-check-table">
+          ${row("IP 地址", `<strong class="ip-main">${escapeHtml(data.ip || "未知")}</strong><button class="ip-icon-button" type="button" data-copy-ip="${escapeHtml(data.ip || "")}" aria-label="复制 IP">⧉</button>`, { side: `<a href="https://ping0.cc/ping/${encodeURIComponent(data.ip || "")}" target="_blank" rel="noopener noreferrer">ping</a><a href="https://ping0.cc/trace/${encodeURIComponent(data.ip || "")}" target="_blank" rel="noopener noreferrer">trace</a>` })}
+          ${row("IP 位置", `${data.flag ? `<span class="ip-flag">${escapeHtml(data.flag)}</span>` : ""}<strong>${escapeHtml(data.location || "未知")}</strong>`, { side: `<a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">错误提交</a>` })}
+          ${row("ASN", data.asn ? `<a href="https://bgp.he.net/${encodeURIComponent(data.asn)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.asn)}</a>` : "<strong>未知</strong>")}
+          ${row("ASN 所有者", `${data.idc ? badge("IDC", "is-danger") : ""}<strong>${escapeHtml(data.org || "未知")}</strong>`)}
+          ${row("企业", `${data.idc ? badge("IDC", "is-danger") : ""}<strong>${escapeHtml(data.company || data.org || "未知")}</strong>`)}
+          ${row("经度", `<strong>${escapeHtml(data.longitude || "未知")}</strong>`)}
+          ${row("纬度", `<strong>${escapeHtml(data.latitude || "未知")}</strong>`)}
+          ${row("IP 类型", badge(data.ipType || "普通出口", data.idc ? "is-danger" : "is-good"), { help: "说明?", side: data.idc ? `<a href="https://ipcheck.ing/" target="_blank" rel="noopener noreferrer">为什么会显示 IDC?</a>` : "" })}
+          ${row("风控值", `<div class="ip-risk"><i style="--risk:${risk}%"></i><strong>${risk}% ${escapeHtml(data.level)}</strong></div>`, { help: "说明?" })}
+          ${row("原生 IP", badge(data.nativeLabel || "信息不足", data.native ? "is-good" : "is-warn"), { help: "说明?" })}
+          ${row("大模型检测", `<a href="https://ping0.cc/" target="_blank" rel="noopener noreferrer">点击检测</a>`, { help: "说明?" })}
+          ${row("IP 地址(数字)", `<strong data-ip-number>${numericIp ? "********" : "未知"}</strong>${numericIp ? `<button class="ip-icon-button" type="button" data-toggle-ip-number="${escapeHtml(numericIp)}" aria-label="显示或隐藏数字 IP">◉</button>` : ""}`)}
+          ${row("共享人数", badge(data.shareLabel || "信息不足", data.shareGood ? "is-good" : "is-warn"), { help: "说明?" })}
+          ${row("适用场景", `<div class="ip-scene-grid">${sceneCards}</div>`, { help: "说明?", wide: true })}
+        </div>
+        <p class="ip-check-note">${escapeHtml(payload.note || "")}</p>
+      `;
+    };
     const renderApiResult = (name, payload) => {
       const result = resultFor(name);
       if (!result) return;
+      if (payload.variant === "ipcheck") {
+        renderIpCheckResult(name, payload);
+        return;
+      }
       const rows = (payload.rows || [])
         .filter((row) => row && row.value != null && row.value !== "")
         .map((row) => `
@@ -1387,6 +1454,17 @@
         const trace = typeof traceText === "string" ? parseTraceText(traceText) : {};
         const posture = classifyIpPosture({ geo, trace, webRtc });
         const ipTitle = geo?.ip || ipInfo?.ip || trace.ip || "当前出口";
+        const orgName = geo?.organization_name || ipInfo?.org || "";
+        const idcLike = /(amazon|aws|google|microsoft|azure|oracle|digitalocean|linode|akamai|cloudflare|ovh|hetzner|vultr|tencent|alibaba|huawei|colo|hosting|data center|datacenter|server|cloud)/i.test(orgName);
+        const locationText = compactJoin([geo?.country || ipInfo?.country, geo?.region || ipInfo?.region, geo?.city || ipInfo?.city], " ");
+        const native = !idcLike && posture.level === "较干净";
+        const sceneStars = posture.level === "高风险" ? 1 : posture.level === "需复查" ? 3 : 4;
+        const scenes = [
+          { name: "TikTok", stars: Math.max(1, sceneStars - (idcLike ? 1 : 0)), recommended: !idcLike && posture.level !== "高风险" },
+          { name: "跨境电商", stars: sceneStars, recommended: posture.level !== "高风险" },
+          { name: "社媒运营", stars: Math.max(1, sceneStars - 1), recommended: !idcLike && posture.level === "较干净" },
+          { name: "AI 应用", stars: posture.level === "高风险" ? 2 : 4, recommended: posture.level !== "高风险" },
+        ];
         const geoRows = [
           { label: "HTTP 出口", value: ipTitle },
           { label: "GeoJS 位置", value: compactJoin([geo?.city, geo?.region, geo?.country_code], " · ") },
@@ -1415,6 +1493,26 @@
               meta: "浏览器策略可能隐藏 mDNS/本地地址",
             }];
         renderApiResult("network", {
+          variant: "ipcheck",
+          ipcheck: {
+            ip: ipTitle,
+            flag: trace.loc || geo?.country_code || ipInfo?.country || "",
+            location: locationText,
+            asn: geo?.asn ? `AS${geo.asn}` : (ipInfo?.org || "").match(/AS\d+/)?.[0] || "",
+            org: orgName,
+            company: orgName,
+            longitude: geo?.longitude || ipInfo?.loc?.split(",")?.[1] || "",
+            latitude: geo?.latitude || ipInfo?.loc?.split(",")?.[0] || "",
+            idc: idcLike,
+            ipType: idcLike ? "IDC机房 IP" : "住宅/原生倾向",
+            level: posture.level,
+            signals: posture.signals,
+            native,
+            nativeLabel: native ? "原生 IP" : idcLike ? "非原生倾向" : "需复查",
+            shareLabel: posture.level === "高风险" ? "较高共享风险" : posture.level === "需复查" ? "信息不足" : "1 - 10 (较好)",
+            shareGood: posture.level === "较干净",
+            scenes,
+          },
           title: `${ipTitle} · ${posture.level}`,
           meta: compactJoin(["GeoJS", "Cloudflare Trace", "IPinfo", "WebRTC"], " · "),
           summary: posture.summary,
@@ -2027,6 +2125,27 @@
           .finally(() => {
             translateButton.disabled = false;
           });
+        return;
+      }
+      const copyIpButton = event.target.closest("[data-copy-ip]");
+      if (copyIpButton) {
+        const ip = copyIpButton.dataset.copyIp || "";
+        if (ip && navigator.clipboard) {
+          navigator.clipboard.writeText(ip).then(() => {
+            copyIpButton.textContent = "✓";
+            window.setTimeout(() => { copyIpButton.textContent = "⧉"; }, 900);
+          }).catch(() => {});
+        }
+        return;
+      }
+      const toggleIpNumber = event.target.closest("[data-toggle-ip-number]");
+      if (toggleIpNumber) {
+        const target = toggleIpNumber.parentElement?.querySelector("[data-ip-number]");
+        const value = toggleIpNumber.dataset.toggleIpNumber || "";
+        if (!target || !value) return;
+        const hidden = target.textContent === "********";
+        target.textContent = hidden ? value : "********";
+        toggleIpNumber.textContent = hidden ? "◌" : "◉";
         return;
       }
       const choice = event.target.closest("[data-trivia-choice]");
