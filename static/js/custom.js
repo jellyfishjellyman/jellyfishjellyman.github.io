@@ -209,15 +209,17 @@
     dock.dataset.sakanaDock = "true";
     dock.setAttribute("aria-label", "互动小挂件");
     dock.innerHTML = `
-      <div class="sakana-dock-toolbar">
-        <button class="sakana-dock-button" type="button" data-sakana-toggle aria-expanded="true" aria-label="隐藏互动小挂件">−</button>
-        <button class="sakana-dock-button" type="button" data-sakana-remove aria-label="删除互动小挂件">×</button>
-      </div>
       <div class="sakana-dock-stage" data-sakana-stage></div>
+      <div class="sakana-dock-toolbar">
+        <button class="sakana-dock-button" type="button" data-sakana-character aria-label="切换形象" title="切换形象">⇄</button>
+        <button class="sakana-dock-button" type="button" data-sakana-toggle aria-expanded="true" aria-label="隐藏互动小挂件" title="隐藏">−</button>
+        <button class="sakana-dock-button" type="button" data-sakana-remove aria-label="删除互动小挂件" title="删除">×</button>
+      </div>
     `;
     document.body.appendChild(dock);
 
     const stage = dock.querySelector("[data-sakana-stage]");
+    const character = dock.querySelector("[data-sakana-character]");
     const toggle = dock.querySelector("[data-sakana-toggle]");
     const remove = dock.querySelector("[data-sakana-remove]");
     const widget = new window.SakanaWidget({
@@ -229,6 +231,10 @@
     });
 
     widget.mount(stage);
+
+    character?.addEventListener("click", () => {
+      widget.nextCharacter();
+    });
 
     toggle?.addEventListener("click", () => {
       const isHidden = dock.classList.toggle("is-hidden");
