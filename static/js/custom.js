@@ -254,6 +254,158 @@
     initSakanaWidget();
   }
 
+  const initHomeLive2d = () => {
+    const isHome = location.pathname === "/" || location.pathname === "/index.html";
+    if (!isHome || reduceMotion || document.querySelector("[data-live2d-home]")) return;
+
+    const panel = document.createElement("aside");
+    panel.id = "landlord";
+    panel.className = "home-live2d";
+    panel.dataset.live2dHome = "true";
+    panel.setAttribute("aria-label", "首页看板娘");
+    panel.innerHTML = `
+      <div class="message" data-live2d-message style="opacity:0"></div>
+      <canvas id="live2d" class="live2d" width="280" height="250" aria-hidden="true"></canvas>
+      <div class="home-live2d-actions">
+        <button class="home-live2d-button" type="button" data-live2d-costume aria-label="变装" title="变装">换</button>
+        <button class="home-live2d-button" type="button" data-live2d-hide aria-label="隐藏看板娘" title="隐藏">×</button>
+      </div>
+    `;
+    document.body.appendChild(panel);
+
+    const message = panel.querySelector("[data-live2d-message]");
+    const costumeButton = panel.querySelector("[data-live2d-costume]");
+    const hideButton = panel.querySelector("[data-live2d-hide]");
+    const models = [
+      { name: "默认服装", path: "/live2d/model/tia/model.json" },
+      { name: "薄荷服装", path: "/live2d/model/tia/model-mint.json" },
+      { name: "玫瑰服装", path: "/live2d/model/tia/model-rose.json" }
+    ];
+    let modelIndex = 0;
+    let messageTimer = 0;
+    let hitokotoTimer = 0;
+
+    const renderTip = (template, context = {}) => String(template || "").replace(/(\\)?\{([^{}\\]+)(\\)?\}/g, (word, slash1, token, slash2) => {
+      if (slash1 || slash2) return word.replace("\\", "");
+      return token.replace(/\s/g, "").split(".").reduce((value, key) => value?.[key], context) ?? "";
+    });
+
+    const pickText = (text) => Array.isArray(text) ? text[Math.floor(Math.random() * text.length)] : text;
+
+    const showLive2dMessage = (text, timeout = 5000) => {
+      if (!message) return;
+      window.clearTimeout(messageTimer);
+      message.innerHTML = pickText(text);
+      message.style.opacity = "1";
+      messageTimer = window.setTimeout(() => {
+        message.style.opacity = "0";
+      }, timeout);
+    };
+
+    const bindTips = (tips, eventName) => {
+      tips.forEach((tip) => {
+        document.querySelectorAll(tip.selector).forEach((target) => {
+          target.addEventListener(eventName, () => {
+            const text = renderTip(pickText(tip.text), { text: cleanText(target.textContent) });
+            showLive2dMessage(text, 3000);
+          });
+        });
+      });
+    };
+
+    const initMessages = async () => {
+      try {
+        const response = await fetch("/live2d/message.json", { cache: "no-store" });
+        const data = response.ok ? await response.json() : null;
+        bindTips(Array.isArray(data?.mouseover) ? data.mouseover : [], "mouseover");
+        bindTips(Array.isArray(data?.click) ? data.click : [], "click");
+      } catch (_) {
+        return;
+      }
+    };
+
+    const showGreeting = () => {
+      let text = "";
+      if (document.referrer) {
+        try {
+          const referrer = new URL(document.referrer);
+          text = `嗨！来自 <span style="color:#0099cc;">${referrer.hostname}</span> 的朋友！`;
+        } catch (_) {
+          text = "嗨~ 快来逗我玩吧！";
+        }
+      } else {
+        const hour = new Date().getHours();
+        if (hour <= 5) text = "你是夜猫子呀？这么晚还不睡觉，明天起得来嘛？";
+        else if (hour <= 7) text = "早上好！一日之计在于晨，美好的一天就要开始了！";
+        else if (hour <= 11) text = "上午好！不要久坐，多起来走动走动哦！";
+        else if (hour <= 14) text = "中午了，先好好吃饭，再继续折腾有趣的事。";
+        else if (hour <= 17) text = "午后很容易犯困呢，今天也要保持精神呀。";
+        else if (hour <= 19) text = "傍晚了！窗外夕阳的景色应该很漂亮。";
+        else if (hour <= 21) text = "晚上好，今天过得怎么样？";
+        else text = "已经这么晚了呀，早点休息吧，晚安~~";
+      }
+      showLive2dMessage(text, 12000);
+    };
+
+    const loadModel = (index) => {
+      modelIndex = (index + models.length) % models.length;
+      if (typeof window.loadlive2d === "function") {
+        window.loadlive2d("live2d", models[modelIndex].path);
+      }
+    };
+
+    const loadScript = (src) => new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        if (typeof window.loadlive2d === "function") resolve();
+        else existing.addEventListener("load", resolve, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = src;
+      script.defer = true;
+      script.addEventListener("load", resolve, { once: true });
+      script.addEventListener("error", reject, { once: true });
+      document.head.appendChild(script);
+    });
+
+    loadScript("/live2d/js/live2d.js")
+      .then(() => {
+        loadModel(modelIndex);
+        initMessages();
+        showGreeting();
+        hitokotoTimer = window.setInterval(async () => {
+          try {
+            const response = await fetch("https://v1.hitokoto.cn/", { cache: "no-store" });
+            const data = await response.json();
+            if (data?.hitokoto) showLive2dMessage(data.hitokoto, 5000);
+          } catch (_) {
+            return;
+          }
+        }, 30000);
+      })
+      .catch(() => {
+        panel.remove();
+      });
+
+    costumeButton?.addEventListener("click", () => {
+      loadModel(modelIndex + 1);
+      showLive2dMessage(`已切换为${models[modelIndex].name}。`, 3000);
+    });
+
+    hideButton?.addEventListener("click", () => {
+      window.clearInterval(hitokotoTimer);
+      panel.remove();
+    });
+
+    window.addEventListener("pagehide", () => {
+      window.clearInterval(hitokotoTimer);
+      window.clearTimeout(messageTimer);
+    }, { once: true });
+  };
+
+  initHomeLive2d();
+
   document.querySelectorAll(".post-content pre").forEach((block) => {
     const button = document.createElement("button");
     button.className = "copy-code-button";
