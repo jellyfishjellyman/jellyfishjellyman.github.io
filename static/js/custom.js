@@ -201,6 +201,53 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
 
+  const initSakanaWidget = () => {
+    if (!window.SakanaWidget || document.querySelector("[data-sakana-dock]")) return;
+
+    const dock = document.createElement("aside");
+    dock.className = "sakana-dock";
+    dock.dataset.sakanaDock = "true";
+    dock.setAttribute("aria-label", "互动小挂件");
+    dock.innerHTML = `
+      <div class="sakana-dock-toolbar">
+        <button class="sakana-dock-button" type="button" data-sakana-toggle aria-expanded="true" aria-label="隐藏互动小挂件">−</button>
+        <button class="sakana-dock-button" type="button" data-sakana-remove aria-label="删除互动小挂件">×</button>
+      </div>
+      <div class="sakana-dock-stage" data-sakana-stage></div>
+    `;
+    document.body.appendChild(dock);
+
+    const stage = dock.querySelector("[data-sakana-stage]");
+    const toggle = dock.querySelector("[data-sakana-toggle]");
+    const remove = dock.querySelector("[data-sakana-remove]");
+    const widget = new window.SakanaWidget({
+      character: "chisato",
+      controls: false,
+      size: Math.min(230, Math.max(170, Math.round(window.innerWidth * 0.18))),
+      rod: true,
+      draggable: true
+    });
+
+    widget.mount(stage);
+
+    toggle?.addEventListener("click", () => {
+      const isHidden = dock.classList.toggle("is-hidden");
+      toggle.textContent = isHidden ? "+" : "−";
+      toggle.setAttribute("aria-expanded", String(!isHidden));
+      toggle.setAttribute("aria-label", isHidden ? "显示互动小挂件" : "隐藏互动小挂件");
+    });
+
+    remove?.addEventListener("click", () => {
+      dock.remove();
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSakanaWidget, { once: true });
+  } else {
+    initSakanaWidget();
+  }
+
   document.querySelectorAll(".post-content pre").forEach((block) => {
     const button = document.createElement("button");
     button.className = "copy-code-button";
