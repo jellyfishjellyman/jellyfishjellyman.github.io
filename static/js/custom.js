@@ -267,21 +267,18 @@
       <div class="message" data-live2d-message style="opacity:0"></div>
       <canvas id="live2d" class="live2d" width="280" height="250" aria-hidden="true"></canvas>
       <div class="home-live2d-actions">
-        <button class="home-live2d-button" type="button" data-live2d-costume aria-label="变装" title="变装">换</button>
+        <button class="home-live2d-button" type="button" data-live2d-search aria-label="搜索" title="搜索">搜</button>
+        <button class="home-live2d-button" type="button" data-live2d-quote aria-label="随机一言" title="随机一言">言</button>
         <button class="home-live2d-button" type="button" data-live2d-hide aria-label="隐藏看板娘" title="隐藏">×</button>
       </div>
     `;
     document.body.appendChild(panel);
 
     const message = panel.querySelector("[data-live2d-message]");
-    const costumeButton = panel.querySelector("[data-live2d-costume]");
+    const searchButton = panel.querySelector("[data-live2d-search]");
+    const quoteButton = panel.querySelector("[data-live2d-quote]");
     const hideButton = panel.querySelector("[data-live2d-hide]");
-    const models = [
-      { name: "默认服装", path: "/live2d/model/tia/model.json" },
-      { name: "薄荷服装", path: "/live2d/model/tia/model-mint.json" },
-      { name: "玫瑰服装", path: "/live2d/model/tia/model-rose.json" }
-    ];
-    let modelIndex = 0;
+    const modelPath = "/live2d/model/tia/model.json";
     let messageTimer = 0;
     let hitokotoTimer = 0;
 
@@ -347,10 +344,20 @@
       showLive2dMessage(text, 12000);
     };
 
-    const loadModel = (index) => {
-      modelIndex = (index + models.length) % models.length;
+    const loadModel = () => {
       if (typeof window.loadlive2d === "function") {
-        window.loadlive2d("live2d", models[modelIndex].path);
+        window.loadlive2d("live2d", modelPath);
+      }
+    };
+
+    const requestHitokoto = async () => {
+      try {
+        const response = await fetch("https://v1.hitokoto.cn/", { cache: "no-store" });
+        const data = await response.json();
+        if (data?.hitokoto) showLive2dMessage(data.hitokoto, 5000);
+        else showLive2dMessage("今天也要保持一点好奇心。", 5000);
+      } catch (_) {
+        showLive2dMessage("风有点大，一言暂时没有送到。", 5000);
       }
     };
 
@@ -371,26 +378,28 @@
 
     loadScript("/live2d/js/live2d.js")
       .then(() => {
-        loadModel(modelIndex);
+        loadModel();
         initMessages();
         showGreeting();
-        hitokotoTimer = window.setInterval(async () => {
-          try {
-            const response = await fetch("https://v1.hitokoto.cn/", { cache: "no-store" });
-            const data = await response.json();
-            if (data?.hitokoto) showLive2dMessage(data.hitokoto, 5000);
-          } catch (_) {
-            return;
-          }
-        }, 30000);
+        hitokotoTimer = window.setInterval(requestHitokoto, 30000);
       })
       .catch(() => {
         panel.remove();
       });
 
-    costumeButton?.addEventListener("click", () => {
-      loadModel(modelIndex + 1);
-      showLive2dMessage(`已切换为${models[modelIndex].name}。`, 3000);
+    searchButton?.addEventListener("click", () => {
+      const input = document.querySelector("[data-search-input]");
+      if (input) {
+        input.focus({ preventScroll: true });
+        input.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        showLive2dMessage("想找什么？我把搜索框叫出来啦。", 4000);
+        return;
+      }
+      window.location.href = "/search/";
+    });
+
+    quoteButton?.addEventListener("click", () => {
+      requestHitokoto();
     });
 
     hideButton?.addEventListener("click", () => {

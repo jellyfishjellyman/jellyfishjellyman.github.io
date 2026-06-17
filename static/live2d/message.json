@@ -13,8 +13,20 @@
       "text": ["在找什么东西呢，需要帮忙吗？"]
     },
     {
-      "selector": ".post-card h2 a, .home-portal a, .board-note",
+      "selector": ".post-card h2 a, .home-portal a",
       "text": ["要看看「{text}」么？"]
+    },
+    {
+      "selector": ".primary-button, .ghost-button",
+      "text": ["这个按钮会带你去「{text}」。"]
+    },
+    {
+      "selector": ".random-quote, [data-quote-next]",
+      "text": ["想换一句话？我也喜欢这种小小的随机。"]
+    },
+    {
+      "selector": ".home-stats-panel",
+      "text": ["数字在这里排排坐，记录这个小站的脚印。"]
     }
   ],
   "click": [

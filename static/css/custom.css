@@ -336,13 +336,14 @@ body.theme-switch-to-night::before {
 
 .home-live2d-actions {
   position: absolute;
-  right: 42px;
-  bottom: 0;
+  right: -2px;
+  bottom: 64px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 4px 6px;
+  gap: 5px;
+  padding: 5px 4px;
   border: 1px solid color-mix(in srgb, var(--panel-border) 84%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
