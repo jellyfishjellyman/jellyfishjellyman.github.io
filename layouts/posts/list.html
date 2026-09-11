@@ -2,6 +2,7 @@
 <section class="module-page posts-page">
   {{ $pages := .Pages.ByDate.Reverse }}
   {{ $groups := slice
+    (dict "name" "技术笔记" "desc" "从原理、工程实现到评估方法，认真拆解值得反复查阅的技术主题。")
     (dict "name" "随感" "desc" "生活、记忆和忽然冒出来的想法。")
     (dict "name" "网上文案" "desc" "在网上看到、觉得有意思的文字。")
     (dict "name" "其他" "desc" "暂时放不进前两类的内容。")
@@ -52,8 +53,13 @@
               </div>
 
               <div class="post-summary">
-                {{ .Summary | plainify | truncate 900 }}
+                {{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 900 }}{{ end }}
               </div>
+              {{ with .Params.tags }}
+                <div class="post-card-tags" aria-label="文章标签">
+                  {{ range first 3 . }}<span>#{{ . }}</span>{{ end }}
+                </div>
+              {{ end }}
             </article>
           {{ end }}
         </div>

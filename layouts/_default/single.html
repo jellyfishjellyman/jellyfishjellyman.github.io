@@ -4,11 +4,18 @@
     <header class="post-single-header">
       {{ partial "ambient-video.html" (dict "base" "post-loop" "class" "ambient-bg-video post-hero-video" "preload" "none" "lazy" true) }}
       <span class="post-category">{{ .Params.category | default "其他" }}</span>
-      <p class="post-epigraph" lang="it">Nel mezzo del cammin di nostra vita.</p>
       <h1>{{ .Title }}</h1>
+      {{ with .Description }}
+        <p class="post-lede">{{ . }}</p>
+      {{ end }}
       <div class="post-meta">
         {{ .Date.Format "2006-01-02" }}{{ with .ReadingTime }} · {{ . }} 分钟阅读{{ end }}
       </div>
+      {{ with .Params.tags }}
+        <div class="post-tags" aria-label="文章标签">
+          {{ range . }}<span>#{{ . }}</span>{{ end }}
+        </div>
+      {{ end }}
     </header>
   {{ end }}
 
